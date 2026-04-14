@@ -21,6 +21,14 @@ You will receive the following from Fermata during onboarding:
 | `password` | Your SDK password |
 | `pipeline_id` | ID of your pipeline schedule (configured in Fermata Cloud) |
 
+You can also discover available pipeline schedules programmatically:
+
+```python
+with FermataSync(url="http://localhost:3000", username="...", password="...") as fermata:
+    for s in fermata.pipelines.list_schedules():
+        print(f"{s['id']}  scope={s['scope']}  scopeId={s['scopeId']}")
+```
+
 ## Quick Start
 
 ### Pipeline mode (recommended)
@@ -310,6 +318,8 @@ This is useful when you need to:
 | `fermata.photos.create(photo_id, *, greenhouse_id, captured_at, position)` | `Photo` | Register photo metadata |
 | `fermata.inference.submit(photo_id, model_name)` | `str` | Submit photo for inference, returns task_id |
 | `fermata.inference.get(task_id)` | `InferenceTask` | Get task status and details |
+| `fermata.pipelines.list_schedules()` | `list[dict]` | List available pipeline schedules |
+| `fermata.pipelines.get_schedule(schedule_id)` | `dict` | Get a pipeline schedule by ID |
 
 ### `UploadLink` fields
 
