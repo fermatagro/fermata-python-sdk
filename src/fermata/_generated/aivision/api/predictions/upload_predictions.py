@@ -1,20 +1,31 @@
 from http import HTTPStatus
 from typing import Any, cast
+from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.models_upload_predictions_request import ModelsUploadPredictionsRequest
-from ...types import Response
+from ...models.models_upload_predictions_response import ModelsUploadPredictionsResponse
+from typing import cast
+
 
 
 def _get_kwargs(
     *,
     body: ModelsUploadPredictionsRequest,
+
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
+
+
+    
+
+    
 
     _kwargs: dict[str, Any] = {
         "method": "post",
@@ -23,41 +34,54 @@ def _get_kwargs(
 
     _kwargs["json"] = body.to_dict()
 
+
     headers["Content-Type"] = "application/json"
 
     _kwargs["headers"] = headers
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | CommonErrorsApiError | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ModelsUploadPredictionsResponse | None:
     if response.status_code == 201:
-        response_201 = cast(Any, None)
+        response_201 = ModelsUploadPredictionsResponse.from_dict(response.json())
+
+
+
         return response_201
 
     if response.status_code == 400:
         response_400 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_400
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_403
 
     if response.status_code == 404:
         response_404 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_404
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -67,9 +91,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | CommonErrorsApiError]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -82,8 +104,9 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-) -> Response[Any | CommonErrorsApiError]:
-    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+
+) -> Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]:
+    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -94,11 +117,13 @@ def sync_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | CommonErrorsApiError]
-    """
+        Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]
+     """
+
 
     kwargs = _get_kwargs(
         body=body,
+
     )
 
     response = client.get_httpx_client().request(
@@ -107,13 +132,13 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-) -> Any | CommonErrorsApiError | None:
-    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+
+) -> CommonErrorsApiError | ModelsUploadPredictionsResponse | None:
+    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -124,21 +149,23 @@ def sync(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | CommonErrorsApiError
-    """
+        CommonErrorsApiError | ModelsUploadPredictionsResponse
+     """
+
 
     return sync_detailed(
         client=client,
-        body=body,
-    ).parsed
+body=body,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-) -> Response[Any | CommonErrorsApiError]:
-    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+
+) -> Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]:
+    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -149,24 +176,28 @@ async def asyncio_detailed(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Response[Any | CommonErrorsApiError]
-    """
+        Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]
+     """
+
 
     kwargs = _get_kwargs(
         body=body,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-) -> Any | CommonErrorsApiError | None:
-    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+
+) -> CommonErrorsApiError | ModelsUploadPredictionsResponse | None:
+    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -177,12 +208,12 @@ async def asyncio(
         httpx.TimeoutException: If the request takes longer than Client.timeout.
 
     Returns:
-        Any | CommonErrorsApiError
-    """
+        CommonErrorsApiError | ModelsUploadPredictionsResponse
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            body=body,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+body=body,
+
+    )).parsed

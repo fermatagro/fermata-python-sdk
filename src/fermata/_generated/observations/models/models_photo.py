@@ -1,53 +1,60 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar, cast
-from uuid import UUID
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-from dateutil.parser import isoparse
+
+from ..types import UNSET, Unset
 
 from ..models.devices_models_device_type import DevicesModelsDeviceType
 from ..models.models_photo_source import ModelsPhotoSource
 from ..types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
 
 if TYPE_CHECKING:
-    from ..models.common_types_grid_pos import CommonTypesGridPos
-    from ..models.models_photo_metadata import ModelsPhotoMetadata
+  from ..models.common_types_grid_pos import CommonTypesGridPos
+  from ..models.models_photo_metadata import ModelsPhotoMetadata
+
+
+
 
 
 T = TypeVar("T", bound="ModelsPhoto")
 
 
+
 @_attrs_define
 class ModelsPhoto:
-    """A photograph captured in the greenhouse
+    """ A photograph captured in the greenhouse
 
-    Attributes:
-        id (UUID): UUID identifier
-        user_id (str): User identifier (opaque string)
-        greenhouse_id (UUID): UUID identifier
-        culture_id (str):
-        growing_cycle_id (UUID): UUID identifier
-        captured_at (datetime.datetime):
-        source (ModelsPhotoSource): Source of the photo capture
-        pos (CommonTypesGridPos): Position in 3D grid space within the greenhouse
-        ptz (list[float]): Camera pan/tilt/zoom settings. Array of 3 elements: [pan (radians, -π to π), tilt (radians, 0
-            to π/2), zoom (level)]
-        created_at (datetime.datetime):
-        media_url (str | Unset): Permanent URL to download the media (Authorization required)
-        cdn_url (str | Unset): URL to download the media from CDN (CDN cookie required)
-        thumbnail_url (str | Unset): URL to download the thumbnail media
-        organization_id (str | Unset): Organization identifier (opaque string)
-        s_3_key (str | Unset): S3 key for the photo. Auto-generated if not provided. Use for migrating existing photos.
-        device_id (UUID | Unset): UUID identifier
-        device_type (DevicesModelsDeviceType | Unset): Device type
-        zone_object_id (UUID | Unset): UUID identifier
-        pipeline_id (UUID | Unset): UUID identifier
-        metadata (ModelsPhotoMetadata | Unset): Additional metadata (resolution, format, etc.)
-    """
+        Attributes:
+            id (UUID): UUID identifier
+            user_id (str): User identifier (opaque string)
+            greenhouse_id (UUID): UUID identifier
+            culture_id (str):
+            growing_cycle_id (UUID): UUID identifier
+            captured_at (datetime.datetime):
+            source (ModelsPhotoSource): Source of the photo capture
+            pos (CommonTypesGridPos): Position in 3D grid space within the greenhouse
+            ptz (list[float]): Camera pan/tilt/zoom settings. Array of 3 elements: [pan (radians, -π to π), tilt (radians, 0
+                to π/2), zoom (level)]
+            created_at (datetime.datetime):
+            media_url (str | Unset): Permanent URL to download the media (Authorization required)
+            cdn_url (str | Unset): URL to download the media from CDN (CDN cookie required)
+            thumbnail_url (str | Unset): URL to download the thumbnail media
+            organization_id (str | Unset): Organization identifier (opaque string)
+            s_3_key (str | Unset): S3 key for the photo. Auto-generated if not provided. Use for migrating existing photos.
+            device_id (UUID | Unset): UUID identifier
+            device_type (DevicesModelsDeviceType | Unset): Device type
+            zone_object_id (UUID | Unset): UUID identifier
+            pipeline_id (UUID | Unset): UUID identifier
+            metadata (ModelsPhotoMetadata | Unset): Additional metadata (resolution, format, etc.)
+     """
 
     id: UUID
     user_id: str
@@ -71,7 +78,13 @@ class ModelsPhoto:
     metadata: ModelsPhotoMetadata | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
+        from ..models.common_types_grid_pos import CommonTypesGridPos
+        from ..models.models_photo_metadata import ModelsPhotoMetadata
         id = str(self.id)
 
         user_id = self.user_id
@@ -89,6 +102,8 @@ class ModelsPhoto:
         pos = self.pos.to_dict()
 
         ptz = self.ptz
+
+
 
         created_at = self.created_at.isoformat()
 
@@ -110,6 +125,7 @@ class ModelsPhoto:
         if not isinstance(self.device_type, Unset):
             device_type = self.device_type.value
 
+
         zone_object_id: str | Unset = UNSET
         if not isinstance(self.zone_object_id, Unset):
             zone_object_id = str(self.zone_object_id)
@@ -122,22 +138,21 @@ class ModelsPhoto:
         if not isinstance(self.metadata, Unset):
             metadata = self.metadata.to_dict()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "id": id,
-                "userId": user_id,
-                "greenhouseId": greenhouse_id,
-                "cultureId": culture_id,
-                "growingCycleId": growing_cycle_id,
-                "capturedAt": captured_at,
-                "source": source,
-                "pos": pos,
-                "ptz": ptz,
-                "createdAt": created_at,
-            }
-        )
+        field_dict.update({
+            "id": id,
+            "userId": user_id,
+            "greenhouseId": greenhouse_id,
+            "cultureId": culture_id,
+            "growingCycleId": growing_cycle_id,
+            "capturedAt": captured_at,
+            "source": source,
+            "pos": pos,
+            "ptz": ptz,
+            "createdAt": created_at,
+        })
         if media_url is not UNSET:
             field_dict["mediaUrl"] = media_url
         if cdn_url is not UNSET:
@@ -161,31 +176,54 @@ class ModelsPhoto:
 
         return field_dict
 
+
+
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.common_types_grid_pos import CommonTypesGridPos
         from ..models.models_photo_metadata import ModelsPhotoMetadata
-
         d = dict(src_dict)
         id = UUID(d.pop("id"))
+
+
+
 
         user_id = d.pop("userId")
 
         greenhouse_id = UUID(d.pop("greenhouseId"))
 
+
+
+
         culture_id = d.pop("cultureId")
 
         growing_cycle_id = UUID(d.pop("growingCycleId"))
 
+
+
+
         captured_at = isoparse(d.pop("capturedAt"))
+
+
+
 
         source = ModelsPhotoSource(d.pop("source"))
 
+
+
+
         pos = CommonTypesGridPos.from_dict(d.pop("pos"))
+
+
+
 
         ptz = cast(list[float], d.pop("ptz"))
 
+
         created_at = isoparse(d.pop("createdAt"))
+
+
+
 
         media_url = d.pop("mediaUrl", UNSET)
 
@@ -199,38 +237,53 @@ class ModelsPhoto:
 
         _device_id = d.pop("deviceId", UNSET)
         device_id: UUID | Unset
-        if isinstance(_device_id, Unset):
+        if isinstance(_device_id,  Unset):
             device_id = UNSET
         else:
             device_id = UUID(_device_id)
 
+
+
+
         _device_type = d.pop("deviceType", UNSET)
         device_type: DevicesModelsDeviceType | Unset
-        if isinstance(_device_type, Unset):
+        if isinstance(_device_type,  Unset):
             device_type = UNSET
         else:
             device_type = DevicesModelsDeviceType(_device_type)
 
+
+
+
         _zone_object_id = d.pop("zoneObjectId", UNSET)
         zone_object_id: UUID | Unset
-        if isinstance(_zone_object_id, Unset):
+        if isinstance(_zone_object_id,  Unset):
             zone_object_id = UNSET
         else:
             zone_object_id = UUID(_zone_object_id)
 
+
+
+
         _pipeline_id = d.pop("pipelineId", UNSET)
         pipeline_id: UUID | Unset
-        if isinstance(_pipeline_id, Unset):
+        if isinstance(_pipeline_id,  Unset):
             pipeline_id = UNSET
         else:
             pipeline_id = UUID(_pipeline_id)
 
+
+
+
         _metadata = d.pop("metadata", UNSET)
         metadata: ModelsPhotoMetadata | Unset
-        if isinstance(_metadata, Unset):
+        if isinstance(_metadata,  Unset):
             metadata = UNSET
         else:
             metadata = ModelsPhotoMetadata.from_dict(_metadata)
+
+
+
 
         models_photo = cls(
             id=id,
@@ -254,6 +307,7 @@ class ModelsPhoto:
             pipeline_id=pipeline_id,
             metadata=metadata,
         )
+
 
         models_photo.additional_properties = d
         return models_photo

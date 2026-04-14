@@ -1,15 +1,21 @@
-import datetime
 from http import HTTPStatus
-from typing import Any
-from uuid import UUID
+from typing import Any, cast
+from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.models_prediction_count import ModelsPredictionCount
-from ...types import UNSET, Response, Unset
+from ...types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
+
 
 
 def _get_kwargs(
@@ -29,7 +35,12 @@ def _get_kwargs(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> dict[str, Any]:
+    
+
+    
+
     params: dict[str, Any] = {}
 
     json_cycle_id = str(cycle_id)
@@ -38,6 +49,7 @@ def _get_kwargs(
     json_classes: list[str] | Unset = UNSET
     if not isinstance(classes, Unset):
         json_classes = classes
+
 
     params["classes"] = json_classes
 
@@ -81,7 +93,9 @@ def _get_kwargs(
 
     params["ymax"] = ymax
 
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -89,29 +103,37 @@ def _get_kwargs(
         "params": params,
     }
 
+
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CommonErrorsApiError | ModelsPredictionCount | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ModelsPredictionCount | None:
     if response.status_code == 200:
         response_200 = ModelsPredictionCount.from_dict(response.json())
+
+
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -121,9 +143,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CommonErrorsApiError | ModelsPredictionCount]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ModelsPredictionCount]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -150,8 +170,9 @@ def sync_detailed(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> Response[CommonErrorsApiError | ModelsPredictionCount]:
-    """Count predictions matching filters
+    """  Count predictions matching filters
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -176,24 +197,26 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsPredictionCount]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         cycle_id=cycle_id,
-        classes=classes,
-        photo_id=photo_id,
-        pipeline_id=pipeline_id,
-        include_hidden=include_hidden,
-        include_empty=include_empty,
-        ignore_threshold=ignore_threshold,
-        captured_from=captured_from,
-        captured_to=captured_to,
-        from_=from_,
-        to=to,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
+classes=classes,
+photo_id=photo_id,
+pipeline_id=pipeline_id,
+include_hidden=include_hidden,
+include_empty=include_empty,
+ignore_threshold=ignore_threshold,
+captured_from=captured_from,
+captured_to=captured_to,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+
     )
 
     response = client.get_httpx_client().request(
@@ -201,7 +224,6 @@ def sync_detailed(
     )
 
     return _build_response(client=client, response=response)
-
 
 def sync(
     *,
@@ -221,8 +243,9 @@ def sync(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> CommonErrorsApiError | ModelsPredictionCount | None:
-    """Count predictions matching filters
+    """  Count predictions matching filters
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -247,27 +270,28 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ModelsPredictionCount
-    """
+     """
+
 
     return sync_detailed(
         client=client,
-        cycle_id=cycle_id,
-        classes=classes,
-        photo_id=photo_id,
-        pipeline_id=pipeline_id,
-        include_hidden=include_hidden,
-        include_empty=include_empty,
-        ignore_threshold=ignore_threshold,
-        captured_from=captured_from,
-        captured_to=captured_to,
-        from_=from_,
-        to=to,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
-    ).parsed
+cycle_id=cycle_id,
+classes=classes,
+photo_id=photo_id,
+pipeline_id=pipeline_id,
+include_hidden=include_hidden,
+include_empty=include_empty,
+ignore_threshold=ignore_threshold,
+captured_from=captured_from,
+captured_to=captured_to,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
@@ -287,8 +311,9 @@ async def asyncio_detailed(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> Response[CommonErrorsApiError | ModelsPredictionCount]:
-    """Count predictions matching filters
+    """  Count predictions matching filters
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -313,30 +338,33 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsPredictionCount]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         cycle_id=cycle_id,
-        classes=classes,
-        photo_id=photo_id,
-        pipeline_id=pipeline_id,
-        include_hidden=include_hidden,
-        include_empty=include_empty,
-        ignore_threshold=ignore_threshold,
-        captured_from=captured_from,
-        captured_to=captured_to,
-        from_=from_,
-        to=to,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
+classes=classes,
+photo_id=photo_id,
+pipeline_id=pipeline_id,
+include_hidden=include_hidden,
+include_empty=include_empty,
+ignore_threshold=ignore_threshold,
+captured_from=captured_from,
+captured_to=captured_to,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
@@ -356,8 +384,9 @@ async def asyncio(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> CommonErrorsApiError | ModelsPredictionCount | None:
-    """Count predictions matching filters
+    """  Count predictions matching filters
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -382,25 +411,25 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ModelsPredictionCount
-    """
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            cycle_id=cycle_id,
-            classes=classes,
-            photo_id=photo_id,
-            pipeline_id=pipeline_id,
-            include_hidden=include_hidden,
-            include_empty=include_empty,
-            ignore_threshold=ignore_threshold,
-            captured_from=captured_from,
-            captured_to=captured_to,
-            from_=from_,
-            to=to,
-            xmin=xmin,
-            ymin=ymin,
-            xmax=xmax,
-            ymax=ymax,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+cycle_id=cycle_id,
+classes=classes,
+photo_id=photo_id,
+pipeline_id=pipeline_id,
+include_hidden=include_hidden,
+include_empty=include_empty,
+ignore_threshold=ignore_threshold,
+captured_from=captured_from,
+captured_to=captured_to,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+
+    )).parsed

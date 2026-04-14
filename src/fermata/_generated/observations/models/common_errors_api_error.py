@@ -1,42 +1,56 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
+
+
+
+
+
+
 T = TypeVar("T", bound="CommonErrorsApiError")
+
 
 
 @_attrs_define
 class CommonErrorsApiError:
-    """All error responses share these common fields
+    """ All error responses share these common fields
 
-    Attributes:
-        request_id (str): Unique identifier for the request, useful for debugging
-        message (str): Human-readable message describing the error
-    """
+        Attributes:
+            request_id (str): Unique identifier for the request, useful for debugging
+            message (str): Human-readable message describing the error
+     """
 
     request_id: str
     message: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         request_id = self.request_id
 
         message = self.message
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "request_id": request_id,
-                "message": message,
-            }
-        )
+        field_dict.update({
+            "request_id": request_id,
+            "message": message,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -49,6 +63,7 @@ class CommonErrorsApiError:
             request_id=request_id,
             message=message,
         )
+
 
         common_errors_api_error.additional_properties = d
         return common_errors_api_error

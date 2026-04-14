@@ -1,15 +1,20 @@
 from http import HTTPStatus
-from typing import Any
+from typing import Any, cast
+from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.list_presets_response_200 import ListPresetsResponse200
 from ...models.models_preset_level import ModelsPresetLevel
 from ...models.models_preset_type import ModelsPresetType
-from ...types import UNSET, Response, Unset
+from ...types import UNSET, Unset
+from typing import cast
+
 
 
 def _get_kwargs(
@@ -20,7 +25,12 @@ def _get_kwargs(
     selected: bool | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> dict[str, Any]:
+    
+
+    
+
     params: dict[str, Any] = {}
 
     json_level: str | Unset = UNSET
@@ -43,7 +53,9 @@ def _get_kwargs(
 
     params["limit"] = limit
 
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -51,29 +63,37 @@ def _get_kwargs(
         "params": params,
     }
 
+
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CommonErrorsApiError | ListPresetsResponse200 | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ListPresetsResponse200 | None:
     if response.status_code == 200:
         response_200 = ListPresetsResponse200.from_dict(response.json())
+
+
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -83,9 +103,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CommonErrorsApiError | ListPresetsResponse200]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ListPresetsResponse200]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -103,8 +121,9 @@ def sync_detailed(
     selected: bool | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> Response[CommonErrorsApiError | ListPresetsResponse200]:
-    """List threshold presets visible to the caller (own org + system)
+    """  List threshold presets visible to the caller (own org + system)
 
     Args:
         level (ModelsPresetLevel | Unset): Hierarchy level of a threshold preset
@@ -120,15 +139,17 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListPresetsResponse200]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         level=level,
-        model_name=model_name,
-        preset_type=preset_type,
-        selected=selected,
-        cursor=cursor,
-        limit=limit,
+model_name=model_name,
+preset_type=preset_type,
+selected=selected,
+cursor=cursor,
+limit=limit,
+
     )
 
     response = client.get_httpx_client().request(
@@ -136,7 +157,6 @@ def sync_detailed(
     )
 
     return _build_response(client=client, response=response)
-
 
 def sync(
     *,
@@ -147,8 +167,9 @@ def sync(
     selected: bool | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> CommonErrorsApiError | ListPresetsResponse200 | None:
-    """List threshold presets visible to the caller (own org + system)
+    """  List threshold presets visible to the caller (own org + system)
 
     Args:
         level (ModelsPresetLevel | Unset): Hierarchy level of a threshold preset
@@ -164,18 +185,19 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ListPresetsResponse200
-    """
+     """
+
 
     return sync_detailed(
         client=client,
-        level=level,
-        model_name=model_name,
-        preset_type=preset_type,
-        selected=selected,
-        cursor=cursor,
-        limit=limit,
-    ).parsed
+level=level,
+model_name=model_name,
+preset_type=preset_type,
+selected=selected,
+cursor=cursor,
+limit=limit,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
@@ -186,8 +208,9 @@ async def asyncio_detailed(
     selected: bool | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> Response[CommonErrorsApiError | ListPresetsResponse200]:
-    """List threshold presets visible to the caller (own org + system)
+    """  List threshold presets visible to the caller (own org + system)
 
     Args:
         level (ModelsPresetLevel | Unset): Hierarchy level of a threshold preset
@@ -203,21 +226,24 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListPresetsResponse200]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         level=level,
-        model_name=model_name,
-        preset_type=preset_type,
-        selected=selected,
-        cursor=cursor,
-        limit=limit,
+model_name=model_name,
+preset_type=preset_type,
+selected=selected,
+cursor=cursor,
+limit=limit,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
@@ -228,8 +254,9 @@ async def asyncio(
     selected: bool | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> CommonErrorsApiError | ListPresetsResponse200 | None:
-    """List threshold presets visible to the caller (own org + system)
+    """  List threshold presets visible to the caller (own org + system)
 
     Args:
         level (ModelsPresetLevel | Unset): Hierarchy level of a threshold preset
@@ -245,16 +272,16 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ListPresetsResponse200
-    """
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            level=level,
-            model_name=model_name,
-            preset_type=preset_type,
-            selected=selected,
-            cursor=cursor,
-            limit=limit,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+level=level,
+model_name=model_name,
+preset_type=preset_type,
+selected=selected,
+cursor=cursor,
+limit=limit,
+
+    )).parsed

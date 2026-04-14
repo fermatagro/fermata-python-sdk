@@ -1,31 +1,44 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
-from uuid import UUID
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
+from uuid import UUID
+
+
+
+
+
+
 T = TypeVar("T", bound="ModelsGetRawCaptureUploadLinkRequest")
+
 
 
 @_attrs_define
 class ModelsGetRawCaptureUploadLinkRequest:
-    """Request for single upload link for raw panorama input image
+    """ Request for single upload link for raw panorama input image
 
-    Attributes:
-        fire_id (UUID): UUID identifier
-        device_id (UUID): UUID identifier
-        level (int): Tilt level (0-7)
-        index (int): Pan index within level (0 to 16-level*2-1)
-    """
+        Attributes:
+            fire_id (UUID): UUID identifier
+            device_id (UUID): UUID identifier
+            level (int): Tilt level (0-7)
+            index (int): Pan index within level (0 to 16-level*2-1)
+     """
 
     fire_id: UUID
     device_id: UUID
     level: int
     index: int
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         fire_id = str(self.fire_id)
@@ -36,25 +49,32 @@ class ModelsGetRawCaptureUploadLinkRequest:
 
         index = self.index
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "fireId": fire_id,
-                "deviceId": device_id,
-                "level": level,
-                "index": index,
-            }
-        )
+        field_dict.update({
+            "fireId": fire_id,
+            "deviceId": device_id,
+            "level": level,
+            "index": index,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         fire_id = UUID(d.pop("fireId"))
 
+
+
+
         device_id = UUID(d.pop("deviceId"))
+
+
+
 
         level = d.pop("level")
 
@@ -66,6 +86,7 @@ class ModelsGetRawCaptureUploadLinkRequest:
             level=level,
             index=index,
         )
+
 
         models_get_raw_capture_upload_link_request.additional_properties = d
         return models_get_raw_capture_upload_link_request

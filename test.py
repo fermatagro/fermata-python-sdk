@@ -33,9 +33,12 @@ async def main() -> None:
 		except Exception as e:
 			print(f"models.list(): {e}")
 
-		# try:
-		# except:
-		# 	print("oops")
+		try:
+			schedules = await fermata.pipelines.list_schedules()
+			for sched in schedules:
+				print(f"Schedule {sched.template_id!r} schedules: {sched.scope}, {sched.scope_id}")
+		except Exception as e:
+			print(f"pipelines.list(): {e}")
 
 if __name__ == "__main__":
 	asyncio.run(main())

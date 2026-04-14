@@ -1,5 +1,5 @@
-"""A client library for accessing Demetra Catalog API"""
 
+""" A client library for accessing Demetra Catalog API """
 from .client import AuthenticatedClient, Client
 
 __all__ = (

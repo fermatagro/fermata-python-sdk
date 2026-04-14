@@ -1,29 +1,41 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..types import UNSET, Unset
+
+
+
+
+
+
 T = TypeVar("T", bound="ModelsMediaURLs")
+
 
 
 @_attrs_define
 class ModelsMediaURLs:
-    """
-    Attributes:
-        media_url (str | Unset): Permanent URL to download the media (Authorization required)
-        cdn_url (str | Unset): URL to download the media from CDN (CDN cookie required)
-        thumbnail_url (str | Unset): URL to download the thumbnail media
-    """
+    """ 
+        Attributes:
+            media_url (str | Unset): Permanent URL to download the media (Authorization required)
+            cdn_url (str | Unset): URL to download the media from CDN (CDN cookie required)
+            thumbnail_url (str | Unset): URL to download the thumbnail media
+     """
 
     media_url: str | Unset = UNSET
     cdn_url: str | Unset = UNSET
     thumbnail_url: str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         media_url = self.media_url
@@ -32,9 +44,11 @@ class ModelsMediaURLs:
 
         thumbnail_url = self.thumbnail_url
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({})
+        field_dict.update({
+        })
         if media_url is not UNSET:
             field_dict["mediaUrl"] = media_url
         if cdn_url is not UNSET:
@@ -43,6 +57,8 @@ class ModelsMediaURLs:
             field_dict["thumbnailUrl"] = thumbnail_url
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -58,6 +74,7 @@ class ModelsMediaURLs:
             cdn_url=cdn_url,
             thumbnail_url=thumbnail_url,
         )
+
 
         models_media_ur_ls.additional_properties = d
         return models_media_ur_ls

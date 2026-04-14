@@ -1,35 +1,48 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..types import UNSET, Unset
+from typing import cast
+
 if TYPE_CHECKING:
-    from ..models.common_errors_api_error import CommonErrorsApiError
-    from ..models.models_photo import ModelsPhoto
+  from ..models.common_errors_api_error import CommonErrorsApiError
+  from ..models.models_photo import ModelsPhoto
+
+
+
 
 
 T = TypeVar("T", bound="ModelsPhotoBatchItemsItem")
 
 
+
 @_attrs_define
 class ModelsPhotoBatchItemsItem:
-    """Result or error wrapper for API responses
+    """ Result or error wrapper for API responses
 
-    Attributes:
-        value (ModelsPhoto | Unset): A photograph captured in the greenhouse
-        error (CommonErrorsApiError | Unset): All error responses share these common fields
-    """
+        Attributes:
+            value (ModelsPhoto | Unset): A photograph captured in the greenhouse
+            error (CommonErrorsApiError | Unset): All error responses share these common fields
+     """
 
     value: ModelsPhoto | Unset = UNSET
     error: CommonErrorsApiError | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
+        from ..models.common_errors_api_error import CommonErrorsApiError
+        from ..models.models_photo import ModelsPhoto
         value: dict[str, Any] | Unset = UNSET
         if not isinstance(self.value, Unset):
             value = self.value.to_dict()
@@ -38,9 +51,11 @@ class ModelsPhotoBatchItemsItem:
         if not isinstance(self.error, Unset):
             error = self.error.to_dict()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({})
+        field_dict.update({
+        })
         if value is not UNSET:
             field_dict["value"] = value
         if error is not UNSET:
@@ -48,30 +63,38 @@ class ModelsPhotoBatchItemsItem:
 
         return field_dict
 
+
+
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.common_errors_api_error import CommonErrorsApiError
         from ..models.models_photo import ModelsPhoto
-
         d = dict(src_dict)
         _value = d.pop("value", UNSET)
         value: ModelsPhoto | Unset
-        if isinstance(_value, Unset):
+        if isinstance(_value,  Unset):
             value = UNSET
         else:
             value = ModelsPhoto.from_dict(_value)
 
+
+
+
         _error = d.pop("error", UNSET)
         error: CommonErrorsApiError | Unset
-        if isinstance(_error, Unset):
+        if isinstance(_error,  Unset):
             error = UNSET
         else:
             error = CommonErrorsApiError.from_dict(_error)
+
+
+
 
         models_photo_batch_items_item = cls(
             value=value,
             error=error,
         )
+
 
         models_photo_batch_items_item.additional_properties = d
         return models_photo_batch_items_item

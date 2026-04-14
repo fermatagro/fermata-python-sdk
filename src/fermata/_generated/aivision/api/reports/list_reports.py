@@ -1,15 +1,20 @@
 from http import HTTPStatus
-from typing import Any
-from uuid import UUID
+from typing import Any, cast
+from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.list_reports_response_200 import ListReportsResponse200
 from ...models.models_report_kind import ModelsReportKind
-from ...types import UNSET, Response, Unset
+from ...types import UNSET, Unset
+from typing import cast
+from uuid import UUID
+
 
 
 def _get_kwargs(
@@ -18,7 +23,12 @@ def _get_kwargs(
     kind: ModelsReportKind | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> dict[str, Any]:
+    
+
+    
+
     params: dict[str, Any] = {}
 
     json_greenhouse_id: str | Unset = UNSET
@@ -36,7 +46,9 @@ def _get_kwargs(
 
     params["limit"] = limit
 
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -44,29 +56,37 @@ def _get_kwargs(
         "params": params,
     }
 
+
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CommonErrorsApiError | ListReportsResponse200 | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ListReportsResponse200 | None:
     if response.status_code == 200:
         response_200 = ListReportsResponse200.from_dict(response.json())
+
+
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -76,9 +96,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CommonErrorsApiError | ListReportsResponse200]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ListReportsResponse200]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -94,8 +112,9 @@ def sync_detailed(
     kind: ModelsReportKind | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> Response[CommonErrorsApiError | ListReportsResponse200]:
-    """List reports
+    """  List reports
 
     Args:
         greenhouse_id (UUID | Unset): UUID identifier
@@ -109,13 +128,15 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListReportsResponse200]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         greenhouse_id=greenhouse_id,
-        kind=kind,
-        cursor=cursor,
-        limit=limit,
+kind=kind,
+cursor=cursor,
+limit=limit,
+
     )
 
     response = client.get_httpx_client().request(
@@ -124,7 +145,6 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     *,
     client: AuthenticatedClient,
@@ -132,8 +152,9 @@ def sync(
     kind: ModelsReportKind | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> CommonErrorsApiError | ListReportsResponse200 | None:
-    """List reports
+    """  List reports
 
     Args:
         greenhouse_id (UUID | Unset): UUID identifier
@@ -147,16 +168,17 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ListReportsResponse200
-    """
+     """
+
 
     return sync_detailed(
         client=client,
-        greenhouse_id=greenhouse_id,
-        kind=kind,
-        cursor=cursor,
-        limit=limit,
-    ).parsed
+greenhouse_id=greenhouse_id,
+kind=kind,
+cursor=cursor,
+limit=limit,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
@@ -165,8 +187,9 @@ async def asyncio_detailed(
     kind: ModelsReportKind | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> Response[CommonErrorsApiError | ListReportsResponse200]:
-    """List reports
+    """  List reports
 
     Args:
         greenhouse_id (UUID | Unset): UUID identifier
@@ -180,19 +203,22 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListReportsResponse200]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         greenhouse_id=greenhouse_id,
-        kind=kind,
-        cursor=cursor,
-        limit=limit,
+kind=kind,
+cursor=cursor,
+limit=limit,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
@@ -201,8 +227,9 @@ async def asyncio(
     kind: ModelsReportKind | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
+
 ) -> CommonErrorsApiError | ListReportsResponse200 | None:
-    """List reports
+    """  List reports
 
     Args:
         greenhouse_id (UUID | Unset): UUID identifier
@@ -216,14 +243,14 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ListReportsResponse200
-    """
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            greenhouse_id=greenhouse_id,
-            kind=kind,
-            cursor=cursor,
-            limit=limit,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+greenhouse_id=greenhouse_id,
+kind=kind,
+cursor=cursor,
+limit=limit,
+
+    )).parsed

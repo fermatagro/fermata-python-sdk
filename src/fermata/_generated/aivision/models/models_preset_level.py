@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ModelsPresetLevel(str, Enum):
     GC = "gc"
     MODEL = "model"

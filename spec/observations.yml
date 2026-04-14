@@ -351,6 +351,8 @@ paths:
         - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymin'
         - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmax'
         - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymax'
+        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmin'
+        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmax'
         - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
         - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
       responses:
@@ -483,6 +485,8 @@ paths:
         - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymin'
         - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmax'
         - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymax'
+        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmin'
+        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmax'
       responses:
         '200':
           description: The request has succeeded.
@@ -873,6 +877,22 @@ components:
       explode: false
     Common.Types.GridRectQuery.ymin:
       name: ymin
+      in: query
+      required: false
+      schema:
+        type: number
+        format: double
+      explode: false
+    Common.Types.HRangeQuery.hmax:
+      name: hmax
+      in: query
+      required: false
+      schema:
+        type: number
+        format: double
+      explode: false
+    Common.Types.HRangeQuery.hmin:
+      name: hmin
       in: query
       required: false
       schema:

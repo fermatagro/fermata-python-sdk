@@ -1,42 +1,49 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
-from uuid import UUID
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-from dateutil.parser import isoparse
+
+from ..types import UNSET, Unset
 
 from ..models.models_preset_level import ModelsPresetLevel
 from ..models.models_preset_type import ModelsPresetType
 from ..types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
 
 if TYPE_CHECKING:
-    from ..models.models_threshold_preset_values import ModelsThresholdPresetValues
+  from ..models.models_threshold_preset_values import ModelsThresholdPresetValues
+
+
+
 
 
 T = TypeVar("T", bound="ModelsThresholdPreset")
 
 
+
 @_attrs_define
 class ModelsThresholdPreset:
-    """A threshold preset with per-class confidence thresholds for a model
+    """ A threshold preset with per-class confidence thresholds for a model
 
-    Attributes:
-        id (UUID): UUID identifier
-        level (ModelsPresetLevel): Hierarchy level of a threshold preset
-        external_id (str): Scoping key: model_name for model-level, org_id for organization, gc_id for gc
-        model_name (str):
-        preset_type (ModelsPresetType): Preset category
-        selected (bool):
-        name (str):
-        values (ModelsThresholdPresetValues): Map of class name to confidence threshold (0..1)
-        created_at (datetime.datetime):
-        owner_organization_id (str | Unset): Owner organization ID. Null for model-level (system) presets.
-        updated_at (datetime.datetime | Unset):
-    """
+        Attributes:
+            id (UUID): UUID identifier
+            level (ModelsPresetLevel): Hierarchy level of a threshold preset
+            external_id (str): Scoping key: model_name for model-level, org_id for organization, gc_id for gc
+            model_name (str):
+            preset_type (ModelsPresetType): Preset category
+            selected (bool):
+            name (str):
+            values (ModelsThresholdPresetValues): Map of class name to confidence threshold (0..1)
+            created_at (datetime.datetime):
+            owner_organization_id (str | Unset): Owner organization ID. Null for model-level (system) presets.
+            updated_at (datetime.datetime | Unset):
+     """
 
     id: UUID
     level: ModelsPresetLevel
@@ -51,7 +58,12 @@ class ModelsThresholdPreset:
     updated_at: datetime.datetime | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
+        from ..models.models_threshold_preset_values import ModelsThresholdPresetValues
         id = str(self.id)
 
         level = self.level.value
@@ -76,21 +88,20 @@ class ModelsThresholdPreset:
         if not isinstance(self.updated_at, Unset):
             updated_at = self.updated_at.isoformat()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "id": id,
-                "level": level,
-                "externalId": external_id,
-                "modelName": model_name,
-                "presetType": preset_type,
-                "selected": selected,
-                "name": name,
-                "values": values,
-                "createdAt": created_at,
-            }
-        )
+        field_dict.update({
+            "id": id,
+            "level": level,
+            "externalId": external_id,
+            "modelName": model_name,
+            "presetType": preset_type,
+            "selected": selected,
+            "name": name,
+            "values": values,
+            "createdAt": created_at,
+        })
         if owner_organization_id is not UNSET:
             field_dict["ownerOrganizationId"] = owner_organization_id
         if updated_at is not UNSET:
@@ -98,14 +109,21 @@ class ModelsThresholdPreset:
 
         return field_dict
 
+
+
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.models_threshold_preset_values import ModelsThresholdPresetValues
-
         d = dict(src_dict)
         id = UUID(d.pop("id"))
 
+
+
+
         level = ModelsPresetLevel(d.pop("level"))
+
+
+
 
         external_id = d.pop("externalId")
 
@@ -113,22 +131,34 @@ class ModelsThresholdPreset:
 
         preset_type = ModelsPresetType(d.pop("presetType"))
 
+
+
+
         selected = d.pop("selected")
 
         name = d.pop("name")
 
         values = ModelsThresholdPresetValues.from_dict(d.pop("values"))
 
+
+
+
         created_at = isoparse(d.pop("createdAt"))
+
+
+
 
         owner_organization_id = d.pop("ownerOrganizationId", UNSET)
 
         _updated_at = d.pop("updatedAt", UNSET)
         updated_at: datetime.datetime | Unset
-        if isinstance(_updated_at, Unset):
+        if isinstance(_updated_at,  Unset):
             updated_at = UNSET
         else:
             updated_at = isoparse(_updated_at)
+
+
+
 
         models_threshold_preset = cls(
             id=id,
@@ -143,6 +173,7 @@ class ModelsThresholdPreset:
             owner_organization_id=owner_organization_id,
             updated_at=updated_at,
         )
+
 
         models_threshold_preset.additional_properties = d
         return models_threshold_preset

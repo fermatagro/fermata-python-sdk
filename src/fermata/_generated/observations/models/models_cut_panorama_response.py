@@ -1,47 +1,65 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
-from uuid import UUID
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
+from uuid import UUID
+
+
+
+
+
+
 T = TypeVar("T", bound="ModelsCutPanoramaResponse")
+
 
 
 @_attrs_define
 class ModelsCutPanoramaResponse:
-    """Response for cut panorama submission
+    """ Response for cut panorama submission
 
-    Attributes:
-        job_id (UUID): UUID identifier
-    """
+        Attributes:
+            job_id (UUID): UUID identifier
+     """
 
     job_id: UUID
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
         job_id = str(self.job_id)
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "jobId": job_id,
-            }
-        )
+        field_dict.update({
+            "jobId": job_id,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         job_id = UUID(d.pop("jobId"))
 
+
+
+
         models_cut_panorama_response = cls(
             job_id=job_id,
         )
+
 
         models_cut_panorama_response.additional_properties = d
         return models_cut_panorama_response

@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ModelsTileLevel(str, Enum):
     L0 = "l0"
     L1 = "l1"

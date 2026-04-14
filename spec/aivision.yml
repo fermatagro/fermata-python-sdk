@@ -538,6 +538,98 @@ paths:
         - Predictions
       security:
         - BearerAuth: []
+  /api/v1/predictions/gallery:
+    get:
+      operationId: listPredictionsForGallery
+      description: Query predictions with filters for gallery view
+      parameters:
+        - name: cycleId
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+          explode: false
+        - name: classes
+          in: query
+          required: false
+          description: Class identifiers from ML API (class names)
+          schema:
+            type: array
+            items:
+              type: string
+          explode: false
+        - name: pipelineId
+          in: query
+          required: false
+          description: Filter predictions by pipeline ID
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+          explode: false
+        - name: capturedFrom
+          in: query
+          required: false
+          description: Filter by photo capture time (start, inclusive)
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: capturedTo
+          in: query
+          required: false
+          description: Filter by photo capture time (end, exclusive)
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.from'
+        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.to'
+        - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmin'
+        - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymin'
+        - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmax'
+        - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymax'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.Prediction'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Predictions
+      security:
+        - BearerAuth: []
   /api/v1/predictions/hide:
     post:
       operationId: hidePredictions
@@ -618,6 +710,10 @@ paths:
       responses:
         '201':
           description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.UploadPredictionsResponse'
         '400':
           description: The server could not understand the request due to invalid syntax.
           content:
@@ -1875,7 +1971,13 @@ components:
       description: Payload information for inference tasks
     Models.PrecomputedPrediction:
       type: object
+      required:
+        - id
       properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Prediction ID assigned by the caller (used to report rejected predictions)
         classId:
           type: string
           description: Detection class name from the external model
@@ -2009,6 +2111,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Models.PredictionHeatmapClass'
+        ptz:
+          $ref: '#/components/schemas/Common.Types.PTZ'
     Models.PredictionQuery:
       type: object
       required:
@@ -2243,6 +2347,31 @@ components:
         modelName:
           type: string
           description: ML model name that produced the predictions
+        organizationName:
+          type: string
+          description: Organization display name (for inference logs)
+        greenhouseId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Greenhouse where the photo was taken
+        cultureId:
+          type: string
+          description: Culture being grown
+        growingCycleId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Growing cycle context
+        plantingDate:
+          type: string
+          format: date-time
+          description: Planting date for the growing cycle
+        deviceId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Device that captured the photo
+        deviceType:
+          type: string
+          description: Device type (e.g. 'camera', 'router')
         predictions:
           type: array
           items:
@@ -2253,6 +2382,15 @@ components:
           format: date-time
           description: Timestamp when predictions were generated. Defaults to current time if omitted.
       description: Request to upload pre-computed predictions for a photo
+    Models.UploadPredictionsResponse:
+      type: object
+      properties:
+        rejectedPredictionIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/Common.Types.ID'
+          description: IDs of predictions that were rejected during validation (e.g. unknown class names)
+      description: Response from uploading pre-computed predictions
     Models.Vertex:
       type: object
       required:

@@ -1,45 +1,58 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
+from ..types import UNSET, Unset
+
+
+
+
+
+
 T = TypeVar("T", bound="ModelsSaveModelRequest")
+
 
 
 @_attrs_define
 class ModelsSaveModelRequest:
-    """Request to save or update an AI model
+    """ Request to save or update an AI model
 
-    Attributes:
-        name (str): Model name (must match Triton deployment name)
-        is_active (bool | Unset): Whether the model should be active (default: true)
-    """
+        Attributes:
+            name (str): Model name (must match Triton deployment name)
+            is_active (bool | Unset): Whether the model should be active (default: true)
+     """
 
     name: str
     is_active: bool | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         name = self.name
 
         is_active = self.is_active
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "name": name,
-            }
-        )
+        field_dict.update({
+            "name": name,
+        })
         if is_active is not UNSET:
             field_dict["isActive"] = is_active
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -52,6 +65,7 @@ class ModelsSaveModelRequest:
             name=name,
             is_active=is_active,
         )
+
 
         models_save_model_request.additional_properties = d
         return models_save_model_request

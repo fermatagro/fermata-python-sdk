@@ -1,0 +1,169 @@
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+
+from attrs import define as _attrs_define
+from attrs import field as _attrs_field
+
+from ..types import UNSET, Unset
+
+from ..models.models_schedule_scope import ModelsScheduleScope
+from ..models.models_schedule_type import ModelsScheduleType
+from ..types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
+
+if TYPE_CHECKING:
+  from ..models.create_or_update_schedule_arguments import CreateOrUpdateScheduleArguments
+
+
+
+
+
+T = TypeVar("T", bound="CreateOrUpdateSchedule")
+
+
+
+@_attrs_define
+class CreateOrUpdateSchedule:
+    """ 
+        Attributes:
+            organization_id (str): Organization identifier (opaque string)
+            template_id (UUID): UUID identifier
+            scope (ModelsScheduleScope): Scope type for schedule binding
+            type_ (ModelsScheduleType): Schedule type indicating where the schedule is executed
+            scope_id (UUID): UUID identifier
+            cron_expr_utc (str): Cron expression in UTC timezone
+            arguments (CreateOrUpdateScheduleArguments): Arguments to pass to the pipeline
+            start_at (datetime.datetime | Unset): When the schedule becomes active (optional)
+     """
+
+    organization_id: str
+    template_id: UUID
+    scope: ModelsScheduleScope
+    type_: ModelsScheduleType
+    scope_id: UUID
+    cron_expr_utc: str
+    arguments: CreateOrUpdateScheduleArguments
+    start_at: datetime.datetime | Unset = UNSET
+    additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
+
+    def to_dict(self) -> dict[str, Any]:
+        from ..models.create_or_update_schedule_arguments import CreateOrUpdateScheduleArguments
+        organization_id = self.organization_id
+
+        template_id = str(self.template_id)
+
+        scope = self.scope.value
+
+        type_ = self.type_.value
+
+        scope_id = str(self.scope_id)
+
+        cron_expr_utc = self.cron_expr_utc
+
+        arguments = self.arguments.to_dict()
+
+        start_at: str | Unset = UNSET
+        if not isinstance(self.start_at, Unset):
+            start_at = self.start_at.isoformat()
+
+
+        field_dict: dict[str, Any] = {}
+        field_dict.update(self.additional_properties)
+        field_dict.update({
+            "organizationId": organization_id,
+            "templateId": template_id,
+            "scope": scope,
+            "type": type_,
+            "scopeId": scope_id,
+            "cronExprUTC": cron_expr_utc,
+            "arguments": arguments,
+        })
+        if start_at is not UNSET:
+            field_dict["startAt"] = start_at
+
+        return field_dict
+
+
+
+    @classmethod
+    def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.create_or_update_schedule_arguments import CreateOrUpdateScheduleArguments
+        d = dict(src_dict)
+        organization_id = d.pop("organizationId")
+
+        template_id = UUID(d.pop("templateId"))
+
+
+
+
+        scope = ModelsScheduleScope(d.pop("scope"))
+
+
+
+
+        type_ = ModelsScheduleType(d.pop("type"))
+
+
+
+
+        scope_id = UUID(d.pop("scopeId"))
+
+
+
+
+        cron_expr_utc = d.pop("cronExprUTC")
+
+        arguments = CreateOrUpdateScheduleArguments.from_dict(d.pop("arguments"))
+
+
+
+
+        _start_at = d.pop("startAt", UNSET)
+        start_at: datetime.datetime | Unset
+        if isinstance(_start_at,  Unset):
+            start_at = UNSET
+        else:
+            start_at = isoparse(_start_at)
+
+
+
+
+        create_or_update_schedule = cls(
+            organization_id=organization_id,
+            template_id=template_id,
+            scope=scope,
+            type_=type_,
+            scope_id=scope_id,
+            cron_expr_utc=cron_expr_utc,
+            arguments=arguments,
+            start_at=start_at,
+        )
+
+
+        create_or_update_schedule.additional_properties = d
+        return create_or_update_schedule
+
+    @property
+    def additional_keys(self) -> list[str]:
+        return list(self.additional_properties.keys())
+
+    def __getitem__(self, key: str) -> Any:
+        return self.additional_properties[key]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self.additional_properties[key] = value
+
+    def __delitem__(self, key: str) -> None:
+        del self.additional_properties[key]
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.additional_properties

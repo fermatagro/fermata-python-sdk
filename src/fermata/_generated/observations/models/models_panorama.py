@@ -1,39 +1,48 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar
-from uuid import UUID
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-from dateutil.parser import isoparse
 
 from ..types import UNSET, Unset
+
+from ..types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
+
+
+
+
+
 
 T = TypeVar("T", bound="ModelsPanorama")
 
 
+
 @_attrs_define
 class ModelsPanorama:
-    """360-degree panorama composed of multiple photos
+    """ 360-degree panorama composed of multiple photos
 
-    Attributes:
-        id (UUID): UUID identifier
-        organization_id (str): Organization identifier (opaque string)
-        greenhouse_id (UUID): UUID identifier
-        device_id (UUID): UUID identifier
-        x (float): The X coordinate of the panorama
-        y (float): The Y coordinate of the panorama
-        height (float): The height at which the panorama was taken
-        base_x (int): The base X grid coordinate
-        base_y (int): The base Y grid coordinate
-        base_url (str): The cdnUrl prefix for accessing panorama tiles
-        captured_at (datetime.datetime): The timestamp when the panorama was captured
-        created_at (datetime.datetime): The timestamp when the panorama was created
-        pipeline_id (UUID | Unset): UUID identifier
-        deleted_at (datetime.datetime | Unset): The timestamp when the panorama was soft-deleted
-    """
+        Attributes:
+            id (UUID): UUID identifier
+            organization_id (str): Organization identifier (opaque string)
+            greenhouse_id (UUID): UUID identifier
+            device_id (UUID): UUID identifier
+            x (float): The X coordinate of the panorama
+            y (float): The Y coordinate of the panorama
+            height (float): The height at which the panorama was taken
+            base_x (int): The base X grid coordinate
+            base_y (int): The base Y grid coordinate
+            base_url (str): The cdnUrl prefix for accessing panorama tiles
+            captured_at (datetime.datetime): The timestamp when the panorama was captured
+            created_at (datetime.datetime): The timestamp when the panorama was created
+            pipeline_id (UUID | Unset): UUID identifier
+            deleted_at (datetime.datetime | Unset): The timestamp when the panorama was soft-deleted
+     """
 
     id: UUID
     organization_id: str
@@ -50,6 +59,10 @@ class ModelsPanorama:
     pipeline_id: UUID | Unset = UNSET
     deleted_at: datetime.datetime | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         id = str(self.id)
@@ -84,24 +97,23 @@ class ModelsPanorama:
         if not isinstance(self.deleted_at, Unset):
             deleted_at = self.deleted_at.isoformat()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "id": id,
-                "organizationId": organization_id,
-                "greenhouseId": greenhouse_id,
-                "deviceId": device_id,
-                "x": x,
-                "y": y,
-                "height": height,
-                "baseX": base_x,
-                "baseY": base_y,
-                "baseUrl": base_url,
-                "capturedAt": captured_at,
-                "createdAt": created_at,
-            }
-        )
+        field_dict.update({
+            "id": id,
+            "organizationId": organization_id,
+            "greenhouseId": greenhouse_id,
+            "deviceId": device_id,
+            "x": x,
+            "y": y,
+            "height": height,
+            "baseX": base_x,
+            "baseY": base_y,
+            "baseUrl": base_url,
+            "capturedAt": captured_at,
+            "createdAt": created_at,
+        })
         if pipeline_id is not UNSET:
             field_dict["pipelineId"] = pipeline_id
         if deleted_at is not UNSET:
@@ -109,16 +121,27 @@ class ModelsPanorama:
 
         return field_dict
 
+
+
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         id = UUID(d.pop("id"))
 
+
+
+
         organization_id = d.pop("organizationId")
 
         greenhouse_id = UUID(d.pop("greenhouseId"))
 
+
+
+
         device_id = UUID(d.pop("deviceId"))
+
+
+
 
         x = d.pop("x")
 
@@ -134,21 +157,33 @@ class ModelsPanorama:
 
         captured_at = isoparse(d.pop("capturedAt"))
 
+
+
+
         created_at = isoparse(d.pop("createdAt"))
+
+
+
 
         _pipeline_id = d.pop("pipelineId", UNSET)
         pipeline_id: UUID | Unset
-        if isinstance(_pipeline_id, Unset):
+        if isinstance(_pipeline_id,  Unset):
             pipeline_id = UNSET
         else:
             pipeline_id = UUID(_pipeline_id)
 
+
+
+
         _deleted_at = d.pop("deletedAt", UNSET)
         deleted_at: datetime.datetime | Unset
-        if isinstance(_deleted_at, Unset):
+        if isinstance(_deleted_at,  Unset):
             deleted_at = UNSET
         else:
             deleted_at = isoparse(_deleted_at)
+
+
+
 
         models_panorama = cls(
             id=id,
@@ -166,6 +201,7 @@ class ModelsPanorama:
             pipeline_id=pipeline_id,
             deleted_at=deleted_at,
         )
+
 
         models_panorama.additional_properties = d
         return models_panorama

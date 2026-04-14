@@ -1,47 +1,65 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
-from uuid import UUID
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
+from uuid import UUID
+
+
+
+
+
+
 T = TypeVar("T", bound="ModelsSubmitPanoramaStitchResponse")
+
 
 
 @_attrs_define
 class ModelsSubmitPanoramaStitchResponse:
-    """Response for panorama stitch submission
+    """ Response for panorama stitch submission
 
-    Attributes:
-        task_id (UUID): UUID identifier
-    """
+        Attributes:
+            task_id (UUID): UUID identifier
+     """
 
     task_id: UUID
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
         task_id = str(self.task_id)
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "taskId": task_id,
-            }
-        )
+        field_dict.update({
+            "taskId": task_id,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         task_id = UUID(d.pop("taskId"))
 
+
+
+
         models_submit_panorama_stitch_response = cls(
             task_id=task_id,
         )
+
 
         models_submit_panorama_stitch_response.additional_properties = d
         return models_submit_panorama_stitch_response

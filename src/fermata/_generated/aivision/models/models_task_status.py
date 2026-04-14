@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ModelsTaskStatus(str, Enum):
     CANCELED = "canceled"
     DONE = "done"

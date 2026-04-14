@@ -1,44 +1,59 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+
+from ..types import UNSET, Unset
+
 from dateutil.parser import isoparse
+from typing import cast
+import datetime
+
+
+
+
+
 
 T = TypeVar("T", bound="ModelsDownloadLinkResponse")
 
 
+
 @_attrs_define
 class ModelsDownloadLinkResponse:
-    """Response with presigned download URL
+    """ Response with presigned download URL
 
-    Attributes:
-        download_url (str): Presigned S3 URL for download
-        expires_at (datetime.datetime): When the presigned URL expires
-    """
+        Attributes:
+            download_url (str): Presigned S3 URL for download
+            expires_at (datetime.datetime): When the presigned URL expires
+     """
 
     download_url: str
     expires_at: datetime.datetime
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         download_url = self.download_url
 
         expires_at = self.expires_at.isoformat()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "downloadUrl": download_url,
-                "expiresAt": expires_at,
-            }
-        )
+        field_dict.update({
+            "downloadUrl": download_url,
+            "expiresAt": expires_at,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -47,10 +62,14 @@ class ModelsDownloadLinkResponse:
 
         expires_at = isoparse(d.pop("expiresAt"))
 
+
+
+
         models_download_link_response = cls(
             download_url=download_url,
             expires_at=expires_at,
         )
+
 
         models_download_link_response.additional_properties = d
         return models_download_link_response

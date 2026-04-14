@@ -1,0 +1,1933 @@
+openapi: 3.0.0
+info:
+  title: Demetra Pipelines API
+  version: 0.0.0
+tags:
+  - name: Templates
+  - name: Schedules
+  - name: Fires
+paths:
+  /api/v1/pipelines/fires:
+    get:
+      operationId: listFires
+      description: |-
+        List fires with optional filtering.
+
+        Supports filtering by template, trigger, status, and time window.
+        Time filters apply to scheduledAt field.
+      parameters:
+        - name: pipelineTemplateId
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+          explode: false
+        - name: triggerType
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Models.TriggerType'
+          explode: false
+        - name: triggerId
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+          explode: false
+        - name: scope
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Models.ScheduleScope'
+          explode: false
+        - name: scopeId
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Models.FireStatus'
+          explode: false
+        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.from'
+        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.to'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.Fire'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/fires/generate:
+    post:
+      operationId: generateFires
+      description: |-
+        Generate missing schedule-triggered fires.
+
+        Scheduler/system operation that creates Fire records for all enabled schedules
+        up to the current time.
+
+        Idempotent via deduplicationKey uniqueness - if a fire already exists for a
+        given schedule+scheduledAt combination, it is counted as skipped.
+
+        Returns counts of created/skipped fires.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.GenerateFiresResult'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/fires/{fireId}:
+    get:
+      operationId: getFire
+      description: Get a specific fire by ID
+      parameters:
+        - name: fireId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.Fire'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      security:
+        - BearerAuth: []
+    post:
+      operationId: createFire
+      description: |-
+        Create a fire (request trigger).
+
+        triggerType is implicitly "request" for this endpoint.
+        Idempotent: if deduplicationKey already exists, returns existing Fire.
+        Deduplication key format: "request:{triggerId}"
+      parameters:
+        - name: fireId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateFire'
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/fires/{fireId}/cancel:
+    post:
+      operationId: cancelFire
+      description: Cancel a fire
+      parameters:
+        - name: fireId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.CancelSkipRequest'
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/fires/{fireId}/complete:
+    post:
+      operationId: completeFire
+      description: |-
+        Complete a fire with terminal status.
+
+        Sets final status (completed|failed|cancelled|skipped) and finishedAt=now.
+        errorMessage should be provided when status=failed.
+      parameters:
+        - name: fireId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.CompleteFireRequest'
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/fires/{fireId}/skip:
+    post:
+      operationId: skipFire
+      description: Skip a fire
+      parameters:
+        - name: fireId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.CancelSkipRequest'
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/fires/{fireId}/start:
+    post:
+      operationId: startFire
+      description: |-
+        Start a fire.
+
+        Transitions status from pending to running.
+        Sets startedAt=now and stores externalRunId (Prefect flow_run_id).
+        externalRunId is immutable once set.
+      parameters:
+        - name: fireId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Fires
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.StartFireRequest'
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules:
+    get:
+      operationId: listSchedules
+      description: List schedules with optional filtering
+      parameters:
+        - name: templateId
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+          explode: false
+        - name: scope
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Models.ScheduleScope'
+          explode: false
+        - name: scopeId
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+          explode: false
+        - name: state
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Models.ScheduleState'
+          explode: false
+        - name: type
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Models.ScheduleType'
+          explode: false
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.Schedule'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}:
+    get:
+      operationId: getSchedule
+      description: Get a specific schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.Schedule'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      security:
+        - BearerAuth: []
+    post:
+      operationId: createSchedule
+      description: Create a new schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateSchedule'
+      security:
+        - BearerAuth: []
+    delete:
+      operationId: deleteSchedule
+      description: Delete a schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}/arguments:
+    post:
+      operationId: updateScheduleArguments
+      description: Update schedule arguments
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                arguments:
+                  type: object
+                  additionalProperties:
+                    type: string
+              required:
+                - arguments
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}/cron:
+    post:
+      operationId: updateScheduleCron
+      description: Update schedule cron expression
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cronExprUTC:
+                  type: string
+              required:
+                - cronExprUTC
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}/disable:
+    post:
+      operationId: disableSchedule
+      description: Disable a schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}/enable:
+    post:
+      operationId: enableSchedule
+      description: Enable a schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}/fires:
+    get:
+      operationId: listScheduleFires
+      description: List fires for a specific schedule
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.OrganizationID'
+          explode: false
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Models.FireStatus'
+          explode: false
+        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.from'
+        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.to'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.Fire'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}/scope:
+    post:
+      operationId: updateScheduleScope
+      description: Update schedule scope binding
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scope:
+                  $ref: '#/components/schemas/Models.ScheduleScope'
+                scopeId:
+                  $ref: '#/components/schemas/Common.Types.ID'
+              required:
+                - scope
+                - scopeId
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/schedules/{scheduleId}/start-at:
+    post:
+      operationId: updateScheduleStartAt
+      description: Update schedule start time
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startAt:
+                  type: string
+                  format: date-time
+              required:
+                - startAt
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/templates:
+    get:
+      operationId: listTemplates
+      description: List available pipeline templates
+      parameters:
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+        - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.Template'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Templates
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/templates/{templateId}:
+    get:
+      operationId: getTemplate
+      description: Get a specific pipeline template
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.Template'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Templates
+      security:
+        - BearerAuth: []
+    post:
+      operationId: createTemplate
+      description: Create a new pipeline template
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateTemplate'
+      security:
+        - BearerAuth: []
+    delete:
+      operationId: deleteTemplate
+      description: Delete a pipeline template
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Templates
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/templates/{templateId}/description:
+    post:
+      operationId: updateTemplateDescription
+      description: Update a pipeline template description
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+              required:
+                - description
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/templates/{templateId}/expected-arguments:
+    post:
+      operationId: updateTemplateExpectedArguments
+      description: Update expected arguments metadata for a pipeline template
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expectedArguments:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Models.ExpectedArgument'
+              required:
+                - expectedArguments
+      security:
+        - BearerAuth: []
+  /api/v1/pipelines/templates/{templateId}/name:
+    post:
+      operationId: renameTemplate
+      description: Rename a pipeline template
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      security:
+        - BearerAuth: []
+components:
+  parameters:
+    Common.Pagination.PageParams.cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Token to retrieve items after a specific point
+      schema:
+        type: string
+      explode: false
+    Common.Pagination.PageParams.limit:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of items to return (server may return fewer)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+        default: 100
+      explode: false
+    Common.Types.TimeRangeQuery.from:
+      name: from
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date-time
+    Common.Types.TimeRangeQuery.to:
+      name: to
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date-time
+  schemas:
+    Common.Errors.ApiError:
+      type: object
+      required:
+        - request_id
+        - message
+      properties:
+        request_id:
+          type: string
+          description: Unique identifier for the request, useful for debugging
+        message:
+          type: string
+          description: Human-readable message describing the error
+      description: All error responses share these common fields
+    Common.Errors.AuthenticationError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - AuthenticationRequired
+      allOf:
+        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that authentication is required to access the resource
+    Common.Errors.ConflictError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - Conflict
+      allOf:
+        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that the resource already exists or conflicts with the current state
+    Common.Errors.ForbiddenError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - Forbidden
+      allOf:
+        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that action is forbidden due to lack of permissions
+    Common.Errors.InternalServerError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - InternalServerError
+      allOf:
+        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that an internal server error occurred
+    Common.Errors.NotFoundError:
+      type: object
+      required:
+        - code
+        - resource_id
+      properties:
+        code:
+          type: string
+          enum:
+            - NotFound
+        resource_id:
+          type: string
+          description: Identifier of the resource that was not found
+      allOf:
+        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that the requested resource was not found
+    Common.Errors.ValidationError:
+      type: object
+      required:
+        - code
+        - details
+      properties:
+        code:
+          type: string
+          enum:
+            - ValidationError
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              issue:
+                type: string
+            required:
+              - field
+              - issue
+      allOf:
+        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that the request was invalid
+    Common.Types.ID:
+      type: string
+      format: uuid
+      description: UUID identifier
+    Common.Types.OrganizationID:
+      type: string
+      description: Organization identifier (opaque string)
+    CreateOrUpdateFire:
+      type: object
+      required:
+        - organizationId
+        - pipelineTemplateId
+        - triggerId
+        - scope
+        - scopeId
+        - status
+      properties:
+        organizationId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.OrganizationID'
+          description: Organization this fire belongs to
+        pipelineTemplateId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Reference to the pipeline template
+        triggerId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Trigger ID for deduplication (schedule_id for schedule, request/correlation ID for request)
+        scope:
+          allOf:
+            - $ref: '#/components/schemas/Models.ScheduleScope'
+          description: 'Scope type: greenhouse or growing cycle'
+        scopeId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: ID of the scoped entity (greenhouse_id or growing_cycle_id)
+        scheduledAt:
+          type: string
+          format: date-time
+          description: When the pipeline is scheduled to run (defaults to server time if omitted)
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Models.FireStatus'
+          description: Current execution status
+        externalRunId:
+          type: string
+          description: Prefect flow_run_id, set at start (immutable once set)
+        errorMessage:
+          type: string
+          description: Error message (present when status=failed or status=partial)
+        arguments:
+          type: object
+          additionalProperties: {}
+          description: Arguments passed to the pipeline execution
+        startedAt:
+          type: string
+          format: date-time
+          description: When execution actually started (status changed to running)
+        finishedAt:
+          type: string
+          format: date-time
+          description: When execution finished (terminal status reached)
+      description: ''
+    CreateOrUpdateSchedule:
+      type: object
+      required:
+        - organizationId
+        - templateId
+        - scope
+        - type
+        - scopeId
+        - cronExprUTC
+        - arguments
+      properties:
+        organizationId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.OrganizationID'
+          description: Organization this schedule belongs to
+        templateId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Reference to the pipeline template
+        scope:
+          allOf:
+            - $ref: '#/components/schemas/Models.ScheduleScope'
+          description: 'Scope type: greenhouse or growing cycle'
+        type:
+          allOf:
+            - $ref: '#/components/schemas/Models.ScheduleType'
+          description: 'Schedule type: cloud or onsite'
+        scopeId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: ID of the scoped entity (greenhouse_id or growing_cycle_id)
+        startAt:
+          type: string
+          format: date-time
+          description: When the schedule becomes active (optional)
+        cronExprUTC:
+          type: string
+          description: Cron expression in UTC timezone
+        arguments:
+          type: object
+          additionalProperties:
+            type: string
+          description: Arguments to pass to the pipeline
+      description: ''
+    CreateOrUpdateTemplate:
+      type: object
+      required:
+        - name
+        - flowName
+      properties:
+        name:
+          type: string
+          description: Human-readable name for the pipeline
+        flowName:
+          type: string
+          description: Prefect flow identifier (immutable after creation)
+        description:
+          type: string
+          description: Description of what this pipeline does
+        expectedArguments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Models.ExpectedArgument'
+          description: Argument definitions describing what parameters this pipeline accepts
+      description: ''
+    Models.ArgumentType:
+      type: string
+      enum:
+        - string
+        - number
+        - boolean
+      description: Type of an expected argument value
+    Models.CancelSkipRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: Reason for cancellation or skip
+      description: Optional reason for cancel/skip operations
+    Models.CompleteFireRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Models.TerminalStatus'
+          description: Final status
+        errorMessage:
+          type: string
+          description: Error message (should be present when status=failed)
+      description: Request to complete a fire with terminal status
+    Models.ExpectedArgument:
+      type: object
+      required:
+        - name
+        - type
+        - required
+      properties:
+        name:
+          type: string
+          description: Argument name (key used when passing arguments to the pipeline)
+        type:
+          allOf:
+            - $ref: '#/components/schemas/Models.ArgumentType'
+          description: Expected value type
+        required:
+          type: boolean
+          description: Whether this argument must be provided
+        defaultValue:
+          type: string
+          description: Default value when argument is omitted (serialized as string)
+        description:
+          type: string
+          description: Human-readable description of the argument's purpose
+      description: Metadata describing an expected argument for a pipeline template
+    Models.Fire:
+      type: object
+      required:
+        - id
+        - organizationId
+        - pipelineTemplateId
+        - triggerType
+        - triggerId
+        - scope
+        - scopeId
+        - deduplicationKey
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          readOnly: true
+        organizationId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.OrganizationID'
+          description: Organization this fire belongs to
+        pipelineTemplateId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Reference to the pipeline template
+        triggerType:
+          allOf:
+            - $ref: '#/components/schemas/Models.TriggerType'
+          description: What triggered this fire
+          readOnly: true
+        triggerId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Trigger ID for deduplication (schedule_id for schedule, request/correlation ID for request)
+        scope:
+          allOf:
+            - $ref: '#/components/schemas/Models.ScheduleScope'
+          description: 'Scope type: greenhouse or growing cycle'
+        scopeId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: ID of the scoped entity (greenhouse_id or growing_cycle_id)
+        scheduledAt:
+          type: string
+          format: date-time
+          description: When the pipeline is scheduled to run (defaults to server time if omitted)
+        deduplicationKey:
+          type: string
+          description: Unique key for deduplication (server-generated, see model docs for format)
+          readOnly: true
+        status:
+          allOf:
+            - $ref: '#/components/schemas/Models.FireStatus'
+          description: Current execution status
+        externalRunId:
+          type: string
+          description: Prefect flow_run_id, set at start (immutable once set)
+        errorMessage:
+          type: string
+          description: Error message (present when status=failed or status=partial)
+        arguments:
+          type: object
+          additionalProperties: {}
+          description: Arguments passed to the pipeline execution
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        startedAt:
+          type: string
+          format: date-time
+          description: When execution actually started (status changed to running)
+        finishedAt:
+          type: string
+          format: date-time
+          description: When execution finished (terminal status reached)
+      description: |-
+        A Fire represents a single scheduled occurrence/execution instance for a pipeline template.
+
+        Immutable planning fields: pipelineTemplateId, triggerType, triggerId, scheduledAt, deduplicationKey, arguments.
+        Mutable execution fields: status, externalRunId, errorMessage, startedAt, finishedAt.
+
+        Deduplication rules (unique constraint on deduplicationKey):
+        - For triggerType="request": deduplicationKey = "request:{triggerId}"
+        - For triggerType="schedule": deduplicationKey = "schedule:{triggerId}:{scheduledAtISO}"
+
+        POST /fires is idempotent: if deduplicationKey exists, returns existing Fire.
+    Models.FireStatus:
+      type: string
+      enum:
+        - pending
+        - running
+        - completed
+        - partial
+        - failed
+        - cancelled
+        - skipped
+      description: |-
+        Current status of the fire.
+
+        State transitions:
+        - pending → running → completed|partial|failed
+        - pending|running → cancelled|skipped
+        - failed|cancelled → running (retry)
+    Models.GenerateFiresResult:
+      type: object
+      required:
+        - created
+        - skipped
+      properties:
+        created:
+          type: integer
+          format: int32
+          description: Number of fires created
+        skipped:
+          type: integer
+          format: int32
+          description: Number of fires skipped (already existed via deduplication)
+      description: Response from generate fires operation
+    Models.Schedule:
+      type: object
+      required:
+        - id
+        - organizationId
+        - templateId
+        - scope
+        - type
+        - scopeId
+        - state
+        - cronExprUTC
+        - arguments
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          readOnly: true
+        organizationId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.OrganizationID'
+          description: Organization this schedule belongs to
+        templateId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Reference to the pipeline template
+        scope:
+          allOf:
+            - $ref: '#/components/schemas/Models.ScheduleScope'
+          description: 'Scope type: greenhouse or growing cycle'
+        type:
+          allOf:
+            - $ref: '#/components/schemas/Models.ScheduleType'
+          description: 'Schedule type: cloud or onsite'
+        scopeId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: ID of the scoped entity (greenhouse_id or growing_cycle_id)
+        state:
+          allOf:
+            - $ref: '#/components/schemas/Models.ScheduleState'
+          description: Whether the schedule is enabled or disabled
+          readOnly: true
+        startAt:
+          type: string
+          format: date-time
+          description: When the schedule becomes active (optional)
+        cronExprUTC:
+          type: string
+          description: Cron expression in UTC timezone
+        arguments:
+          type: object
+          additionalProperties:
+            type: string
+          description: Arguments to pass to the pipeline
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A schedule that triggers pipeline execution on a cron basis
+    Models.ScheduleScope:
+      type: string
+      enum:
+        - greenhouse
+        - growing_cycle
+      description: Scope type for schedule binding
+    Models.ScheduleState:
+      type: string
+      enum:
+        - enabled
+        - disabled
+      description: Schedule state
+    Models.ScheduleType:
+      type: string
+      enum:
+        - cloud
+        - onsite
+      description: Schedule type indicating where the schedule is executed
+    Models.StartFireRequest:
+      type: object
+      required:
+        - externalRunId
+      properties:
+        externalRunId:
+          type: string
+          description: Prefect flow_run_id (immutable once set)
+      description: Request to start a fire
+    Models.Template:
+      type: object
+      required:
+        - id
+        - name
+        - flowName
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          readOnly: true
+        name:
+          type: string
+          description: Human-readable name for the pipeline
+        flowName:
+          type: string
+          description: Prefect flow identifier (immutable after creation)
+        description:
+          type: string
+          description: Description of what this pipeline does
+        expectedArguments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Models.ExpectedArgument'
+          description: Argument definitions describing what parameters this pipeline accepts
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A pipeline template representing a Prefect flow definition
+    Models.TerminalStatus:
+      type: string
+      enum:
+        - completed
+        - partial
+        - failed
+        - cancelled
+        - skipped
+      description: Terminal status for completing a fire
+    Models.TriggerType:
+      type: string
+      enum:
+        - schedule
+        - request
+      description: What triggered the fire
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: Bearer
+servers:
+  - url: https://api.croptimus.com
+    description: prod
+    variables: {}
+  - url: https://api.fermata.click
+    description: dev
+    variables: {}
+  - url: http://localhost:3000
+    description: local
+    variables: {}

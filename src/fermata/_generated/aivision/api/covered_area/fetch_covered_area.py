@@ -1,17 +1,22 @@
-import datetime
 from http import HTTPStatus
-from typing import Any
+from typing import Any, cast
 from urllib.parse import quote
-from uuid import UUID
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.models_covered_area import ModelsCoveredArea
 from ...models.models_time_bucket import ModelsTimeBucket
-from ...types import UNSET, Response, Unset
+from ...types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
+
 
 
 def _get_kwargs(
@@ -24,7 +29,12 @@ def _get_kwargs(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> dict[str, Any]:
+    
+
+    
+
     params: dict[str, Any] = {}
 
     json_time_bucket = time_bucket.value
@@ -44,27 +54,29 @@ def _get_kwargs(
 
     params["ymax"] = ymax
 
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/api/v1/covered-area/{cycle_id}".format(
-            cycle_id=quote(str(cycle_id), safe=""),
-        ),
+        "url": "/api/v1/covered-area/{cycle_id}".format(cycle_id=quote(str(cycle_id), safe=""),),
         "params": params,
     }
+
 
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CommonErrorsApiError | list[ModelsCoveredArea] | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | list[ModelsCoveredArea] | None:
     if response.status_code == 200:
         response_200 = []
         _response_200 = response.json()
-        for response_200_item_data in _response_200:
+        for response_200_item_data in (_response_200):
             response_200_item = ModelsCoveredArea.from_dict(response_200_item_data)
+
+
 
             response_200.append(response_200_item)
 
@@ -73,20 +85,28 @@ def _parse_response(
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_403
 
     if response.status_code == 404:
         response_404 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_404
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -96,9 +116,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CommonErrorsApiError | list[ModelsCoveredArea]]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | list[ModelsCoveredArea]]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -118,8 +136,9 @@ def sync_detailed(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> Response[CommonErrorsApiError | list[ModelsCoveredArea]]:
-    """Fetch covered area
+    """  Fetch covered area
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -137,17 +156,19 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | list[ModelsCoveredArea]]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         cycle_id=cycle_id,
-        time_bucket=time_bucket,
-        from_=from_,
-        to=to,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
+time_bucket=time_bucket,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+
     )
 
     response = client.get_httpx_client().request(
@@ -155,7 +176,6 @@ def sync_detailed(
     )
 
     return _build_response(client=client, response=response)
-
 
 def sync(
     cycle_id: UUID,
@@ -168,8 +188,9 @@ def sync(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> CommonErrorsApiError | list[ModelsCoveredArea] | None:
-    """Fetch covered area
+    """  Fetch covered area
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -187,20 +208,21 @@ def sync(
 
     Returns:
         CommonErrorsApiError | list[ModelsCoveredArea]
-    """
+     """
+
 
     return sync_detailed(
         cycle_id=cycle_id,
-        client=client,
-        time_bucket=time_bucket,
-        from_=from_,
-        to=to,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
-    ).parsed
+client=client,
+time_bucket=time_bucket,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
 
+    ).parsed
 
 async def asyncio_detailed(
     cycle_id: UUID,
@@ -213,8 +235,9 @@ async def asyncio_detailed(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> Response[CommonErrorsApiError | list[ModelsCoveredArea]]:
-    """Fetch covered area
+    """  Fetch covered area
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -232,23 +255,26 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | list[ModelsCoveredArea]]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         cycle_id=cycle_id,
-        time_bucket=time_bucket,
-        from_=from_,
-        to=to,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
+time_bucket=time_bucket,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     cycle_id: UUID,
@@ -261,8 +287,9 @@ async def asyncio(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+
 ) -> CommonErrorsApiError | list[ModelsCoveredArea] | None:
-    """Fetch covered area
+    """  Fetch covered area
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -280,18 +307,18 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | list[ModelsCoveredArea]
-    """
+     """
 
-    return (
-        await asyncio_detailed(
-            cycle_id=cycle_id,
-            client=client,
-            time_bucket=time_bucket,
-            from_=from_,
-            to=to,
-            xmin=xmin,
-            ymin=ymin,
-            xmax=xmax,
-            ymax=ymax,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        cycle_id=cycle_id,
+client=client,
+time_bucket=time_bucket,
+from_=from_,
+to=to,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+
+    )).parsed

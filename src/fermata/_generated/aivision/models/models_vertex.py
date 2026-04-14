@@ -1,41 +1,55 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
+
+
+
+
+
+
 T = TypeVar("T", bound="ModelsVertex")
+
 
 
 @_attrs_define
 class ModelsVertex:
-    """
-    Attributes:
-        x (float):
-        y (float):
-    """
+    """ 
+        Attributes:
+            x (float):
+            y (float):
+     """
 
     x: float
     y: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         x = self.x
 
         y = self.y
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "x": x,
-                "y": y,
-            }
-        )
+        field_dict.update({
+            "x": x,
+            "y": y,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -48,6 +62,7 @@ class ModelsVertex:
             x=x,
             y=y,
         )
+
 
         models_vertex.additional_properties = d
         return models_vertex

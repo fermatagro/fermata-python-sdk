@@ -10,6 +10,7 @@ from fermata._namespaces.catalog import AsyncModels
 from fermata._namespaces.greenhouses import AsyncGreenhouses
 from fermata._namespaces.inference import AsyncInference
 from fermata._namespaces.photos import AsyncPhotos
+from fermata._namespaces.pipelines import AsyncPipelines
 from fermata._transport import Transport
 
 
@@ -41,6 +42,7 @@ class Fermata:
         self.inference = AsyncInference(self._transport)
         self.models = AsyncModels(self._transport)
         self.greenhouses = AsyncGreenhouses(self._transport)
+        self.pipelines = AsyncPipelines(self._transport)
 
     @property
     def scan_id(self) -> str:

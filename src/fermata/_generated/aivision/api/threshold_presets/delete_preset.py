@@ -1,32 +1,40 @@
 from http import HTTPStatus
 from typing import Any, cast
 from urllib.parse import quote
-from uuid import UUID
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
-from ...types import Response
+from typing import cast
+from uuid import UUID
+
 
 
 def _get_kwargs(
     preset_id: UUID,
+
 ) -> dict[str, Any]:
+    
+
+    
+
+    
+
     _kwargs: dict[str, Any] = {
         "method": "delete",
-        "url": "/api/v1/presets/{preset_id}".format(
-            preset_id=quote(str(preset_id), safe=""),
-        ),
+        "url": "/api/v1/presets/{preset_id}".format(preset_id=quote(str(preset_id), safe=""),),
     }
+
 
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Any | CommonErrorsApiError | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Any | CommonErrorsApiError | None:
     if response.status_code == 204:
         response_204 = cast(Any, None)
         return response_204
@@ -34,15 +42,21 @@ def _parse_response(
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -52,9 +66,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[Any | CommonErrorsApiError]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[Any | CommonErrorsApiError]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -67,8 +79,9 @@ def sync_detailed(
     preset_id: UUID,
     *,
     client: AuthenticatedClient,
+
 ) -> Response[Any | CommonErrorsApiError]:
-    """Delete a threshold preset
+    """  Delete a threshold preset
 
     Args:
         preset_id (UUID): UUID identifier
@@ -79,10 +92,12 @@ def sync_detailed(
 
     Returns:
         Response[Any | CommonErrorsApiError]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         preset_id=preset_id,
+
     )
 
     response = client.get_httpx_client().request(
@@ -91,13 +106,13 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     preset_id: UUID,
     *,
     client: AuthenticatedClient,
+
 ) -> Any | CommonErrorsApiError | None:
-    """Delete a threshold preset
+    """  Delete a threshold preset
 
     Args:
         preset_id (UUID): UUID identifier
@@ -108,20 +123,22 @@ def sync(
 
     Returns:
         Any | CommonErrorsApiError
-    """
+     """
+
 
     return sync_detailed(
         preset_id=preset_id,
-        client=client,
-    ).parsed
+client=client,
 
+    ).parsed
 
 async def asyncio_detailed(
     preset_id: UUID,
     *,
     client: AuthenticatedClient,
+
 ) -> Response[Any | CommonErrorsApiError]:
-    """Delete a threshold preset
+    """  Delete a threshold preset
 
     Args:
         preset_id (UUID): UUID identifier
@@ -132,23 +149,27 @@ async def asyncio_detailed(
 
     Returns:
         Response[Any | CommonErrorsApiError]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         preset_id=preset_id,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     preset_id: UUID,
     *,
     client: AuthenticatedClient,
+
 ) -> Any | CommonErrorsApiError | None:
-    """Delete a threshold preset
+    """  Delete a threshold preset
 
     Args:
         preset_id (UUID): UUID identifier
@@ -159,11 +180,11 @@ async def asyncio(
 
     Returns:
         Any | CommonErrorsApiError
-    """
+     """
 
-    return (
-        await asyncio_detailed(
-            preset_id=preset_id,
-            client=client,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        preset_id=preset_id,
+client=client,
+
+    )).parsed

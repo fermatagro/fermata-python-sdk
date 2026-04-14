@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ModelsReportKind(str, Enum):
     CUSTOM = "custom"
     DAILY = "daily"

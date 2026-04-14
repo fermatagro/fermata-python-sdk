@@ -1,54 +1,72 @@
 from http import HTTPStatus
-from typing import Any
+from typing import Any, cast
 from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.models_ai_model import ModelsAIModel
-from ...types import Response
+from typing import cast
+
 
 
 def _get_kwargs(
     model_name: str,
+
 ) -> dict[str, Any]:
+    
+
+    
+
+    
+
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/api/v1/models/by-name/{model_name}".format(
-            model_name=quote(str(model_name), safe=""),
-        ),
+        "url": "/api/v1/models/by-name/{model_name}".format(model_name=quote(str(model_name), safe=""),),
     }
+
 
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CommonErrorsApiError | ModelsAIModel | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ModelsAIModel | None:
     if response.status_code == 200:
         response_200 = ModelsAIModel.from_dict(response.json())
+
+
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_403
 
     if response.status_code == 404:
         response_404 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_404
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -58,9 +76,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CommonErrorsApiError | ModelsAIModel]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ModelsAIModel]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -73,8 +89,9 @@ def sync_detailed(
     model_name: str,
     *,
     client: AuthenticatedClient,
+
 ) -> Response[CommonErrorsApiError | ModelsAIModel]:
-    """Get AI model by name from ML API
+    """  Get AI model by name from ML API
 
     Args:
         model_name (str):
@@ -85,10 +102,12 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsAIModel]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         model_name=model_name,
+
     )
 
     response = client.get_httpx_client().request(
@@ -97,13 +116,13 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-
 def sync(
     model_name: str,
     *,
     client: AuthenticatedClient,
+
 ) -> CommonErrorsApiError | ModelsAIModel | None:
-    """Get AI model by name from ML API
+    """  Get AI model by name from ML API
 
     Args:
         model_name (str):
@@ -114,20 +133,22 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ModelsAIModel
-    """
+     """
+
 
     return sync_detailed(
         model_name=model_name,
-        client=client,
-    ).parsed
+client=client,
 
+    ).parsed
 
 async def asyncio_detailed(
     model_name: str,
     *,
     client: AuthenticatedClient,
+
 ) -> Response[CommonErrorsApiError | ModelsAIModel]:
-    """Get AI model by name from ML API
+    """  Get AI model by name from ML API
 
     Args:
         model_name (str):
@@ -138,23 +159,27 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsAIModel]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         model_name=model_name,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     model_name: str,
     *,
     client: AuthenticatedClient,
+
 ) -> CommonErrorsApiError | ModelsAIModel | None:
-    """Get AI model by name from ML API
+    """  Get AI model by name from ML API
 
     Args:
         model_name (str):
@@ -165,11 +190,11 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ModelsAIModel
-    """
+     """
 
-    return (
-        await asyncio_detailed(
-            model_name=model_name,
-            client=client,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        model_name=model_name,
+client=client,
+
+    )).parsed

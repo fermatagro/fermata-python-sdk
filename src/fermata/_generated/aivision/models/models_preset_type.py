@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ModelsPresetType(str, Enum):
     BALANCE = "balance"
     EXPERIMENTAL = "experimental"

@@ -1,56 +1,78 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
+
+from ..types import UNSET, Unset
+
 from dateutil.parser import isoparse
+from typing import cast
+import datetime
+
+
+
+
+
 
 T = TypeVar("T", bound="CommonTypesTimeRange")
 
 
+
 @_attrs_define
 class CommonTypesTimeRange:
-    """Time range with start and end timestamps
+    """ Time range with start and end timestamps
 
-    Attributes:
-        from_ (datetime.datetime):
-        to (datetime.datetime):
-    """
+        Attributes:
+            from_ (datetime.datetime):
+            to (datetime.datetime):
+     """
 
     from_: datetime.datetime
     to: datetime.datetime
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         from_ = self.from_.isoformat()
 
         to = self.to.isoformat()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "from": from_,
-                "to": to,
-            }
-        )
+        field_dict.update({
+            "from": from_,
+            "to": to,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         from_ = isoparse(d.pop("from"))
 
+
+
+
         to = isoparse(d.pop("to"))
+
+
+
 
         common_types_time_range = cls(
             from_=from_,
             to=to,
         )
+
 
         common_types_time_range.additional_properties = d
         return common_types_time_range

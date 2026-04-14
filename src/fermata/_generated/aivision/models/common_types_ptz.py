@@ -1,28 +1,41 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
+
+
+
+
+
+
 T = TypeVar("T", bound="CommonTypesPTZ")
+
 
 
 @_attrs_define
 class CommonTypesPTZ:
-    """Pan-Tilt-Zoom camera position. Pan and tilt are in radians.
+    """ Pan-Tilt-Zoom camera position. Pan and tilt are in radians.
 
-    Attributes:
-        pan (float): Pan angle in radians (-π to π)
-        tilt (float): Tilt angle in radians (0 to π/2)
-        zoom (float): Zoom level (camera-specific, e.g., 1-25)
-    """
+        Attributes:
+            pan (float): Pan angle in radians (-π to π)
+            tilt (float): Tilt angle in radians (0 to π/2)
+            zoom (float): Zoom level (camera-specific, e.g., 1-25)
+     """
 
     pan: float
     tilt: float
     zoom: float
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         pan = self.pan
@@ -31,17 +44,18 @@ class CommonTypesPTZ:
 
         zoom = self.zoom
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "pan": pan,
-                "tilt": tilt,
-                "zoom": zoom,
-            }
-        )
+        field_dict.update({
+            "pan": pan,
+            "tilt": tilt,
+            "zoom": zoom,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -57,6 +71,7 @@ class CommonTypesPTZ:
             tilt=tilt,
             zoom=zoom,
         )
+
 
         common_types_ptz.additional_properties = d
         return common_types_ptz

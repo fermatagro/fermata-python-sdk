@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ModelsTileFace(str, Enum):
     B = "b"
     D = "d"

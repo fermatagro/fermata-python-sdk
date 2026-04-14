@@ -8,7 +8,7 @@ GEN_DIR="$SDK_ROOT/src/fermata/_generated"
 DEMETRA_OPENAPI="$(cd "$SDK_ROOT/.." && pwd)/demetra/api/openapi"
 VENV_BIN="$SDK_ROOT/.venv/bin"
 
-DOMAINS=(observations aivision catalog)
+DOMAINS=(observations aivision catalog pipelines)
 
 echo "=== Copying specs from demetra ==="
 for domain in "${DOMAINS[@]}"; do

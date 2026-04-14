@@ -1,16 +1,22 @@
-import datetime
 from http import HTTPStatus
-from typing import Any
-from uuid import UUID
+from typing import Any, cast
+from urllib.parse import quote
 
 import httpx
 
-from ... import errors
 from ...client import AuthenticatedClient, Client
+from ...types import Response, UNSET
+from ... import errors
+
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.models_photo_count import ModelsPhotoCount
 from ...models.models_photo_source import ModelsPhotoSource
-from ...types import UNSET, Response, Unset
+from ...types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
+
 
 
 def _get_kwargs(
@@ -27,7 +33,14 @@ def _get_kwargs(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+    hmin: float | Unset = UNSET,
+    hmax: float | Unset = UNSET,
+
 ) -> dict[str, Any]:
+    
+
+    
+
     params: dict[str, Any] = {}
 
     json_from_ = from_.isoformat()
@@ -75,7 +88,13 @@ def _get_kwargs(
 
     params["ymax"] = ymax
 
+    params["hmin"] = hmin
+
+    params["hmax"] = hmax
+
+
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
+
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -83,29 +102,37 @@ def _get_kwargs(
         "params": params,
     }
 
+
     return _kwargs
 
 
-def _parse_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> CommonErrorsApiError | ModelsPhotoCount | None:
+
+def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ModelsPhotoCount | None:
     if response.status_code == 200:
         response_200 = ModelsPhotoCount.from_dict(response.json())
+
+
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
+
+
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
+
+
 
         return response_500
 
@@ -115,9 +142,7 @@ def _parse_response(
         return None
 
 
-def _build_response(
-    *, client: AuthenticatedClient | Client, response: httpx.Response
-) -> Response[CommonErrorsApiError | ModelsPhotoCount]:
+def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ModelsPhotoCount]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -141,8 +166,11 @@ def sync_detailed(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+    hmin: float | Unset = UNSET,
+    hmax: float | Unset = UNSET,
+
 ) -> Response[CommonErrorsApiError | ModelsPhotoCount]:
-    """Count photos matching filters
+    """  Count photos matching filters
 
     Args:
         from_ (datetime.datetime):
@@ -157,6 +185,8 @@ def sync_detailed(
         ymin (float | Unset):
         xmax (float | Unset):
         ymax (float | Unset):
+        hmin (float | Unset):
+        hmax (float | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -164,21 +194,25 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsPhotoCount]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         from_=from_,
-        to=to,
-        growing_cycle_id=growing_cycle_id,
-        greenhouse_id=greenhouse_id,
-        device_id=device_id,
-        zone_object_id=zone_object_id,
-        source=source,
-        pipeline_id=pipeline_id,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
+to=to,
+growing_cycle_id=growing_cycle_id,
+greenhouse_id=greenhouse_id,
+device_id=device_id,
+zone_object_id=zone_object_id,
+source=source,
+pipeline_id=pipeline_id,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+hmin=hmin,
+hmax=hmax,
+
     )
 
     response = client.get_httpx_client().request(
@@ -186,7 +220,6 @@ def sync_detailed(
     )
 
     return _build_response(client=client, response=response)
-
 
 def sync(
     *,
@@ -203,8 +236,11 @@ def sync(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+    hmin: float | Unset = UNSET,
+    hmax: float | Unset = UNSET,
+
 ) -> CommonErrorsApiError | ModelsPhotoCount | None:
-    """Count photos matching filters
+    """  Count photos matching filters
 
     Args:
         from_ (datetime.datetime):
@@ -219,6 +255,8 @@ def sync(
         ymin (float | Unset):
         xmax (float | Unset):
         ymax (float | Unset):
+        hmin (float | Unset):
+        hmax (float | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -226,24 +264,27 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ModelsPhotoCount
-    """
+     """
+
 
     return sync_detailed(
         client=client,
-        from_=from_,
-        to=to,
-        growing_cycle_id=growing_cycle_id,
-        greenhouse_id=greenhouse_id,
-        device_id=device_id,
-        zone_object_id=zone_object_id,
-        source=source,
-        pipeline_id=pipeline_id,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
-    ).parsed
+from_=from_,
+to=to,
+growing_cycle_id=growing_cycle_id,
+greenhouse_id=greenhouse_id,
+device_id=device_id,
+zone_object_id=zone_object_id,
+source=source,
+pipeline_id=pipeline_id,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+hmin=hmin,
+hmax=hmax,
 
+    ).parsed
 
 async def asyncio_detailed(
     *,
@@ -260,8 +301,11 @@ async def asyncio_detailed(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+    hmin: float | Unset = UNSET,
+    hmax: float | Unset = UNSET,
+
 ) -> Response[CommonErrorsApiError | ModelsPhotoCount]:
-    """Count photos matching filters
+    """  Count photos matching filters
 
     Args:
         from_ (datetime.datetime):
@@ -276,6 +320,8 @@ async def asyncio_detailed(
         ymin (float | Unset):
         xmax (float | Unset):
         ymax (float | Unset):
+        hmin (float | Unset):
+        hmax (float | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -283,27 +329,32 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsPhotoCount]
-    """
+     """
+
 
     kwargs = _get_kwargs(
         from_=from_,
-        to=to,
-        growing_cycle_id=growing_cycle_id,
-        greenhouse_id=greenhouse_id,
-        device_id=device_id,
-        zone_object_id=zone_object_id,
-        source=source,
-        pipeline_id=pipeline_id,
-        xmin=xmin,
-        ymin=ymin,
-        xmax=xmax,
-        ymax=ymax,
+to=to,
+growing_cycle_id=growing_cycle_id,
+greenhouse_id=greenhouse_id,
+device_id=device_id,
+zone_object_id=zone_object_id,
+source=source,
+pipeline_id=pipeline_id,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+hmin=hmin,
+hmax=hmax,
+
     )
 
-    response = await client.get_async_httpx_client().request(**kwargs)
+    response = await client.get_async_httpx_client().request(
+        **kwargs
+    )
 
     return _build_response(client=client, response=response)
-
 
 async def asyncio(
     *,
@@ -320,8 +371,11 @@ async def asyncio(
     ymin: float | Unset = UNSET,
     xmax: float | Unset = UNSET,
     ymax: float | Unset = UNSET,
+    hmin: float | Unset = UNSET,
+    hmax: float | Unset = UNSET,
+
 ) -> CommonErrorsApiError | ModelsPhotoCount | None:
-    """Count photos matching filters
+    """  Count photos matching filters
 
     Args:
         from_ (datetime.datetime):
@@ -336,6 +390,8 @@ async def asyncio(
         ymin (float | Unset):
         xmax (float | Unset):
         ymax (float | Unset):
+        hmin (float | Unset):
+        hmax (float | Unset):
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -343,22 +399,24 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ModelsPhotoCount
-    """
+     """
 
-    return (
-        await asyncio_detailed(
-            client=client,
-            from_=from_,
-            to=to,
-            growing_cycle_id=growing_cycle_id,
-            greenhouse_id=greenhouse_id,
-            device_id=device_id,
-            zone_object_id=zone_object_id,
-            source=source,
-            pipeline_id=pipeline_id,
-            xmin=xmin,
-            ymin=ymin,
-            xmax=xmax,
-            ymax=ymax,
-        )
-    ).parsed
+
+    return (await asyncio_detailed(
+        client=client,
+from_=from_,
+to=to,
+growing_cycle_id=growing_cycle_id,
+greenhouse_id=greenhouse_id,
+device_id=device_id,
+zone_object_id=zone_object_id,
+source=source,
+pipeline_id=pipeline_id,
+xmin=xmin,
+ymin=ymin,
+xmax=xmax,
+ymax=ymax,
+hmin=hmin,
+hmax=hmax,
+
+    )).parsed

@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class ModelsTimeBucket(str, Enum):
     DAY = "day"
     WEEK = "week"

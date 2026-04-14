@@ -1,35 +1,44 @@
 from __future__ import annotations
 
-import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar
-from uuid import UUID
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-from dateutil.parser import isoparse
+
+from ..types import UNSET, Unset
 
 from ..models.models_report_kind import ModelsReportKind
 from ..types import UNSET, Unset
+from dateutil.parser import isoparse
+from typing import cast
+from uuid import UUID
+import datetime
+
+
+
+
+
 
 T = TypeVar("T", bound="ModelsReport")
 
 
+
 @_attrs_define
 class ModelsReport:
-    """
-    Attributes:
-        id (UUID): UUID identifier
-        greenhouse_id (UUID): UUID identifier
-        kind (ModelsReportKind): Type of AI vision report
-        title (str):
-        from_ (datetime.datetime):
-        to (datetime.datetime):
-        created_at (datetime.datetime):
-        cycle_id (UUID | Unset): UUID identifier
-        ready_at (datetime.datetime | Unset):
-        download_url (str | Unset): Presigned URL to download the report PDF (available when report is ready)
-    """
+    """ 
+        Attributes:
+            id (UUID): UUID identifier
+            greenhouse_id (UUID): UUID identifier
+            kind (ModelsReportKind): Type of AI vision report
+            title (str):
+            from_ (datetime.datetime):
+            to (datetime.datetime):
+            created_at (datetime.datetime):
+            cycle_id (UUID | Unset): UUID identifier
+            ready_at (datetime.datetime | Unset):
+            download_url (str | Unset): Presigned URL to download the report PDF (available when report is ready)
+     """
 
     id: UUID
     greenhouse_id: UUID
@@ -42,6 +51,10 @@ class ModelsReport:
     ready_at: datetime.datetime | Unset = UNSET
     download_url: str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         id = str(self.id)
@@ -68,19 +81,18 @@ class ModelsReport:
 
         download_url = self.download_url
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "id": id,
-                "greenhouseId": greenhouse_id,
-                "kind": kind,
-                "title": title,
-                "from": from_,
-                "to": to,
-                "createdAt": created_at,
-            }
-        )
+        field_dict.update({
+            "id": id,
+            "greenhouseId": greenhouse_id,
+            "kind": kind,
+            "title": title,
+            "from": from_,
+            "to": to,
+            "createdAt": created_at,
+        })
         if cycle_id is not UNSET:
             field_dict["cycleId"] = cycle_id
         if ready_at is not UNSET:
@@ -90,36 +102,62 @@ class ModelsReport:
 
         return field_dict
 
+
+
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         id = UUID(d.pop("id"))
 
+
+
+
         greenhouse_id = UUID(d.pop("greenhouseId"))
 
+
+
+
         kind = ModelsReportKind(d.pop("kind"))
+
+
+
 
         title = d.pop("title")
 
         from_ = isoparse(d.pop("from"))
 
+
+
+
         to = isoparse(d.pop("to"))
+
+
+
 
         created_at = isoparse(d.pop("createdAt"))
 
+
+
+
         _cycle_id = d.pop("cycleId", UNSET)
         cycle_id: UUID | Unset
-        if isinstance(_cycle_id, Unset):
+        if isinstance(_cycle_id,  Unset):
             cycle_id = UNSET
         else:
             cycle_id = UUID(_cycle_id)
 
+
+
+
         _ready_at = d.pop("readyAt", UNSET)
         ready_at: datetime.datetime | Unset
-        if isinstance(_ready_at, Unset):
+        if isinstance(_ready_at,  Unset):
             ready_at = UNSET
         else:
             ready_at = isoparse(_ready_at)
+
+
+
 
         download_url = d.pop("downloadUrl", UNSET)
 
@@ -135,6 +173,7 @@ class ModelsReport:
             ready_at=ready_at,
             download_url=download_url,
         )
+
 
         models_report.additional_properties = d
         return models_report

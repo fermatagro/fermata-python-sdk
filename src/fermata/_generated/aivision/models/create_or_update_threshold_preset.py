@@ -1,32 +1,39 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
 from ..models.models_preset_level import ModelsPresetLevel
 from ..models.models_preset_type import ModelsPresetType
+from typing import cast
 
 if TYPE_CHECKING:
-    from ..models.create_or_update_threshold_preset_values import CreateOrUpdateThresholdPresetValues
+  from ..models.create_or_update_threshold_preset_values import CreateOrUpdateThresholdPresetValues
+
+
+
 
 
 T = TypeVar("T", bound="CreateOrUpdateThresholdPreset")
 
 
+
 @_attrs_define
 class CreateOrUpdateThresholdPreset:
-    """
-    Attributes:
-        level (ModelsPresetLevel): Hierarchy level of a threshold preset
-        external_id (str): Scoping key: model_name for model-level, org_id for organization, gc_id for gc
-        model_name (str):
-        preset_type (ModelsPresetType): Preset category
-        name (str):
-        values (CreateOrUpdateThresholdPresetValues): Map of class name to confidence threshold (0..1)
-    """
+    """ 
+        Attributes:
+            level (ModelsPresetLevel): Hierarchy level of a threshold preset
+            external_id (str): Scoping key: model_name for model-level, org_id for organization, gc_id for gc
+            model_name (str):
+            preset_type (ModelsPresetType): Preset category
+            name (str):
+            values (CreateOrUpdateThresholdPresetValues): Map of class name to confidence threshold (0..1)
+     """
 
     level: ModelsPresetLevel
     external_id: str
@@ -36,7 +43,12 @@ class CreateOrUpdateThresholdPreset:
     values: CreateOrUpdateThresholdPresetValues
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
+
+
+
+
     def to_dict(self) -> dict[str, Any]:
+        from ..models.create_or_update_threshold_preset_values import CreateOrUpdateThresholdPresetValues
         level = self.level.value
 
         external_id = self.external_id
@@ -49,27 +61,30 @@ class CreateOrUpdateThresholdPreset:
 
         values = self.values.to_dict()
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "level": level,
-                "externalId": external_id,
-                "modelName": model_name,
-                "presetType": preset_type,
-                "name": name,
-                "values": values,
-            }
-        )
+        field_dict.update({
+            "level": level,
+            "externalId": external_id,
+            "modelName": model_name,
+            "presetType": preset_type,
+            "name": name,
+            "values": values,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.create_or_update_threshold_preset_values import CreateOrUpdateThresholdPresetValues
-
         d = dict(src_dict)
         level = ModelsPresetLevel(d.pop("level"))
+
+
+
 
         external_id = d.pop("externalId")
 
@@ -77,9 +92,15 @@ class CreateOrUpdateThresholdPreset:
 
         preset_type = ModelsPresetType(d.pop("presetType"))
 
+
+
+
         name = d.pop("name")
 
         values = CreateOrUpdateThresholdPresetValues.from_dict(d.pop("values"))
+
+
+
 
         create_or_update_threshold_preset = cls(
             level=level,
@@ -89,6 +110,7 @@ class CreateOrUpdateThresholdPreset:
             name=name,
             values=values,
         )
+
 
         create_or_update_threshold_preset.additional_properties = d
         return create_or_update_threshold_preset

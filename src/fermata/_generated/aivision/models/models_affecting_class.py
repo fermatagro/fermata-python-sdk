@@ -1,29 +1,42 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
+from ..types import UNSET, Unset
+
+
+
+
+
+
+
 T = TypeVar("T", bound="ModelsAffectingClass")
+
 
 
 @_attrs_define
 class ModelsAffectingClass:
-    """
-    Attributes:
-        class_ (str): Class code
-        value (int): Affected area, in 1x1sqm cells
-        detection_count (int): Total number of detections for this class in this time bucket
-        box_count (int): Total number of prediction boxes for this class in this time bucket
-    """
+    """ 
+        Attributes:
+            class_ (str): Class code
+            value (int): Affected area, in 1x1sqm cells
+            detection_count (int): Total number of detections for this class in this time bucket
+            box_count (int): Total number of prediction boxes for this class in this time bucket
+     """
 
     class_: str
     value: int
     detection_count: int
     box_count: int
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
+
+
+
+
 
     def to_dict(self) -> dict[str, Any]:
         class_ = self.class_
@@ -34,18 +47,19 @@ class ModelsAffectingClass:
 
         box_count = self.box_count
 
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update(
-            {
-                "class": class_,
-                "value": value,
-                "detectionCount": detection_count,
-                "boxCount": box_count,
-            }
-        )
+        field_dict.update({
+            "class": class_,
+            "value": value,
+            "detectionCount": detection_count,
+            "boxCount": box_count,
+        })
 
         return field_dict
+
+
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -64,6 +78,7 @@ class ModelsAffectingClass:
             detection_count=detection_count,
             box_count=box_count,
         )
+
 
         models_affecting_class.additional_properties = d
         return models_affecting_class
