@@ -104,17 +104,16 @@ class Fermata:
         assert self._pipeline_id is not None
         assert self._sync_id is not None
 
-        # 1. Resolve schedule
+        # 1. Resolve schedule (scope=growing_cycle, scope_id=cycle_id)
         schedule = await self.pipelines.get_schedule(self._pipeline_id)
-        greenhouse_id = schedule["scopeId"]
+        cycle_id = schedule["scopeId"]
         template_id = schedule["templateId"]
         model_name: str | None = schedule.get("arguments", {}).get("model_name")
         org_id = schedule["organizationId"]
 
-        # 2. Resolve active growing cycle
-        now = datetime.datetime.now(datetime.UTC).isoformat()
-        cycles = await self.cultivation.list_active_cycles(greenhouse_id, now)
-        cycle_id: str | None = cycles[0]["id"] if cycles else None
+        # 2. Get greenhouse from growing cycle
+        cycle = await self.cultivation.get_cycle(cycle_id)
+        greenhouse_id = cycle["greenhouseId"]
 
         # 3. Auto-select model if not in schedule arguments
         if not model_name:
@@ -128,8 +127,8 @@ class Fermata:
         await self.pipelines.create_fire(
             fire_id,
             template_id=template_id,
-            scope="greenhouse",
-            scope_id=greenhouse_id,
+            scope="growing_cycle",
+            scope_id=cycle_id,
             trigger_id=self._pipeline_id,
             arguments={"sync_id": self._sync_id},
         )

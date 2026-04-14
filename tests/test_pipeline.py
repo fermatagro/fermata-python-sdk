@@ -28,23 +28,19 @@ SCHEDULE_RESPONSE = {
     "id": SCHEDULE_ID,
     "organizationId": ORG_ID,
     "templateId": TEMPLATE_ID,
-    "scope": "greenhouse",
-    "scopeId": GREENHOUSE_ID,
+    "scope": "growing_cycle",
+    "scopeId": CYCLE_ID,
     "state": "enabled",
     "cronExprUtc": "0 0 * * *",
     "arguments": {"model_name": "tomato-v3"},
     "createdAt": "2026-04-01T00:00:00Z",
 }
 
-CYCLES_RESPONSE = {
-    "items": [
-        {
-            "id": CYCLE_ID,
-            "organizationId": ORG_ID,
-            "greenhouseId": GREENHOUSE_ID,
-            "plantingDate": "2026-03-01T00:00:00Z",
-        }
-    ]
+CYCLE_RESPONSE = {
+    "id": CYCLE_ID,
+    "organizationId": ORG_ID,
+    "greenhouseId": GREENHOUSE_ID,
+    "plantingDate": "2026-03-01T00:00:00Z",
 }
 
 PHOTO_JSON = {
@@ -75,7 +71,7 @@ def _upload_link_handler(request: httpx.Request) -> httpx.Response:
 def _mock_pipeline_init(mock_hera: respx.Router) -> None:
     """Register mocks for the pipeline init sequence."""
     mock_hera.get(f"/api/v1/pipelines/schedules/{SCHEDULE_ID}").respond(200, json=SCHEDULE_RESPONSE)
-    mock_hera.get("/api/v1/cycles/active").respond(200, json=CYCLES_RESPONSE)
+    mock_hera.get(f"/api/v1/cycles/{CYCLE_ID}").respond(200, json=CYCLE_RESPONSE)
     mock_hera.post(url__regex=r"/api/v1/pipelines/fires/.+").respond(201)
 
 
@@ -99,25 +95,24 @@ async def test_pipeline_init_resolves_context(mock_hera: respx.Router) -> None:
         assert f.scan_id == f.run.run_id  # scan_id set to fire_id
 
 
-async def test_pipeline_init_no_active_cycle(mock_hera: respx.Router) -> None:
-    """Pipeline mode works when no active growing cycle exists."""
-    mock_hera.get(f"/api/v1/pipelines/schedules/{SCHEDULE_ID}").respond(200, json=SCHEDULE_RESPONSE)
-    mock_hera.get("/api/v1/cycles/active").respond(200, json={"items": []})
-    mock_hera.post(url__regex=r"/api/v1/pipelines/fires/.+").respond(201)
+async def test_pipeline_init_sets_cycle_and_greenhouse(mock_hera: respx.Router) -> None:
+    """Pipeline mode derives greenhouse_id from the growing cycle."""
+    _mock_pipeline_init(mock_hera)
 
     async with Fermata(
         HERA_URL, USERNAME, PASSWORD,
         pipeline_id=SCHEDULE_ID, sync_id="run-001",
     ) as f:
         assert f.run is not None
-        assert f.run.growing_cycle_id is None
+        assert f.run.growing_cycle_id == CYCLE_ID
+        assert f.run.greenhouse_id == GREENHOUSE_ID
 
 
 async def test_pipeline_init_model_fallback(mock_hera: respx.Router) -> None:
     """If schedule has no model_name, fall back to models.list()."""
     schedule_no_model = {**SCHEDULE_RESPONSE, "arguments": {}}
     mock_hera.get(f"/api/v1/pipelines/schedules/{SCHEDULE_ID}").respond(200, json=schedule_no_model)
-    mock_hera.get("/api/v1/cycles/active").respond(200, json=CYCLES_RESPONSE)
+    mock_hera.get(f"/api/v1/cycles/{CYCLE_ID}").respond(200, json=CYCLE_RESPONSE)
     mock_hera.post(url__regex=r"/api/v1/pipelines/fires/.+").respond(201)
     mock_hera.get("/api/v1/models").respond(200, json=[
         {"modelName": "fallback-model", "modelType": "detection", "isActive": True}

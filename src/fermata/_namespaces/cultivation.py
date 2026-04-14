@@ -9,6 +9,14 @@ class AsyncCultivation:
     def __init__(self, transport: Transport) -> None:
         self._t = transport
 
+    async def get_cycle(self, cycle_id: str) -> dict[str, Any]:
+        """Fetch a growing cycle by ID.
+
+        GET /api/v1/cycles/{cycleId}
+        """
+        resp = await self._t.request("GET", f"/api/v1/cycles/{cycle_id}")
+        return resp.json()
+
     async def list_active_cycles(
         self, greenhouse_id: str, at_time: str
     ) -> list[dict[str, Any]]:
