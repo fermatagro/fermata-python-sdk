@@ -9,7 +9,7 @@ from fermata._generated.aivision.models.models_task import ModelsTask as Inferen
 from fermata._generated.aivision.models.models_task_status import ModelsTaskStatus as TaskStatus
 from fermata._generated.catalog.models.models_ai_model import ModelsAIModel as Model
 from fermata._generated.cultivation.models.models_growing_cycle import ModelsGrowingCycle as GrowingCycle
-from fermata._generated.observations.models.models_photo import ModelsPhoto as Photo
+from fermata._generated.greenhouses.models.models_greenhouse import ModelsGreenhouse as Greenhouse
 from fermata._generated.observations.models.models_upload_link_response import (
     ModelsUploadLinkResponse as UploadLink,
 )
@@ -29,11 +29,11 @@ class PipelineRun:
 
 
 __all__ = [
-    "Photo",
     "UploadLink",
     "InferenceTask",
     "TaskStatus",
     "Model",
+    "Greenhouse",
     "Schedule",
     "GrowingCycle",
     "PipelineRun",

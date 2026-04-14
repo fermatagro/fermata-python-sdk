@@ -3,45 +3,9 @@ info:
   title: Demetra Catalog API
   version: 0.0.0
 tags:
-  - name: AI Models
-  - name: ML Classes
+- name: AI Models
+- name: ML Classes
 paths:
-  /api/v1/classes:
-    get:
-      operationId: listMLClasses
-      description: List ML classes from ML API
-      parameters: []
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Models.MLClass'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - ML Classes
-      security:
-        - BearerAuth: []
   /api/v1/models:
     get:
       operationId: listAIModels
@@ -75,64 +39,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-        - AI Models
+      - AI Models
       security:
-        - BearerAuth: []
-    post:
-      operationId: saveAIModel
-      description: Register a new AI model or update its active status. When activating, checks Triton readiness.
-      parameters: []
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.AIModel'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '409':
-          description: The request conflicts with the current state of the server.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ConflictError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - AI Models
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Models.SaveModelRequest'
-      security:
-        - BearerAuth: []
+      - BearerAuth: []
   /api/v1/models/by-name/{modelName}:
     get:
       operationId: getAIModelByName
       description: Get AI model by name from ML API
       parameters:
-        - name: modelName
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: modelName
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: The request has succeeded.
@@ -165,16 +84,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-        - AI Models
+      - AI Models
       security:
-        - BearerAuth: []
+      - BearerAuth: []
 components:
   schemas:
     Common.Errors.ApiError:
       type: object
       required:
-        - request_id
-        - message
+      - request_id
+      - message
       properties:
         request_id:
           type: string
@@ -186,105 +105,68 @@ components:
     Common.Errors.AuthenticationError:
       type: object
       required:
-        - code
+      - code
       properties:
         code:
           type: string
           enum:
-            - AuthenticationRequired
+          - AuthenticationRequired
       allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that authentication is required to access the resource
-    Common.Errors.ConflictError:
-      type: object
-      required:
-        - code
-      properties:
-        code:
-          type: string
-          enum:
-            - Conflict
-      allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
-      description: Indicates that the resource already exists or conflicts with the current state
     Common.Errors.ForbiddenError:
       type: object
       required:
-        - code
+      - code
       properties:
         code:
           type: string
           enum:
-            - Forbidden
+          - Forbidden
       allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that action is forbidden due to lack of permissions
     Common.Errors.InternalServerError:
       type: object
       required:
-        - code
+      - code
       properties:
         code:
           type: string
           enum:
-            - InternalServerError
+          - InternalServerError
       allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that an internal server error occurred
     Common.Errors.NotFoundError:
       type: object
       required:
-        - code
-        - resource_id
+      - code
+      - resource_id
       properties:
         code:
           type: string
           enum:
-            - NotFound
+          - NotFound
         resource_id:
           type: string
           description: Identifier of the resource that was not found
       allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that the requested resource was not found
-    Common.Errors.ValidationError:
-      type: object
-      required:
-        - code
-        - details
-      properties:
-        code:
-          type: string
-          enum:
-            - ValidationError
-        details:
-          type: array
-          items:
-            type: object
-            properties:
-              field:
-                type: string
-              issue:
-                type: string
-            required:
-              - field
-              - issue
-      allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
-      description: Indicates that the request was invalid
     Models.AIModel:
       type: object
       required:
-        - modelName
-        - modelType
-        - isActive
+      - modelName
+      - modelType
+      - isActive
       properties:
         modelName:
           type: string
           description: Model name (unique identifier)
         modelType:
           allOf:
-            - $ref: '#/components/schemas/Models.AIModelType'
+          - $ref: '#/components/schemas/Models.AIModelType'
           description: Type of the model
         isActive:
           type: boolean
@@ -293,58 +175,11 @@ components:
     Models.AIModelType:
       type: string
       enum:
-        - detection
-        - classification
-        - segmentation
+      - detection
+      - classification
+      - segmentation
       description: Type of AI model
-    Models.ClassInfo:
-      type: object
-      required:
-        - classId
-      properties:
-        classId:
-          type: string
-          description: ID of the class
-      description: Class information within a model
-    Models.MLClass:
-      type: object
-      required:
-        - name
-        - group
-      properties:
-        name:
-          type: string
-          description: Class name
-        group:
-          type: string
-          description: Class group
-        legacyNumId:
-          type: string
-          description: Legacy numeric ID
-      description: ML Class from ML API
-    Models.SaveModelRequest:
-      type: object
-      required:
-        - name
-      properties:
-        name:
-          type: string
-          description: Model name (must match Triton deployment name)
-        isActive:
-          type: boolean
-          description: 'Whether the model should be active (default: true)'
-      description: Request to save or update an AI model
   securitySchemes:
     BearerAuth:
       type: http
       scheme: Bearer
-servers:
-  - url: https://api.croptimus.com
-    description: prod
-    variables: {}
-  - url: https://api.fermata.click
-    description: dev
-    variables: {}
-  - url: http://localhost:3000
-    description: local
-    variables: {}

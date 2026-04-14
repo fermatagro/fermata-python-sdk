@@ -3,532 +3,25 @@ info:
   title: Demetra Observations API
   version: 0.0.0
 tags:
-  - name: Photos
-  - name: Panoramas
-  - name: Media
-  - name: MediaThumbnails
+- name: Photos
+- name: Panoramas
+- name: Media
+- name: MediaThumbnails
 paths:
-  /api/v1/panoramas:
-    get:
-      operationId: listPanoramas
-      description: List panoramas with pagination
-      parameters:
-        - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
-        - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
-        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.from'
-        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.to'
-        - $ref: '#/components/parameters/Models.ListPanoramaRequest.greenhouseId'
-        - $ref: '#/components/parameters/Models.ListPanoramaRequest.pipelineId'
-        - $ref: '#/components/parameters/Models.ListPanoramaRequest.deviceId'
-        - $ref: '#/components/parameters/Models.ListPanoramaRequest.baseX'
-        - $ref: '#/components/parameters/Models.ListPanoramaRequest.baseY'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - items
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Models.Panorama'
-                    description: Items for the current page
-                  next_token:
-                    type: string
-                    description: Token to retrieve the next page of items, if any
-                description: Generic paginated response model with cursor-based pagination
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Panoramas
-      security:
-        - BearerAuth: []
-  /api/v1/panoramas/cut:
-    post:
-      operationId: cutPanorama
-      description: Submit a cut-only tile generation job for an existing panorama
-      parameters: []
-      responses:
-        '202':
-          description: The request has been accepted for processing, but processing has not yet completed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.CutPanoramaResponse'
-        '400':
-          description: The server could not understand the request due to invalid syntax.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ValidationError'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Panoramas
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Models.CutPanoramaRequest'
-      security:
-        - BearerAuth: []
-  /api/v1/panoramas/stitch:
-    post:
-      operationId: submitPanoramaStitch
-      description: Submit a panorama stitching task. Creates a Kharon ticket to process the stitch asynchronously.
-      parameters: []
-      responses:
-        '202':
-          description: The request has been accepted for processing, but processing has not yet completed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.SubmitPanoramaStitchResponse'
-        '400':
-          description: The server could not understand the request due to invalid syntax.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ValidationError'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Panoramas
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Models.SubmitPanoramaStitchRequest'
-      security:
-        - BearerAuth: []
-  /api/v1/panoramas/stitch/upload-link:
-    post:
-      operationId: getRawCaptureUploadLink
-      description: Get presigned upload URL for a single raw panorama input image
-      parameters: []
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.GetRawCaptureUploadLinkResponse'
-        '400':
-          description: The server could not understand the request due to invalid syntax.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ValidationError'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '409':
-          description: The request conflicts with the current state of the server.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ConflictError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Panoramas
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Models.GetRawCaptureUploadLinkRequest'
-      security:
-        - BearerAuth: []
-  /api/v1/panoramas/{panoramaId}:
-    get:
-      operationId: getPanorama
-      description: Get panorama by ID. For M2M tokens, pass X-Organization-Id header.
-      parameters:
-        - name: panoramaId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.Panorama'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Panoramas
-      security:
-        - BearerAuth: []
-    delete:
-      operationId: deletePanorama
-      description: Delete panorama by ID. For M2M tokens, pass X-Organization-Id header.
-      parameters:
-        - name: panoramaId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-      responses:
-        '204':
-          description: There is no content to send for this request, but the headers may be useful.
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Panoramas
-      security:
-        - BearerAuth: []
-  /api/v1/photos:
-    get:
-      operationId: listPhotos
-      description: List photos with filtering options
-      parameters:
-        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.from'
-        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.to'
-        - name: growingCycleId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: greenhouseId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: deviceId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: zoneObjectId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: source
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Models.PhotoSource'
-          explode: false
-        - name: pipelineId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmin'
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymin'
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmax'
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymax'
-        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmin'
-        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmax'
-        - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
-        - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - items
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Models.Photo'
-                    description: Items for the current page
-                  next_token:
-                    type: string
-                    description: Token to retrieve the next page of items, if any
-                description: Generic paginated response model with cursor-based pagination
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Photos
-      security:
-        - BearerAuth: []
-  /api/v1/photos/batch:
-    get:
-      operationId: getPhotoBatch
-      description: Get a batch of photos by IDs
-      parameters:
-        - name: photoIds
-          in: query
-          required: true
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.PhotoBatch'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Photos
-      security:
-        - BearerAuth: []
-  /api/v1/photos/count:
-    get:
-      operationId: countPhotos
-      description: Count photos matching filters
-      parameters:
-        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.from'
-        - $ref: '#/components/parameters/Common.Types.TimeRangeQuery.to'
-        - name: growingCycleId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: greenhouseId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: deviceId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: zoneObjectId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - name: source
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Models.PhotoSource'
-          explode: false
-        - name: pipelineId
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-          explode: false
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmin'
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymin'
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.xmax'
-        - $ref: '#/components/parameters/Common.Types.GridRectQuery.ymax'
-        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmin'
-        - $ref: '#/components/parameters/Common.Types.HRangeQuery.hmax'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.PhotoCount'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Photos
-      security:
-        - BearerAuth: []
   /api/v1/photos/{photoId}:
     post:
       operationId: createPhoto
       description: Create photo metadata after S3 upload
       parameters:
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
+      - name: photoId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
       responses:
         '201':
-          description: The request has succeeded and a new resource has been created as a result.
+          description: The request has succeeded and a new resource has been created
+            as a result.
         '401':
           description: Access is unauthorized.
           content:
@@ -548,7 +41,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-        - Photos
+      - Photos
       requestBody:
         required: true
         content:
@@ -556,61 +49,17 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateOrUpdatePhoto'
       security:
-        - BearerAuth: []
-    get:
-      operationId: getPhoto
-      description: Get photo information
-      parameters:
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Models.Photo'
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Photos
-      security:
-        - BearerAuth: []
+      - BearerAuth: []
   /api/v1/photos/{photoId}/upload-link:
     post:
       operationId: createPhotoUploadLink
       description: Get a presigned URL for direct S3 upload
       parameters:
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
+      - name: photoId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
       responses:
         '200':
           description: The request has succeeded.
@@ -637,7 +86,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-        - Photos
+      - Photos
       requestBody:
         required: true
         content:
@@ -645,322 +94,14 @@ paths:
             schema:
               $ref: '#/components/schemas/Models.CreateUploadLink'
       security:
-        - BearerAuth: []
-  /cloudfront/{orgId}/thumb/{mediaType}/{year}/{month}/{day}/{mediaId}/{thumbCode}.{thumbExt}:
-    get:
-      operationId: getMediaThumb
-      description: 'Get dynamic thumbnail ThumbCode format: w{width}h{height}dpr{dpr}q{quality}, e.g., w320h180dpr2q75.jpeg'
-      parameters:
-        - name: orgId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.OrganizationID'
-        - name: mediaType
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: year
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int16
-        - name: month
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int8
-        - name: day
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int8
-        - name: mediaId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-        - name: thumbCode
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Models.ThumbCode'
-        - name: thumbExt
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The request has succeeded.
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - MediaThumbnails
-      security:
-        - BearerAuth: []
-  /media/panorama/{organizationId}/{panoramaId}:
-    get:
-      operationId: getMediaPanorama
-      description: Get panorama media (redirects to S3 presigned URL)
-      parameters:
-        - name: organizationId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.OrganizationID'
-        - name: panoramaId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-      responses:
-        '307':
-          description: The URL of the requested resource has been changed temporarily.
-          headers:
-            location:
-              required: true
-              description: The Location header contains the URL where the status of the long running operation can be checked.
-              schema:
-                type: string
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Media
-      security:
-        - BearerAuth: []
-  /media/photo/{organizationId}/{photoId}:
-    get:
-      operationId: getMediaPhoto
-      description: Get photo media (redirects to S3 presigned URL)
-      parameters:
-        - name: organizationId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.OrganizationID'
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/Common.Types.ID'
-      responses:
-        '307':
-          description: The URL of the requested resource has been changed temporarily.
-          headers:
-            location:
-              required: true
-              description: The Location header contains the URL where the status of the long running operation can be checked.
-              schema:
-                type: string
-        '401':
-          description: Access is unauthorized.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
-        '403':
-          description: Access is forbidden.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
-        '404':
-          description: The server cannot find the requested resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.NotFoundError'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Common.Errors.InternalServerError'
-      tags:
-        - Media
-      security:
-        - BearerAuth: []
+      - BearerAuth: []
 components:
-  parameters:
-    Common.Pagination.PageParams.cursor:
-      name: cursor
-      in: query
-      required: false
-      description: Token to retrieve items after a specific point
-      schema:
-        type: string
-      explode: false
-    Common.Pagination.PageParams.limit:
-      name: limit
-      in: query
-      required: false
-      description: Maximum number of items to return (server may return fewer)
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 1000
-        default: 100
-      explode: false
-    Common.Types.GridRectQuery.xmax:
-      name: xmax
-      in: query
-      required: false
-      schema:
-        type: number
-        format: double
-      explode: false
-    Common.Types.GridRectQuery.xmin:
-      name: xmin
-      in: query
-      required: false
-      schema:
-        type: number
-        format: double
-      explode: false
-    Common.Types.GridRectQuery.ymax:
-      name: ymax
-      in: query
-      required: false
-      schema:
-        type: number
-        format: double
-      explode: false
-    Common.Types.GridRectQuery.ymin:
-      name: ymin
-      in: query
-      required: false
-      schema:
-        type: number
-        format: double
-      explode: false
-    Common.Types.HRangeQuery.hmax:
-      name: hmax
-      in: query
-      required: false
-      schema:
-        type: number
-        format: double
-      explode: false
-    Common.Types.HRangeQuery.hmin:
-      name: hmin
-      in: query
-      required: false
-      schema:
-        type: number
-        format: double
-      explode: false
-    Common.Types.TimeRangeQuery.from:
-      name: from
-      in: query
-      required: true
-      schema:
-        type: string
-        format: date-time
-    Common.Types.TimeRangeQuery.to:
-      name: to
-      in: query
-      required: true
-      schema:
-        type: string
-        format: date-time
-    Models.ListPanoramaRequest.baseX:
-      name: baseX
-      in: query
-      required: false
-      description: The base X grid coordinate
-      schema:
-        type: integer
-        format: int32
-      explode: false
-    Models.ListPanoramaRequest.baseY:
-      name: baseY
-      in: query
-      required: false
-      description: The base Y grid coordinate
-      schema:
-        type: integer
-        format: int32
-      explode: false
-    Models.ListPanoramaRequest.deviceId:
-      name: deviceId
-      in: query
-      required: false
-      description: Filter by device ID
-      schema:
-        $ref: '#/components/schemas/Common.Types.ID'
-      explode: false
-    Models.ListPanoramaRequest.greenhouseId:
-      name: greenhouseId
-      in: query
-      required: false
-      description: The ID of the greenhouse this panorama belongs to
-      schema:
-        $ref: '#/components/schemas/Common.Types.ID'
-      explode: false
-    Models.ListPanoramaRequest.pipelineId:
-      name: pipelineId
-      in: query
-      required: false
-      description: Filter by pipeline ID
-      schema:
-        $ref: '#/components/schemas/Common.Types.ID'
-      explode: false
   schemas:
     Common.Errors.ApiError:
       type: object
       required:
-        - request_id
-        - message
+      - request_id
+      - message
       properties:
         request_id:
           type: string
@@ -972,103 +113,50 @@ components:
     Common.Errors.AuthenticationError:
       type: object
       required:
-        - code
+      - code
       properties:
         code:
           type: string
           enum:
-            - AuthenticationRequired
+          - AuthenticationRequired
       allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that authentication is required to access the resource
-    Common.Errors.ConflictError:
-      type: object
-      required:
-        - code
-      properties:
-        code:
-          type: string
-          enum:
-            - Conflict
-      allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
-      description: Indicates that the resource already exists or conflicts with the current state
     Common.Errors.ForbiddenError:
       type: object
       required:
-        - code
+      - code
       properties:
         code:
           type: string
           enum:
-            - Forbidden
+          - Forbidden
       allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that action is forbidden due to lack of permissions
     Common.Errors.InternalServerError:
       type: object
       required:
-        - code
+      - code
       properties:
         code:
           type: string
           enum:
-            - InternalServerError
+          - InternalServerError
       allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that an internal server error occurred
-    Common.Errors.NotFoundError:
-      type: object
-      required:
-        - code
-        - resource_id
-      properties:
-        code:
-          type: string
-          enum:
-            - NotFound
-        resource_id:
-          type: string
-          description: Identifier of the resource that was not found
-      allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
-      description: Indicates that the requested resource was not found
-    Common.Errors.ValidationError:
-      type: object
-      required:
-        - code
-        - details
-      properties:
-        code:
-          type: string
-          enum:
-            - ValidationError
-        details:
-          type: array
-          items:
-            type: object
-            properties:
-              field:
-                type: string
-              issue:
-                type: string
-            required:
-              - field
-              - issue
-      allOf:
-        - $ref: '#/components/schemas/Common.Errors.ApiError'
-      description: Indicates that the request was invalid
     Common.Types.GridPos:
       type: object
       required:
-        - x
-        - 'y'
-        - h
+      - x
+      - y
+      - h
       properties:
         x:
           type: number
           format: double
-        'y':
+        y:
           type: number
           format: double
         h:
@@ -1079,23 +167,17 @@ components:
       type: string
       format: uuid
       description: UUID identifier
-    Common.Types.OrganizationID:
-      type: string
-      description: Organization identifier (opaque string)
-    Common.Types.UserID:
-      type: string
-      description: User identifier (opaque string)
     CreateOrUpdatePhoto:
       type: object
       required:
-        - id
-        - greenhouseId
-        - cultureId
-        - growingCycleId
-        - capturedAt
-        - source
-        - pos
-        - ptz
+      - id
+      - greenhouseId
+      - cultureId
+      - growingCycleId
+      - capturedAt
+      - source
+      - pos
+      - ptz
       properties:
         id:
           $ref: '#/components/schemas/Common.Types.ID'
@@ -1112,17 +194,19 @@ components:
           $ref: '#/components/schemas/Models.PhotoSource'
         s3Key:
           type: string
-          description: S3 key for the photo. Auto-generated if not provided. Use for migrating existing photos.
+          description: S3 key for the photo. Auto-generated if not provided. Use for
+            migrating existing photos.
         pos:
           allOf:
-            - $ref: '#/components/schemas/Common.Types.GridPos'
+          - $ref: '#/components/schemas/Common.Types.GridPos'
           description: Position of the object on photo on the grid (XYH)
         deviceId:
           $ref: '#/components/schemas/Common.Types.ID'
         deviceType:
           allOf:
-            - $ref: '#/components/schemas/Devices.Models.DeviceType'
-          description: Type of the device. Optional - defaults to 'unknown' if not provided.
+          - $ref: '#/components/schemas/Devices.Models.DeviceType'
+          description: Type of the device. Optional - defaults to 'unknown' if not
+            provided.
         zoneObjectId:
           $ref: '#/components/schemas/Common.Types.ID'
         pipelineId:
@@ -1136,516 +220,56 @@ components:
           items:
             type: number
             format: double
-          description: 'Camera pan/tilt/zoom settings. Array of 3 elements: [pan (radians, -π to π), tilt (radians, 0 to π/2), zoom (level)]'
+          description: 'Camera pan/tilt/zoom settings. Array of 3 elements: [pan (radians,
+            -π to π), tilt (radians, 0 to π/2), zoom (level)]'
       description: ''
     Devices.Models.DeviceType:
       type: string
       enum:
-        - camera
-        - router
-        - unknown
+      - camera
+      - router
+      - unknown
       description: Device type
-    Models.CreatePanoramaUploadLink:
-      type: object
-      required:
-        - capturedAt
-      properties:
-        capturedAt:
-          type: string
-          format: date-time
-          description: When the panorama was captured (used for S3 path organization)
-      description: Request to create upload link for a panorama
-    Models.CreateTileUploadLink:
-      type: object
-      required:
-        - capturedAt
-      properties:
-        capturedAt:
-          type: string
-          format: date-time
-          description: When the panorama was captured (used for S3 path organization)
-      description: Request to create upload link for a panorama tile
     Models.CreateUploadLink:
       type: object
       required:
-        - capturedAt
+      - capturedAt
       properties:
         capturedAt:
           type: string
           format: date-time
           description: When the photo was captured (used for S3 path organization)
       description: Request to create upload link for a photo
-    Models.CutPanoramaRequest:
-      type: object
-      required:
-        - panoramaId
-      properties:
-        panoramaId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: ID of the existing panorama to cut into tiles
-      description: Request to submit a cut-only tile generation job for an existing panorama
-    Models.CutPanoramaResponse:
-      type: object
-      required:
-        - jobId
-      properties:
-        jobId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the created cut job (use stitcher API to poll status)
-      description: Response for cut panorama submission
-    Models.DownloadLinkResponse:
-      type: object
-      required:
-        - downloadUrl
-        - expiresAt
-      properties:
-        downloadUrl:
-          type: string
-          description: Presigned S3 URL for download
-        expiresAt:
-          type: string
-          format: date-time
-          description: When the presigned URL expires
-      description: Response with presigned download URL
-    Models.GetRawCaptureUploadLinkRequest:
-      type: object
-      required:
-        - fireId
-        - deviceId
-        - level
-        - index
-      properties:
-        fireId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: Prefect fire ID (groups all captures for a greenhouse run)
-        deviceId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the device that will capture the image
-        level:
-          type: integer
-          format: int32
-          minimum: 0
-          maximum: 7
-          description: Tilt level (0-7)
-        index:
-          type: integer
-          format: int32
-          minimum: 0
-          description: Pan index within level (0 to 16-level*2-1)
-      description: Request for single upload link for raw panorama input image
-    Models.GetRawCaptureUploadLinkResponse:
-      type: object
-      required:
-        - uploadUrl
-        - expiresAt
-      properties:
-        uploadUrl:
-          type: string
-          description: Presigned S3 URL for direct upload
-        expiresAt:
-          type: string
-          format: date-time
-          description: When the presigned URL expires
-      description: Response with single presigned upload URL for raw capture
-    Models.GetStitchDownloadLinksRequest:
-      type: object
-      required:
-        - fireId
-        - deviceId
-      properties:
-        fireId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: Prefect fire ID (groups all captures for a greenhouse run)
-        deviceId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the device that captured the images
-      description: Request for download links for all raw panorama input images
-    Models.GetStitchDownloadLinksResponse:
-      type: object
-      required:
-        - downloadUrls
-        - expiresAt
-      properties:
-        downloadUrls:
-          type: object
-          additionalProperties:
-            type: string
-          description: "Map of level_index to presigned download URL. Keys: '0_0', '0_1', ..., '7_1'"
-        expiresAt:
-          type: string
-          format: date-time
-          description: When the presigned URLs expire
-      description: Response with presigned download URLs for all raw panorama input images (72 total)
-    Models.MediaURLs:
-      type: object
-      properties:
-        mediaUrl:
-          type: string
-          description: Permanent URL to download the media (Authorization required)
-          readOnly: true
-        cdnUrl:
-          type: string
-          description: URL to download the media from CDN (CDN cookie required)
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: URL to download the thumbnail media
-          readOnly: true
-    Models.Panorama:
-      type: object
-      required:
-        - id
-        - organizationId
-        - greenhouseId
-        - deviceId
-        - x
-        - 'y'
-        - height
-        - baseX
-        - baseY
-        - baseUrl
-        - capturedAt
-        - createdAt
-      properties:
-        id:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: Unique identifier, assigned by the system
-          readOnly: true
-        organizationId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.OrganizationID'
-          description: The ID of the organization this panorama belongs to
-          readOnly: true
-        greenhouseId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the greenhouse this panorama belongs to
-        deviceId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the device that captured this panorama
-        pipelineId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the processing pipeline
-        x:
-          type: number
-          format: double
-          description: The X coordinate of the panorama
-        'y':
-          type: number
-          format: double
-          description: The Y coordinate of the panorama
-        height:
-          type: number
-          format: double
-          description: The height at which the panorama was taken
-        baseX:
-          type: integer
-          format: int32
-          description: The base X grid coordinate
-          readOnly: true
-        baseY:
-          type: integer
-          format: int32
-          description: The base Y grid coordinate
-          readOnly: true
-        baseUrl:
-          type: string
-          description: The cdnUrl prefix for accessing panorama tiles
-          readOnly: true
-        capturedAt:
-          type: string
-          format: date-time
-          description: The timestamp when the panorama was captured
-        createdAt:
-          type: string
-          format: date-time
-          description: The timestamp when the panorama was created
-          readOnly: true
-        deletedAt:
-          type: string
-          format: date-time
-          description: The timestamp when the panorama was soft-deleted
-          readOnly: true
-      description: 360-degree panorama composed of multiple photos
-    Models.Photo:
-      type: object
-      required:
-        - id
-        - userId
-        - greenhouseId
-        - cultureId
-        - growingCycleId
-        - capturedAt
-        - source
-        - pos
-        - ptz
-        - createdAt
-      properties:
-        mediaUrl:
-          type: string
-          description: Permanent URL to download the media (Authorization required)
-          readOnly: true
-        cdnUrl:
-          type: string
-          description: URL to download the media from CDN (CDN cookie required)
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: URL to download the thumbnail media
-          readOnly: true
-        id:
-          $ref: '#/components/schemas/Common.Types.ID'
-        organizationId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.OrganizationID'
-          readOnly: true
-        userId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.UserID'
-          readOnly: true
-        greenhouseId:
-          $ref: '#/components/schemas/Common.Types.ID'
-        cultureId:
-          type: string
-        growingCycleId:
-          $ref: '#/components/schemas/Common.Types.ID'
-        capturedAt:
-          type: string
-          format: date-time
-        source:
-          $ref: '#/components/schemas/Models.PhotoSource'
-        s3Key:
-          type: string
-          description: S3 key for the photo. Auto-generated if not provided. Use for migrating existing photos.
-        pos:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.GridPos'
-          description: Position of the object on photo on the grid (XYH)
-        deviceId:
-          $ref: '#/components/schemas/Common.Types.ID'
-        deviceType:
-          allOf:
-            - $ref: '#/components/schemas/Devices.Models.DeviceType'
-          description: Type of the device. Optional - defaults to 'unknown' if not provided.
-        zoneObjectId:
-          $ref: '#/components/schemas/Common.Types.ID'
-        pipelineId:
-          $ref: '#/components/schemas/Common.Types.ID'
-        metadata:
-          type: object
-          additionalProperties: {}
-          description: Additional metadata (resolution, format, etc.)
-        ptz:
-          type: array
-          items:
-            type: number
-            format: double
-          description: 'Camera pan/tilt/zoom settings. Array of 3 elements: [pan (radians, -π to π), tilt (radians, 0 to π/2), zoom (level)]'
-        createdAt:
-          type: string
-          format: date-time
-          readOnly: true
-      description: A photograph captured in the greenhouse
-    Models.PhotoBatch:
-      type: object
-      required:
-        - items
-      properties:
-        items:
-          type: array
-          items:
-            type: object
-            properties:
-              value:
-                $ref: '#/components/schemas/Models.Photo'
-              error:
-                $ref: '#/components/schemas/Common.Errors.ApiError'
-            description: Result or error wrapper for API responses
-    Models.PhotoCount:
-      type: object
-      required:
-        - count
-      properties:
-        count:
-          type: integer
-          format: int64
     Models.PhotoSource:
       type: string
       enum:
-        - human
-        - pipeline
+      - human
+      - pipeline
       description: Source of the photo capture
-    Models.SubmitPanoramaStitchRequest:
-      type: object
-      required:
-        - fireId
-        - greenhouseId
-        - deviceId
-        - capturedAt
-        - x
-        - 'y'
-        - height
-        - ptsTemplate
-      properties:
-        fireId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: Prefect fire ID (groups all captures for a greenhouse run)
-        greenhouseId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the greenhouse this panorama belongs to
-        deviceId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the device that captured the base images
-        capturedAt:
-          type: string
-          format: date-time
-          description: When the base images were captured
-        x:
-          type: number
-          format: double
-          description: The X coordinate of the camera position
-        'y':
-          type: number
-          format: double
-          description: The Y coordinate of the camera position
-        height:
-          type: number
-          format: double
-          description: The height of the camera
-        ptsTemplate:
-          type: string
-          description: PTGui template name to use for stitching
-      description: Request to submit a panorama stitching task
-    Models.SubmitPanoramaStitchResponse:
-      type: object
-      required:
-        - taskId
-      properties:
-        taskId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: The ID of the created stitch task
-      description: Response for panorama stitch submission
-    Models.ThumbCode:
-      type: string
-      pattern: ^w\d+h\d+dpr\d+q\d+(\.jpeg)?$
-      description: 'Dynamic thumbnail specification code. Format: w{width}h{height}dpr{dpr}q{quality}, e.g., w320h180dpr2q75'
-    Models.Tile:
-      type: object
-      required:
-        - panoramaId
-        - face
-        - level
-        - row
-        - column
-        - createdAt
-      properties:
-        panoramaId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: Panorama ID
-        face:
-          allOf:
-            - $ref: '#/components/schemas/Models.TileFace'
-          description: Tile face
-        level:
-          allOf:
-            - $ref: '#/components/schemas/Models.TileLevel'
-          description: Tile level
-        row:
-          type: integer
-          format: int8
-          description: Tile row
-        column:
-          type: integer
-          format: int8
-          description: Tile column
-        createdAt:
-          type: string
-          format: date-time
-          description: Tile creation timestamp
-      description: Panorama tile metadata
-    Models.TileFace:
-      type: string
-      enum:
-        - f
-        - b
-        - l
-        - r
-        - u
-        - d
-      description: Panorama tile face options
-    Models.TileID:
-      type: object
-      required:
-        - panoramaId
-        - face
-        - level
-        - row
-        - column
-      properties:
-        panoramaId:
-          allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
-          description: Unique identifier of the panorama, assigned by the system
-        face:
-          allOf:
-            - $ref: '#/components/schemas/Models.TileFace'
-          description: Chosen face of the panorama tile
-        level:
-          allOf:
-            - $ref: '#/components/schemas/Models.TileLevel'
-          description: Chosen level of detalization of the panorama tile
-        row:
-          type: integer
-          format: int8
-          description: Row of the chosen tile
-        column:
-          type: integer
-          format: int8
-          description: Column of the chosen tile
-      description: Identifier of a panorama tile
-    Models.TileLevel:
-      type: string
-      enum:
-        - l0
-        - l1
-        - l2
-      description: Tile size options
     Models.UploadLinkResponse:
       type: object
       required:
-        - photoId
-        - uploadUrl
-        - downloadUrl
-        - deleteUrl
-        - expiresAt
+      - photoId
+      - uploadUrl
+      - downloadUrl
+      - deleteUrl
+      - expiresAt
       properties:
         photoId:
           allOf:
-            - $ref: '#/components/schemas/Common.Types.ID'
+          - $ref: '#/components/schemas/Common.Types.ID'
           description: ID assigned to the photo being uploaded
         uploadUrl:
           type: string
           description: Presigned S3 URL for direct upload (PUT)
         downloadUrl:
           type: string
-          description: Presigned S3 URL for direct download (GET) - use for preview before metadata is created
+          description: Presigned S3 URL for direct download (GET) - use for preview
+            before metadata is created
         deleteUrl:
           type: string
-          description: Presigned S3 URL for direct delete (DELETE) - use to cleanup orphan files on retake/cancel
+          description: Presigned S3 URL for direct delete (DELETE) - use to cleanup
+            orphan files on retake/cancel
         expiresAt:
           type: string
           format: date-time
@@ -1655,13 +279,3 @@ components:
     BearerAuth:
       type: http
       scheme: Bearer
-servers:
-  - url: https://api.croptimus.com
-    description: prod
-    variables: {}
-  - url: https://api.fermata.click
-    description: dev
-    variables: {}
-  - url: http://localhost:3000
-    description: local
-    variables: {}
