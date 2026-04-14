@@ -1,21 +1,15 @@
+import datetime
 from http import HTTPStatus
-from typing import Any, cast
-from urllib.parse import quote
+from typing import Any
+from uuid import UUID
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.list_predictions_for_gallery_response_200 import ListPredictionsForGalleryResponse200
-from ...types import UNSET, Unset
-from dateutil.parser import isoparse
-from typing import cast
-from uuid import UUID
-import datetime
-
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
@@ -33,12 +27,7 @@ def _get_kwargs(
     ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> dict[str, Any]:
-    
-
-    
-
     params: dict[str, Any] = {}
 
     json_cycle_id = str(cycle_id)
@@ -47,7 +36,6 @@ def _get_kwargs(
     json_classes: list[str] | Unset = UNSET
     if not isinstance(classes, Unset):
         json_classes = classes
-
 
     params["classes"] = json_classes
 
@@ -84,9 +72,7 @@ def _get_kwargs(
 
     params["limit"] = limit
 
-
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
-
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -94,37 +80,29 @@ def _get_kwargs(
         "params": params,
     }
 
-
     return _kwargs
 
 
-
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ListPredictionsForGalleryResponse200 | None:
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CommonErrorsApiError | ListPredictionsForGalleryResponse200 | None:
     if response.status_code == 200:
         response_200 = ListPredictionsForGalleryResponse200.from_dict(response.json())
-
-
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
-
-
 
         return response_500
 
@@ -134,7 +112,9 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ListPredictionsForGalleryResponse200]:
+def _build_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CommonErrorsApiError | ListPredictionsForGalleryResponse200]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -159,9 +139,8 @@ def sync_detailed(
     ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> Response[CommonErrorsApiError | ListPredictionsForGalleryResponse200]:
-    """  Query predictions with filters for gallery view
+    """Query predictions with filters for gallery view
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -184,24 +163,22 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListPredictionsForGalleryResponse200]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         cycle_id=cycle_id,
-classes=classes,
-pipeline_id=pipeline_id,
-captured_from=captured_from,
-captured_to=captured_to,
-from_=from_,
-to=to,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-cursor=cursor,
-limit=limit,
-
+        classes=classes,
+        pipeline_id=pipeline_id,
+        captured_from=captured_from,
+        captured_to=captured_to,
+        from_=from_,
+        to=to,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
+        cursor=cursor,
+        limit=limit,
     )
 
     response = client.get_httpx_client().request(
@@ -209,6 +186,7 @@ limit=limit,
     )
 
     return _build_response(client=client, response=response)
+
 
 def sync(
     *,
@@ -226,9 +204,8 @@ def sync(
     ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> CommonErrorsApiError | ListPredictionsForGalleryResponse200 | None:
-    """  Query predictions with filters for gallery view
+    """Query predictions with filters for gallery view
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -251,26 +228,25 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ListPredictionsForGalleryResponse200
-     """
-
+    """
 
     return sync_detailed(
         client=client,
-cycle_id=cycle_id,
-classes=classes,
-pipeline_id=pipeline_id,
-captured_from=captured_from,
-captured_to=captured_to,
-from_=from_,
-to=to,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-cursor=cursor,
-limit=limit,
-
+        cycle_id=cycle_id,
+        classes=classes,
+        pipeline_id=pipeline_id,
+        captured_from=captured_from,
+        captured_to=captured_to,
+        from_=from_,
+        to=to,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
+        cursor=cursor,
+        limit=limit,
     ).parsed
+
 
 async def asyncio_detailed(
     *,
@@ -288,9 +264,8 @@ async def asyncio_detailed(
     ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> Response[CommonErrorsApiError | ListPredictionsForGalleryResponse200]:
-    """  Query predictions with filters for gallery view
+    """Query predictions with filters for gallery view
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -313,31 +288,28 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListPredictionsForGalleryResponse200]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         cycle_id=cycle_id,
-classes=classes,
-pipeline_id=pipeline_id,
-captured_from=captured_from,
-captured_to=captured_to,
-from_=from_,
-to=to,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-cursor=cursor,
-limit=limit,
-
+        classes=classes,
+        pipeline_id=pipeline_id,
+        captured_from=captured_from,
+        captured_to=captured_to,
+        from_=from_,
+        to=to,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
+        cursor=cursor,
+        limit=limit,
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     *,
@@ -355,9 +327,8 @@ async def asyncio(
     ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> CommonErrorsApiError | ListPredictionsForGalleryResponse200 | None:
-    """  Query predictions with filters for gallery view
+    """Query predictions with filters for gallery view
 
     Args:
         cycle_id (UUID): UUID identifier
@@ -380,23 +351,23 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ListPredictionsForGalleryResponse200
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        client=client,
-cycle_id=cycle_id,
-classes=classes,
-pipeline_id=pipeline_id,
-captured_from=captured_from,
-captured_to=captured_to,
-from_=from_,
-to=to,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-cursor=cursor,
-limit=limit,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            client=client,
+            cycle_id=cycle_id,
+            classes=classes,
+            pipeline_id=pipeline_id,
+            captured_from=captured_from,
+            captured_to=captured_to,
+            from_=from_,
+            to=to,
+            xmin=xmin,
+            ymin=ymin,
+            xmax=xmax,
+            ymax=ymax,
+            cursor=cursor,
+            limit=limit,
+        )
+    ).parsed

@@ -1,6 +1,5 @@
 from http import HTTPStatus
-from typing import Any, cast
-from urllib.parse import quote
+from typing import Any
 
 import httpx
 
@@ -11,8 +10,7 @@ from ... import errors
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.models_upload_predictions_request import ModelsUploadPredictionsRequest
 from ...models.models_upload_predictions_response import ModelsUploadPredictionsResponse
-from typing import cast
-
+from ...types import Response
 
 
 def _get_kwargs(
@@ -41,12 +39,11 @@ def _get_kwargs(
     return _kwargs
 
 
-
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ModelsUploadPredictionsResponse | None:
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CommonErrorsApiError | ModelsUploadPredictionsResponse | None:
     if response.status_code == 201:
         response_201 = ModelsUploadPredictionsResponse.from_dict(response.json())
-
-
 
         return response_201
 
@@ -91,7 +88,9 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]:
+def _build_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -104,9 +103,8 @@ def sync_detailed(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-
 ) -> Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]:
-    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -118,8 +116,7 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         body=body,
@@ -136,9 +133,8 @@ def sync(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-
 ) -> CommonErrorsApiError | ModelsUploadPredictionsResponse | None:
-    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -150,8 +146,7 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ModelsUploadPredictionsResponse
-     """
-
+    """
 
     return sync_detailed(
         client=client,
@@ -163,9 +158,8 @@ async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-
 ) -> Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]:
-    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -177,8 +171,7 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsUploadPredictionsResponse]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         body=body,
@@ -195,9 +188,8 @@ async def asyncio(
     *,
     client: AuthenticatedClient,
     body: ModelsUploadPredictionsRequest,
-
 ) -> CommonErrorsApiError | ModelsUploadPredictionsResponse | None:
-    """  Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
+    """Upload pre-computed predictions for a photo. Stores predictions directly without ML API processing.
 
     Args:
         body (ModelsUploadPredictionsRequest): Request to upload pre-computed predictions for a
@@ -209,7 +201,7 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ModelsUploadPredictionsResponse
-     """
+    """
 
 
     return (await asyncio_detailed(

@@ -29,20 +29,20 @@ T = TypeVar("T", bound="ModelsUploadPredictionsRequest")
 class ModelsUploadPredictionsRequest:
     """ Request to upload pre-computed predictions for a photo
 
-        Attributes:
-            photo_id (UUID): UUID identifier
-            model_name (str): ML model name that produced the predictions
-            organization_name (str | Unset): Organization display name (for inference logs)
-            greenhouse_id (UUID | Unset): UUID identifier
-            culture_id (str | Unset): Culture being grown
-            growing_cycle_id (UUID | Unset): UUID identifier
-            planting_date (datetime.datetime | Unset): Planting date for the growing cycle
-            device_id (UUID | Unset): UUID identifier
-            device_type (str | Unset): Device type (e.g. 'camera', 'router')
-            predictions (list[ModelsPrecomputedPrediction] | Unset): Pre-computed predictions to store
-            predicted_at (datetime.datetime | Unset): Timestamp when predictions were generated. Defaults to current time if
-                omitted.
-     """
+    Attributes:
+        photo_id (UUID): UUID identifier
+        model_name (str): ML model name that produced the predictions
+        organization_name (str | Unset): Organization display name (for inference logs)
+        greenhouse_id (UUID | Unset): UUID identifier
+        culture_id (str | Unset): Culture being grown
+        growing_cycle_id (UUID | Unset): UUID identifier
+        planting_date (datetime.datetime | Unset): Planting date for the growing cycle
+        device_id (UUID | Unset): UUID identifier
+        device_type (str | Unset): Device type (e.g. 'camera', 'router')
+        predictions (list[ModelsPrecomputedPrediction] | Unset): Pre-computed predictions to store
+        predicted_at (datetime.datetime | Unset): Timestamp when predictions were generated. Defaults to current time if
+            omitted.
+    """
 
     photo_id: UUID
     model_name: str
@@ -105,10 +105,12 @@ class ModelsUploadPredictionsRequest:
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "photoId": photo_id,
-            "modelName": model_name,
-        })
+        field_dict.update(
+            {
+                "photoId": photo_id,
+                "modelName": model_name,
+            }
+        )
         if organization_name is not UNSET:
             field_dict["organizationName"] = organization_name
         if greenhouse_id is not UNSET:
@@ -147,45 +149,33 @@ class ModelsUploadPredictionsRequest:
 
         _greenhouse_id = d.pop("greenhouseId", UNSET)
         greenhouse_id: UUID | Unset
-        if isinstance(_greenhouse_id,  Unset):
+        if isinstance(_greenhouse_id, Unset):
             greenhouse_id = UNSET
         else:
             greenhouse_id = UUID(_greenhouse_id)
-
-
-
 
         culture_id = d.pop("cultureId", UNSET)
 
         _growing_cycle_id = d.pop("growingCycleId", UNSET)
         growing_cycle_id: UUID | Unset
-        if isinstance(_growing_cycle_id,  Unset):
+        if isinstance(_growing_cycle_id, Unset):
             growing_cycle_id = UNSET
         else:
             growing_cycle_id = UUID(_growing_cycle_id)
 
-
-
-
         _planting_date = d.pop("plantingDate", UNSET)
         planting_date: datetime.datetime | Unset
-        if isinstance(_planting_date,  Unset):
+        if isinstance(_planting_date, Unset):
             planting_date = UNSET
         else:
             planting_date = isoparse(_planting_date)
 
-
-
-
         _device_id = d.pop("deviceId", UNSET)
         device_id: UUID | Unset
-        if isinstance(_device_id,  Unset):
+        if isinstance(_device_id, Unset):
             device_id = UNSET
         else:
             device_id = UUID(_device_id)
-
-
-
 
         device_type = d.pop("deviceType", UNSET)
 

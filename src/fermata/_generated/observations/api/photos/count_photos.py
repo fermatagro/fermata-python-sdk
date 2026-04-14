@@ -35,7 +35,6 @@ def _get_kwargs(
     ymax: float | Unset = UNSET,
     hmin: float | Unset = UNSET,
     hmax: float | Unset = UNSET,
-
 ) -> dict[str, Any]:
     
 
@@ -91,7 +90,6 @@ def _get_kwargs(
     params["hmin"] = hmin
 
     params["hmax"] = hmax
-
 
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
 
@@ -168,7 +166,6 @@ def sync_detailed(
     ymax: float | Unset = UNSET,
     hmin: float | Unset = UNSET,
     hmax: float | Unset = UNSET,
-
 ) -> Response[CommonErrorsApiError | ModelsPhotoCount]:
     """  Count photos matching filters
 
@@ -199,20 +196,19 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         from_=from_,
-to=to,
-growing_cycle_id=growing_cycle_id,
-greenhouse_id=greenhouse_id,
-device_id=device_id,
-zone_object_id=zone_object_id,
-source=source,
-pipeline_id=pipeline_id,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-hmin=hmin,
-hmax=hmax,
-
+        to=to,
+        growing_cycle_id=growing_cycle_id,
+        greenhouse_id=greenhouse_id,
+        device_id=device_id,
+        zone_object_id=zone_object_id,
+        source=source,
+        pipeline_id=pipeline_id,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
+        hmin=hmin,
+        hmax=hmax,
     )
 
     response = client.get_httpx_client().request(
@@ -238,7 +234,6 @@ def sync(
     ymax: float | Unset = UNSET,
     hmin: float | Unset = UNSET,
     hmax: float | Unset = UNSET,
-
 ) -> CommonErrorsApiError | ModelsPhotoCount | None:
     """  Count photos matching filters
 
@@ -269,20 +264,21 @@ def sync(
 
     return sync_detailed(
         client=client,
-from_=from_,
-to=to,
-growing_cycle_id=growing_cycle_id,
-greenhouse_id=greenhouse_id,
-device_id=device_id,
-zone_object_id=zone_object_id,
-source=source,
-pipeline_id=pipeline_id,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-hmin=hmin,
-hmax=hmax,
+        from_=from_,
+        to=to,
+        growing_cycle_id=growing_cycle_id,
+        greenhouse_id=greenhouse_id,
+        device_id=device_id,
+        zone_object_id=zone_object_id,
+        source=source,
+        pipeline_id=pipeline_id,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
+        hmin=hmin,
+        hmax=hmax,
+    ).parsed
 
     ).parsed
 
@@ -303,7 +299,6 @@ async def asyncio_detailed(
     ymax: float | Unset = UNSET,
     hmin: float | Unset = UNSET,
     hmax: float | Unset = UNSET,
-
 ) -> Response[CommonErrorsApiError | ModelsPhotoCount]:
     """  Count photos matching filters
 
@@ -334,20 +329,19 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         from_=from_,
-to=to,
-growing_cycle_id=growing_cycle_id,
-greenhouse_id=greenhouse_id,
-device_id=device_id,
-zone_object_id=zone_object_id,
-source=source,
-pipeline_id=pipeline_id,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-hmin=hmin,
-hmax=hmax,
-
+        to=to,
+        growing_cycle_id=growing_cycle_id,
+        greenhouse_id=greenhouse_id,
+        device_id=device_id,
+        zone_object_id=zone_object_id,
+        source=source,
+        pipeline_id=pipeline_id,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
+        hmin=hmin,
+        hmax=hmax,
     )
 
     response = await client.get_async_httpx_client().request(
@@ -373,7 +367,6 @@ async def asyncio(
     ymax: float | Unset = UNSET,
     hmin: float | Unset = UNSET,
     hmax: float | Unset = UNSET,
-
 ) -> CommonErrorsApiError | ModelsPhotoCount | None:
     """  Count photos matching filters
 
@@ -401,22 +394,22 @@ async def asyncio(
         CommonErrorsApiError | ModelsPhotoCount
      """
 
-
-    return (await asyncio_detailed(
-        client=client,
-from_=from_,
-to=to,
-growing_cycle_id=growing_cycle_id,
-greenhouse_id=greenhouse_id,
-device_id=device_id,
-zone_object_id=zone_object_id,
-source=source,
-pipeline_id=pipeline_id,
-xmin=xmin,
-ymin=ymin,
-xmax=xmax,
-ymax=ymax,
-hmin=hmin,
-hmax=hmax,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            client=client,
+            from_=from_,
+            to=to,
+            growing_cycle_id=growing_cycle_id,
+            greenhouse_id=greenhouse_id,
+            device_id=device_id,
+            zone_object_id=zone_object_id,
+            source=source,
+            pipeline_id=pipeline_id,
+            xmin=xmin,
+            ymin=ymin,
+            xmax=xmax,
+            ymax=ymax,
+            hmin=hmin,
+            hmax=hmax,
+        )
+    ).parsed

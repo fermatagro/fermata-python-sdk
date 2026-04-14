@@ -1,41 +1,28 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
+from uuid import UUID
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..types import UNSET, Unset
 
-from ..types import UNSET, Unset
-from typing import cast
-from uuid import UUID
-
-
-
-
-
-
 T = TypeVar("T", bound="ModelsUploadPredictionsResponse")
-
 
 
 @_attrs_define
 class ModelsUploadPredictionsResponse:
-    """ Response from uploading pre-computed predictions
+    """Response from uploading pre-computed predictions
 
-        Attributes:
-            rejected_prediction_ids (list[UUID] | Unset): IDs of predictions that were rejected during validation (e.g.
-                unknown class names)
-     """
+    Attributes:
+        rejected_prediction_ids (list[UUID] | Unset): IDs of predictions that were rejected during validation (e.g.
+            unknown class names)
+    """
 
     rejected_prediction_ids: list[UUID] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         rejected_prediction_ids: list[str] | Unset = UNSET
@@ -45,19 +32,13 @@ class ModelsUploadPredictionsResponse:
                 rejected_prediction_ids_item = str(rejected_prediction_ids_item_data)
                 rejected_prediction_ids.append(rejected_prediction_ids_item)
 
-
-
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-        })
+        field_dict.update({})
         if rejected_prediction_ids is not UNSET:
             field_dict["rejectedPredictionIds"] = rejected_prediction_ids
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -69,15 +50,11 @@ class ModelsUploadPredictionsResponse:
             for rejected_prediction_ids_item_data in _rejected_prediction_ids:
                 rejected_prediction_ids_item = UUID(rejected_prediction_ids_item_data)
 
-
-
                 rejected_prediction_ids.append(rejected_prediction_ids_item)
-
 
         models_upload_predictions_response = cls(
             rejected_prediction_ids=rejected_prediction_ids,
         )
-
 
         models_upload_predictions_response.additional_properties = d
         return models_upload_predictions_response

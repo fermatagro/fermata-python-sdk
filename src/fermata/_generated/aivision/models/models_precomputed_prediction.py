@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar
+from uuid import UUID
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
@@ -27,12 +28,12 @@ T = TypeVar("T", bound="ModelsPrecomputedPrediction")
 class ModelsPrecomputedPrediction:
     """ A single pre-computed prediction from an external model
 
-        Attributes:
-            id (UUID): UUID identifier
-            class_id (str | Unset): Detection class name from the external model
-            confidence (float | Unset): Confidence score (0-1)
-            bbox (CommonTypesGridRect | Unset): Rectangular area on the greenhouse grid
-     """
+    Attributes:
+        id (UUID): UUID identifier
+        class_id (str | Unset): Detection class name from the external model
+        confidence (float | Unset): Confidence score (0-1)
+        bbox (CommonTypesGridRect | Unset): Rectangular area on the greenhouse grid
+    """
 
     id: UUID
     class_id: str | Unset = UNSET
@@ -45,7 +46,6 @@ class ModelsPrecomputedPrediction:
 
 
     def to_dict(self) -> dict[str, Any]:
-        from ..models.common_types_grid_rect import CommonTypesGridRect
         id = str(self.id)
 
         class_id = self.class_id
@@ -59,9 +59,11 @@ class ModelsPrecomputedPrediction:
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "id": id,
-        })
+        field_dict.update(
+            {
+                "id": id,
+            }
+        )
         if class_id is not UNSET:
             field_dict["classId"] = class_id
         if confidence is not UNSET:
@@ -78,9 +80,6 @@ class ModelsPrecomputedPrediction:
         from ..models.common_types_grid_rect import CommonTypesGridRect
         d = dict(src_dict)
         id = UUID(d.pop("id"))
-
-
-
 
         class_id = d.pop("classId", UNSET)
 
