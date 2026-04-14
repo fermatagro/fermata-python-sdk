@@ -19,13 +19,39 @@ You will receive the following from Fermata during onboarding:
 | `url` | Fermata endpoint running on your local machine |
 | `username` | Your SDK username |
 | `password` | Your SDK password |
-| `greenhouse_id` | ID of your greenhouse (configured in Fermata Cloud) |
+| `pipeline_id` | ID of your pipeline schedule (configured in Fermata Cloud) |
 
 ## Quick Start
+
+### Pipeline mode (recommended)
+
+The simplest way to use the SDK. Greenhouse, AI model, and growing cycle are resolved automatically from your pipeline schedule:
 
 ```python
 from fermata import FermataSync
 
+with FermataSync(
+    url="http://localhost:3000",
+    username="your-username",
+    password="your-password",
+    pipeline_id="your-pipeline-id",
+    sync_id="robot-run-2026-04-13-slot-2",  # unique string per scan run
+) as fermata:
+    task_id = fermata.infer(
+        image="path/to/photo.jpg",
+        captured_at="2026-04-01T10:00:00Z",
+        position={"x": 5.2, "y": 3.1, "h": 2.0},
+    )
+    print(f"Submitted: {task_id}")
+```
+
+That's it. The photo is uploaded, inference runs automatically, and results appear in the Fermata Cloud dashboard.
+
+### Manual mode
+
+If you need to specify the greenhouse and model explicitly:
+
+```python
 with FermataSync(
     url="http://localhost:3000",
     username="your-username",
@@ -37,10 +63,49 @@ with FermataSync(
         captured_at="2026-04-01T10:00:00Z",
         position={"x": 5.2, "y": 3.1, "h": 2.0},
     )
-    print(f"Submitted: {task_id}")
 ```
 
-That's it. The photo is uploaded, inference runs automatically, and results appear in the Fermata Cloud dashboard.
+## Pipeline Mode
+
+When `pipeline_id` and `sync_id` are provided, the SDK automatically resolves:
+
+- **Greenhouse** — from the pipeline schedule's scope
+- **AI model** — from the schedule's arguments (or the first available model)
+- **Growing cycle** — the currently active cycle for the greenhouse
+
+```python
+with FermataSync(
+    url="http://localhost:3000",
+    username="your-username",
+    password="your-password",
+    pipeline_id="your-pipeline-id",
+    sync_id="robot-run-2026-04-13-slot-2",
+) as fermata:
+    # Resolved context is available via fermata.run
+    print(f"Greenhouse: {fermata.run.greenhouse_id}")
+    print(f"Model: {fermata.run.model_name}")
+    print(f"Cycle: {fermata.run.growing_cycle_id}")
+    print(f"Run ID: {fermata.run.run_id}")
+
+    # No need to pass greenhouse_id or model_name
+    fermata.infer(image="photo.jpg", captured_at="2026-04-01T10:00:00Z")
+```
+
+### `sync_id`
+
+A unique string you generate for each scan run (e.g., `"robot-run-2026-04-13-slot-2"`). It is stored with the run for traceability.
+
+In pipeline mode, photo IDs are generated deterministically from the `sync_id`, `captured_at`, and `position`. This means if the robot crashes and retries the same photos, they are automatically deduplicated — no duplicate uploads or inference tasks.
+
+### `PipelineRun` fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `run_id` | `str` | Unique ID for this run (pipeline fire ID) |
+| `greenhouse_id` | `str` | Greenhouse from the schedule |
+| `growing_cycle_id` | `str \| None` | Active growing cycle (None if no active cycle) |
+| `model_name` | `str` | AI model to use |
+| `organization_id` | `str` | Organization ID |
 
 ## Scan Sessions
 
@@ -68,9 +133,9 @@ Uploads a photo and submits it for AI inference. Returns a task ID.
 ```python
 task_id = fermata.infer(
     image,              # File path (str/Path) or raw image bytes
-    greenhouse_id,      # Your greenhouse ID
     captured_at,        # When the photo was taken (ISO 8601 string or datetime)
     *,
+    greenhouse_id=None, # Required in manual mode, auto-filled in pipeline mode
     position=None,      # Robot position: {"x": float, "y": float, "h": float}
     model_name=None,    # AI model to use (default: auto-selected)
     photo_id=None,      # Custom photo ID (default: auto-generated)
@@ -89,7 +154,7 @@ fermata.infer(image="photos/row3_pos12.jpg", ...)
 fermata.infer(image=camera.capture(), ...)
 ```
 
-**`greenhouse_id`** — Identifies which greenhouse this photo belongs to. Provided by Fermata during setup.
+**`greenhouse_id`** — Identifies which greenhouse this photo belongs to. Required in manual mode, auto-filled from the pipeline schedule in pipeline mode. Explicit values always override the pipeline context.
 
 **`captured_at`** — Timestamp of when the photo was taken. Use ISO 8601 format:
 
@@ -121,22 +186,27 @@ Upload all photos from a scan directory:
 
 ```python
 from pathlib import Path
+from datetime import datetime, timezone
 from fermata import FermataSync
 
 FERMATA_URL = "http://localhost:3000"
 USERNAME = "your-username"
 PASSWORD = "your-password"
-GREENHOUSE_ID = "your-greenhouse-id"
+PIPELINE_ID = "your-pipeline-id"
 
 def scan(photo_dir):
-    with FermataSync(url=FERMATA_URL, username=USERNAME, password=PASSWORD) as fermata:
-        print(f"Starting scan {fermata.scan_id}")
+    sync_id = f"scan-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}"
+
+    with FermataSync(
+        url=FERMATA_URL, username=USERNAME, password=PASSWORD,
+        pipeline_id=PIPELINE_ID, sync_id=sync_id,
+    ) as fermata:
+        print(f"Starting scan {fermata.run.run_id} for {fermata.run.greenhouse_id}")
 
         for photo in sorted(Path(photo_dir).glob("*.jpg")):
             task_id = fermata.infer(
                 image=photo,
-                greenhouse_id=GREENHOUSE_ID,
-                captured_at=photo.stat().st_mtime,
+                captured_at=datetime.fromtimestamp(photo.stat().st_mtime, tz=timezone.utc),
                 position=parse_position(photo.name),  # your position parser
             )
             print(f"{photo.name} -> {task_id}")
@@ -145,6 +215,8 @@ def scan(photo_dir):
 
 scan("./today_scan/")
 ```
+
+If the robot crashes mid-scan, restart with the same `sync_id` — photos already uploaded are automatically skipped.
 
 ## Async Client
 
@@ -155,10 +227,12 @@ import asyncio
 from fermata import Fermata
 
 async def main():
-    async with Fermata(url="...", username="...", password="...") as fermata:
+    async with Fermata(
+        url="...", username="...", password="...",
+        pipeline_id="your-pipeline-id", sync_id="run-001",
+    ) as fermata:
         task_id = await fermata.infer(
             image="photo.jpg",
-            greenhouse_id="gh-01",
             captured_at="2026-04-01T10:00:00Z",
         )
 
@@ -168,7 +242,10 @@ asyncio.run(main())
 ### Concurrent uploads
 
 ```python
-async with Fermata(url="...", username="...", password="...") as fermata:
+async with Fermata(
+    url="...", username="...", password="...",
+    pipeline_id="your-pipeline-id", sync_id="run-001",
+) as fermata:
     photos = [
         ("img1.jpg", {"x": 1.0, "y": 2.0, "h": 0.5}),
         ("img2.jpg", {"x": 3.0, "y": 4.0, "h": 0.5}),
@@ -178,7 +255,6 @@ async with Fermata(url="...", username="...", password="...") as fermata:
     task_ids = await asyncio.gather(*[
         fermata.infer(
             image=img,
-            greenhouse_id="gh-01",
             captured_at="2026-04-01T10:00:00Z",
             position=pos,
         )
