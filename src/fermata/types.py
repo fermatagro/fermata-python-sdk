@@ -22,7 +22,8 @@ class PipelineRun:
 
     run_id: str
     greenhouse_id: str
-    growing_cycle_id: str | None
+    growing_cycle_id: str
+    culture_id: str
     model_name: str
     organization_id: str
 

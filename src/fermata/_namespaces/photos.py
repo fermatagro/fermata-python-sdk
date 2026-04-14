@@ -3,31 +3,52 @@ from __future__ import annotations
 import datetime
 from pathlib import Path
 from typing import Any
+from uuid import UUID
 
-from fermata._generated.observations.models.models_photo import ModelsPhoto
+import httpx
+from dateutil.parser import isoparse
+
+from fermata._call import call_async, call_sync
+from fermata._generated.observations.api.photos import (
+    create_photo as _create_photo,
+)
+from fermata._generated.observations.api.photos import (
+    create_photo_upload_link as _upload_link,
+)
+from fermata._generated.observations.models.common_types_grid_pos import CommonTypesGridPos
+from fermata._generated.observations.models.create_or_update_photo import CreateOrUpdatePhoto
+from fermata._generated.observations.models.models_create_upload_link import ModelsCreateUploadLink
+from fermata._generated.observations.models.models_photo_source import ModelsPhotoSource
 from fermata._generated.observations.models.models_upload_link_response import ModelsUploadLinkResponse
-from fermata._transport import Transport
+from fermata._generated.observations.types import UNSET
+
+
+def _parse_dt(value: str | datetime.datetime) -> datetime.datetime:
+    if isinstance(value, datetime.datetime):
+        return value
+    return isoparse(value)
+
+
+def _read_image(image: str | Path | bytes) -> bytes:
+    if isinstance(image, (str, Path)):
+        return Path(image).read_bytes()
+    return image
 
 
 class AsyncPhotos:
-    def __init__(self, transport: Transport) -> None:
-        self._t = transport
+    def __init__(self, client: Any, raw_client: httpx.AsyncClient) -> None:
+        self._c = client
+        self._raw = raw_client
 
-    async def upload_link(self, photo_id: str, captured_at: str | datetime.datetime) -> ModelsUploadLinkResponse:
-        ts = captured_at if isinstance(captured_at, str) else captured_at.isoformat()
-        resp = await self._t.request(
-            "POST",
-            f"/api/v1/photos/{photo_id}/upload-link",
-            json={"capturedAt": ts},
-        )
-        return ModelsUploadLinkResponse.from_dict(resp.json())
+    async def upload_link(
+        self, photo_id: str, captured_at: str | datetime.datetime
+    ) -> ModelsUploadLinkResponse:
+        body = ModelsCreateUploadLink(captured_at=_parse_dt(captured_at))
+        return await call_async(_upload_link.asyncio_detailed(UUID(photo_id), body=body, client=self._c))
 
     async def upload(self, upload_url: str, image: str | Path | bytes) -> None:
-        if isinstance(image, (str, Path)):
-            data = Path(image).read_bytes()
-        else:
-            data = image
-        await self._t.request_raw("PUT", upload_url, content=data)
+        resp = await self._raw.put(upload_url, content=_read_image(image))
+        resp.raise_for_status()
 
     async def create(
         self,
@@ -35,19 +56,72 @@ class AsyncPhotos:
         *,
         greenhouse_id: str,
         captured_at: str | datetime.datetime,
+        culture_id: str = "",
+        growing_cycle_id: str = "",
         source: str = "human",
         position: dict[str, float] | None = None,
         scan_id: str | None = None,
-    ) -> ModelsPhoto:
-        ts = captured_at if isinstance(captured_at, str) else captured_at.isoformat()
-        body: dict[str, Any] = {
-            "greenhouseId": greenhouse_id,
-            "capturedAt": ts,
-            "source": source,
-        }
-        if position:
-            body["pos"] = {"x": position.get("x", 0), "y": position.get("y", 0), "h": position.get("h", 0)}
-        if scan_id:
-            body["pipelineId"] = scan_id
-        resp = await self._t.request("POST", f"/api/v1/photos/{photo_id}", json=body)
-        return ModelsPhoto.from_dict(resp.json())
+    ) -> None:
+        pos = CommonTypesGridPos(
+            x=position.get("x", 0) if position else 0,
+            y=position.get("y", 0) if position else 0,
+            h=position.get("h", 0) if position else 0,
+        )
+        body = CreateOrUpdatePhoto(
+            id=UUID(photo_id),
+            greenhouse_id=UUID(greenhouse_id),
+            culture_id=culture_id,
+            growing_cycle_id=UUID(growing_cycle_id) if growing_cycle_id else UUID(int=0),
+            captured_at=_parse_dt(captured_at),
+            source=ModelsPhotoSource(source),
+            pos=pos,
+            ptz=[0.0, 0.0, 0.0],
+            pipeline_id=UUID(scan_id) if scan_id else UNSET,
+        )
+        await call_async(_create_photo.asyncio_detailed(UUID(photo_id), body=body, client=self._c))
+
+
+class SyncPhotos:
+    def __init__(self, client: Any, raw_client: httpx.Client) -> None:
+        self._c = client
+        self._raw = raw_client
+
+    def upload_link(
+        self, photo_id: str, captured_at: str | datetime.datetime
+    ) -> ModelsUploadLinkResponse:
+        body = ModelsCreateUploadLink(captured_at=_parse_dt(captured_at))
+        return call_sync(_upload_link.sync_detailed(UUID(photo_id), body=body, client=self._c))
+
+    def upload(self, upload_url: str, image: str | Path | bytes) -> None:
+        resp = self._raw.put(upload_url, content=_read_image(image))
+        resp.raise_for_status()
+
+    def create(
+        self,
+        photo_id: str,
+        *,
+        greenhouse_id: str,
+        captured_at: str | datetime.datetime,
+        culture_id: str = "",
+        growing_cycle_id: str = "",
+        source: str = "human",
+        position: dict[str, float] | None = None,
+        scan_id: str | None = None,
+    ) -> None:
+        pos = CommonTypesGridPos(
+            x=position.get("x", 0) if position else 0,
+            y=position.get("y", 0) if position else 0,
+            h=position.get("h", 0) if position else 0,
+        )
+        body = CreateOrUpdatePhoto(
+            id=UUID(photo_id),
+            greenhouse_id=UUID(greenhouse_id),
+            culture_id=culture_id,
+            growing_cycle_id=UUID(growing_cycle_id) if growing_cycle_id else UUID(int=0),
+            captured_at=_parse_dt(captured_at),
+            source=ModelsPhotoSource(source),
+            pos=pos,
+            ptz=[0.0, 0.0, 0.0],
+            pipeline_id=UUID(scan_id) if scan_id else UNSET,
+        )
+        call_sync(_create_photo.sync_detailed(UUID(photo_id), body=body, client=self._c))

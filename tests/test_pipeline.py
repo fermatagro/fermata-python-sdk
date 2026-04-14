@@ -150,8 +150,8 @@ async def test_infer_pipeline_auto_fills(mock_hera: respx.Router) -> None:
     """infer() uses greenhouse_id and model_name from run context."""
     _mock_pipeline_init(mock_hera)
     mock_hera.post(url__regex=r"/api/v1/photos/.+/upload-link").mock(side_effect=_upload_link_handler)
-    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(200, json=PHOTO_JSON)
-    mock_hera.post("/api/v1/inference").respond(200, json={
+    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(201)
+    mock_hera.post("/api/v1/inference").respond(202, json={
         "taskId": "00000000-0000-0000-0000-000000000099",
     })
 
@@ -174,8 +174,8 @@ async def test_infer_pipeline_explicit_override(mock_hera: respx.Router) -> None
     """Explicit greenhouse_id and model_name override run context."""
     _mock_pipeline_init(mock_hera)
     mock_hera.post(url__regex=r"/api/v1/photos/.+/upload-link").mock(side_effect=_upload_link_handler)
-    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(200, json=PHOTO_JSON)
-    mock_hera.post("/api/v1/inference").respond(200, json={
+    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(201)
+    mock_hera.post("/api/v1/inference").respond(202, json={
         "taskId": "00000000-0000-0000-0000-000000000099",
     })
 
@@ -192,7 +192,7 @@ async def test_infer_pipeline_explicit_override(mock_hera: respx.Router) -> None
             task_id = await f.infer(
                 image=b"fake-jpeg-bytes",
                 captured_at="2026-04-01T10:00:00Z",
-                greenhouse_id="override-gh",
+                greenhouse_id="00000000-0000-0000-0000-000000000099",
                 model_name="override-model",
             )
 
@@ -237,8 +237,8 @@ async def test_infer_retry_handles_409(mock_hera: respx.Router) -> None:
     """On retry, 409 on photo create is caught and inference still proceeds."""
     _mock_pipeline_init(mock_hera)
     mock_hera.post(url__regex=r"/api/v1/photos/.+/upload-link").mock(side_effect=_upload_link_handler)
-    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(409, json={"message": "already exists"})
-    mock_hera.post("/api/v1/inference").respond(200, json={
+    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(409, json={"message": "already exists", "request_id": "req-1"})
+    mock_hera.post("/api/v1/inference").respond(202, json={
         "taskId": "00000000-0000-0000-0000-000000000099",
     })
 

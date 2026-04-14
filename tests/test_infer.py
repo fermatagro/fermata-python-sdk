@@ -4,19 +4,6 @@ import httpx
 import respx
 
 
-PHOTO_JSON = {
-    "id": "00000000-0000-0000-0000-000000000001",
-    "userId": "test",
-    "greenhouseId": "00000000-0000-0000-0000-000000000010",
-    "cultureId": "tomato",
-    "growingCycleId": "00000000-0000-0000-0000-000000000002",
-    "capturedAt": "2026-04-01T10:00:00Z",
-    "source": "human",
-    "pos": {"x": 0, "y": 0, "h": 0},
-    "ptz": [0, 0, 0],
-    "createdAt": "2026-04-01T10:00:00Z",
-}
-
 MINIO_URL_PATTERN = r"http://minio:9000/.*"
 
 
@@ -34,11 +21,11 @@ def _upload_link_handler(request):
 async def test_infer_full_flow(client, mock_hera):
     """Test the full infer() convenience method."""
     mock_hera.post(url__regex=r"/api/v1/photos/.+/upload-link").mock(side_effect=_upload_link_handler)
-    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(200, json=PHOTO_JSON)
+    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(201)
     mock_hera.get("/api/v1/models").respond(200, json=[
         {"modelName": "tomato-v3", "modelType": "detection", "isActive": True}
     ])
-    mock_hera.post("/api/v1/inference").respond(200, json={
+    mock_hera.post("/api/v1/inference").respond(202, json={
         "taskId": "00000000-0000-0000-0000-000000000099",
     })
 
@@ -58,8 +45,8 @@ async def test_infer_full_flow(client, mock_hera):
 async def test_infer_with_explicit_model(client, mock_hera):
     """When model_name is provided, skip the models list call."""
     mock_hera.post(url__regex=r"/api/v1/photos/.+/upload-link").mock(side_effect=_upload_link_handler)
-    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(200, json=PHOTO_JSON)
-    mock_hera.post("/api/v1/inference").respond(200, json={
+    mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(201)
+    mock_hera.post("/api/v1/inference").respond(202, json={
         "taskId": "00000000-0000-0000-0000-000000000099",
     })
 

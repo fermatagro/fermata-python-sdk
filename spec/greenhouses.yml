@@ -6,8 +6,152 @@ tags:
   - name: Greenhouses
   - name: Greenhouse Objects
   - name: Device Placements
+  - name: Control Points
   - name: Zone Objects
 paths:
+  /api/v1/greenhouse-devices/{deviceId}/control-points:
+    get:
+      operationId: listControlPoints
+      description: List control points for a device
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.ControlPoint'
+                required:
+                  - items
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Control Points
+      security:
+        - BearerAuth: []
+  /api/v1/greenhouse-devices/{deviceId}/control-points/{controlPointId}:
+    post:
+      operationId: replaceControlPoint
+      description: Create or update a control point
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+        - name: controlPointId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Control Points
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateControlPoint'
+      security:
+        - BearerAuth: []
+    delete:
+      operationId: deleteControlPoint
+      description: Delete a control point
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+        - name: controlPointId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Control Points
+      security:
+        - BearerAuth: []
   /api/v1/greenhouses:
     get:
       operationId: listGreenhouses
@@ -153,6 +297,58 @@ paths:
       responses:
         '204':
           description: There is no content to send for this request, but the headers may be useful.
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+        - Greenhouses
+      security:
+        - BearerAuth: []
+  /api/v1/greenhouses/{greenhouseId}/control-points:
+    get:
+      operationId: getControlPointsSummary
+      description: Get control points count per device grouped by type
+      parameters:
+        - name: greenhouseId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.ControlPointsSummary'
+                required:
+                  - items
         '401':
           description: Access is unauthorized.
           content:
@@ -348,12 +544,6 @@ paths:
                   format: double
                 orientationVector:
                   $ref: '#/components/schemas/Common.Types.OrientationVector'
-                conversionMatrix:
-                  type: array
-                  items:
-                    type: number
-                    format: double
-                  description: 3x3 rotation matrix (row-major, 9 elements) for camera coordinate conversion
               required:
                 - pos
                 - height
@@ -511,12 +701,6 @@ paths:
                   format: double
                 orientationVector:
                   $ref: '#/components/schemas/Common.Types.OrientationVector'
-                conversionMatrix:
-                  type: array
-                  items:
-                    type: number
-                    format: double
-                  description: 3x3 rotation matrix (row-major, 9 elements) for camera coordinate conversion
               required:
                 - pos
                 - height
@@ -1877,6 +2061,33 @@ components:
           format: double
           description: Zoom level (camera-specific, e.g., 1-25)
       description: Pan-Tilt-Zoom camera position. Pan and tilt are in radians.
+    CreateOrUpdateControlPoint:
+      type: object
+      required:
+        - pos
+        - camPos
+        - pt
+      properties:
+        name:
+          type: string
+          description: Human-readable label (e.g. 'Pillar 4', 'Palette R9')
+        pos:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.GridPos'
+          description: World position of the point (meters)
+        camPos:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.GridPos'
+          description: Camera position of the point (meters)
+        pt:
+          allOf:
+            - $ref: '#/components/schemas/Models.PanTilt'
+          description: Camera pan/tilt angles pointing at this point (radians)
+        type:
+          allOf:
+            - $ref: '#/components/schemas/Models.ControlPointType'
+          description: Type of control point
+      description: ''
     CreateOrUpdateGreenhouse:
       type: object
       required:
@@ -1961,6 +2172,87 @@ components:
         - router
         - unknown
       description: Device type
+    Models.ControlPoint:
+      type: object
+      required:
+        - id
+        - deviceId
+        - greenhouseId
+        - pos
+        - camPos
+        - pt
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Unique identifier
+          readOnly: true
+        deviceId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Device this control point belongs to
+          readOnly: true
+        greenhouseId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          description: Greenhouse this control point belongs to
+          readOnly: true
+        name:
+          type: string
+          description: Human-readable label (e.g. 'Pillar 4', 'Palette R9')
+        pos:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.GridPos'
+          description: World position of the point (meters)
+        camPos:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.GridPos'
+          description: Camera position of the point (meters)
+        pt:
+          allOf:
+            - $ref: '#/components/schemas/Models.PanTilt'
+          description: Camera pan/tilt angles pointing at this point (radians)
+        type:
+          allOf:
+            - $ref: '#/components/schemas/Models.ControlPointType'
+          description: Type of control point
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      description: Reference point for camera calibration. Links a known world position to camera pan/tilt angles.
+    Models.ControlPointType:
+      type: string
+      enum:
+        - reference
+        - control
+      description: Type of control point
+    Models.ControlPointsSummary:
+      type: object
+      required:
+        - deviceId
+        - referenceCount
+        - controlCount
+      properties:
+        deviceId:
+          allOf:
+            - $ref: '#/components/schemas/Common.Types.ID'
+          readOnly: true
+        referenceCount:
+          type: integer
+          format: int32
+          readOnly: true
+        controlCount:
+          type: integer
+          format: int32
+          readOnly: true
+      description: Control points count per device grouped by type
     Models.DeviceInGreenhouse:
       type: object
       required:
@@ -1999,7 +2291,8 @@ components:
             format: double
           minItems: 9
           maxItems: 9
-          description: 3x3 rotation matrix (row-major, 9 elements) for converting between camera and world coordinates
+          description: 3x3 rotation matrix (row-major, 9 elements) for converting between camera and world coordinates. Calculated automatically from reference control points.
+          readOnly: true
         createdAt:
           type: string
           format: date-time

@@ -19,9 +19,12 @@ async def test_token_exchange():
         })
 
         tm = TokenManager(HERA_URL, "user", "pass")
-        async with httpx.AsyncClient() as client:
-            token = await tm.get_token(client)
+        await tm.open()
+        try:
+            token = await tm.get_token()
             assert token == "jwt-123"
+        finally:
+            await tm.close()
 
 
 async def test_token_cached():
@@ -40,11 +43,14 @@ async def test_token_cached():
         router.post("/auth/token").mock(side_effect=side_effect)
 
         tm = TokenManager(HERA_URL, "user", "pass")
-        async with httpx.AsyncClient() as client:
-            t1 = await tm.get_token(client)
-            t2 = await tm.get_token(client)
+        await tm.open()
+        try:
+            t1 = await tm.get_token()
+            t2 = await tm.get_token()
             assert t1 == t2
             assert call_count == 1
+        finally:
+            await tm.close()
 
 
 async def test_force_refresh():
@@ -63,11 +69,15 @@ async def test_force_refresh():
         router.post("/auth/token").mock(side_effect=side_effect)
 
         tm = TokenManager(HERA_URL, "user", "pass")
-        async with httpx.AsyncClient() as client:
-            t1 = await tm.get_token(client)
-            t2 = await tm.force_refresh(client)
+        await tm.open()
+        try:
+            t1 = await tm.get_token()
+            await tm.force_refresh()
+            t2 = await tm.get_token()
             assert t1 != t2
             assert call_count == 2
+        finally:
+            await tm.close()
 
 
 async def test_token_exchange_failure():
@@ -75,6 +85,9 @@ async def test_token_exchange_failure():
         router.post("/auth/token").respond(status_code=401, json={"error": "invalid_credentials"})
 
         tm = TokenManager(HERA_URL, "bad-user", "bad-pass")
-        async with httpx.AsyncClient() as client:
+        await tm.open()
+        try:
             with pytest.raises(AuthError):
-                await tm.get_token(client)
+                await tm.get_token()
+        finally:
+            await tm.close()
