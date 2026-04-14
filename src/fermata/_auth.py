@@ -58,8 +58,8 @@ class TokenManager:
             response = await client.post(
                 f"{self._base_url}/auth/token",
                 data={
-                    "username": self._username,
-                    "password": self._password,
+                    "client_id": self._username,
+                    "client_secret": self._password,
                 },
                 headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
@@ -74,6 +74,9 @@ class TokenManager:
 
         body = response.json()
         self._token = body["access_token"]
+        if self._token is None:
+            raise AuthError("Token exchange failed: no access_token in response")
+
         self._org_id = _extract_org_id(self._token)
         expires_in = body.get("expires_in", 3600)
         self._expires_at = time.monotonic() + expires_in

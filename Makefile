@@ -1,5 +1,6 @@
-.PHONY: generate test lint fmt install
+.PHONY: generate test lint fmt install run
 
+PYTHON := $(shell command -v python3)
 VENV := .venv/bin
 
 generate:
@@ -17,5 +18,9 @@ fmt:
 	$(VENV)/ruff check --fix src/ tests/
 
 install:
-	python3 -m venv .venv
+	$(PYTHON) -m venv .venv
+	$(VENV)/pip install --upgrade pip
 	$(VENV)/pip install -e ".[dev]"
+
+run:
+	env $$(cat .env | xargs) $(VENV)/python test.py
