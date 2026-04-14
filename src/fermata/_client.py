@@ -1,17 +1,48 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from pathlib import Path
 from typing import Any, Self
+
 from uuid_utils import uuid7
 
 from fermata._auth import TokenManager
 from fermata._namespaces.catalog import AsyncModels
+from fermata._namespaces.cultivation import AsyncCultivation
 from fermata._namespaces.greenhouses import AsyncGreenhouses
 from fermata._namespaces.inference import AsyncInference
 from fermata._namespaces.photos import AsyncPhotos
 from fermata._namespaces.pipelines import AsyncPipelines
 from fermata._transport import Transport
+from fermata.exceptions import ConflictError
+from fermata.types import PipelineRun
+
+# Fixed namespace for deterministic photo ID generation (UUIDv5).
+_PHOTO_NS = uuid.UUID("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d")
+
+
+def _deterministic_photo_id(
+    sync_id: str,
+    captured_at: str,
+    position: dict[str, float] | None,
+) -> str:
+    """Generate a deterministic photo ID from scan context.
+
+    Same (sync_id, captured_at, position) always produces the same UUID,
+    enabling idempotent retries after crashes.
+    """
+    parts = [sync_id, captured_at]
+    if position:
+        parts.extend(
+            [
+                str(position.get("x", 0)),
+                str(position.get("y", 0)),
+                str(position.get("h", 0)),
+            ]
+        )
+    name = ":".join(parts)
+    return str(uuid.uuid5(_PHOTO_NS, name))
 
 
 class Fermata:
@@ -23,6 +54,11 @@ class Fermata:
     Usage:
         async with Fermata(url="http://localhost:3000", username="...", password="...") as f:
             task_id = await f.infer(image="photo.jpg", greenhouse_id="gh-01", captured_at="...")
+
+    Pipeline mode (auto-resolves greenhouse, model, cycle from schedule):
+        async with Fermata(url=..., username=..., password=...,
+                           pipeline_id="schedule-uuid", sync_id="run-001") as f:
+            task_id = await f.infer(image="photo.jpg", captured_at="...")
     """
 
     def __init__(
@@ -31,26 +67,87 @@ class Fermata:
         username: str,
         password: str,
         *,
+        pipeline_id: str | None = None,
+        sync_id: str | None = None,
         timeout: float = 30.0,
         max_retries: int = 3,
     ) -> None:
+        if pipeline_id and not sync_id:
+            raise ValueError("sync_id is required when pipeline_id is set")
+
         self._token_manager = TokenManager(url, username, password)
         self._transport = Transport(url, self._token_manager, timeout=timeout, max_retries=max_retries)
         self._scan_id = str(uuid7())
+        self._pipeline_id = pipeline_id
+        self._sync_id = sync_id
+        self._run: PipelineRun | None = None
 
         self.photos = AsyncPhotos(self._transport)
         self.inference = AsyncInference(self._transport)
         self.models = AsyncModels(self._transport)
         self.greenhouses = AsyncGreenhouses(self._transport)
         self.pipelines = AsyncPipelines(self._transport)
+        self.cultivation = AsyncCultivation(self._transport)
 
     @property
     def scan_id(self) -> str:
         """Unique ID for this scan session. Auto-generated on construction."""
         return self._scan_id
 
+    @property
+    def run(self) -> PipelineRun | None:
+        """Resolved pipeline context, or None if not in pipeline mode."""
+        return self._run
+
+    async def _init_pipeline(self) -> None:
+        """Resolve schedule into run context and create a fire."""
+        assert self._pipeline_id is not None
+        assert self._sync_id is not None
+
+        # 1. Resolve schedule
+        schedule = await self.pipelines.get_schedule(self._pipeline_id)
+        greenhouse_id = schedule["scopeId"]
+        template_id = schedule["templateId"]
+        model_name: str | None = schedule.get("arguments", {}).get("model_name")
+        org_id = schedule["organizationId"]
+
+        # 2. Resolve active growing cycle
+        now = datetime.datetime.now(datetime.UTC).isoformat()
+        cycles = await self.cultivation.list_active_cycles(greenhouse_id, now)
+        cycle_id: str | None = cycles[0]["id"] if cycles else None
+
+        # 3. Auto-select model if not in schedule arguments
+        if not model_name:
+            models_list = await self.models.list()
+            if not models_list:
+                raise RuntimeError("No models available on Hera and none configured in schedule")
+            model_name = models_list[0].model_name
+
+        # 4. Create fire (run instance)
+        fire_id = str(uuid7())
+        await self.pipelines.create_fire(
+            fire_id,
+            template_id=template_id,
+            scope="greenhouse",
+            scope_id=greenhouse_id,
+            trigger_id=self._pipeline_id,
+            arguments={"sync_id": self._sync_id},
+        )
+
+        # 5. Store context
+        self._run = PipelineRun(
+            run_id=fire_id,
+            greenhouse_id=greenhouse_id,
+            growing_cycle_id=cycle_id,
+            model_name=model_name,
+            organization_id=org_id,
+        )
+        self._scan_id = fire_id  # photos grouped by fire
+
     async def __aenter__(self) -> Self:
         await self._transport.__aenter__()
+        if self._pipeline_id:
+            await self._init_pipeline()
         return self
 
     async def __aexit__(self, *exc: Any) -> None:
@@ -59,36 +156,48 @@ class Fermata:
     async def infer(
         self,
         image: str | Path | bytes,
-        greenhouse_id: str,
         captured_at: str | datetime.datetime,
         *,
+        greenhouse_id: str | None = None,
         position: dict[str, float] | None = None,
         model_name: str | None = None,
         photo_id: str | None = None,
     ) -> str:
         """Upload photo + submit inference. Returns task_id.
 
-        Steps:
-        1. Generate photo_id (UUIDv7) if not provided
-        2. Get presigned upload URL from Hera
-        3. Upload image bytes to storage via presigned URL
-        4. Create photo metadata in Hera
-        5. Resolve model_name if not specified
-        6. Submit inference task
-        7. Return task_id
+        In pipeline mode, greenhouse_id and model_name are resolved
+        automatically from the schedule. Explicit values take precedence.
         """
+        # Fill from run context if not provided
+        if self._run:
+            greenhouse_id = greenhouse_id or self._run.greenhouse_id
+            model_name = model_name or self._run.model_name
+
+        if not greenhouse_id:
+            raise ValueError("greenhouse_id is required when not using pipeline mode")
+
+        ts = captured_at if isinstance(captured_at, str) else captured_at.isoformat()
+
+        # Deterministic photo_id in pipeline mode (enables retry idempotency)
         if photo_id is None:
-            photo_id = str(uuid7())
+            if self._sync_id:
+                photo_id = _deterministic_photo_id(self._sync_id, ts, position)
+            else:
+                photo_id = str(uuid7())
 
         link = await self.photos.upload_link(photo_id, captured_at)
         await self.photos.upload(link.upload_url, image)
-        await self.photos.create(
-            photo_id,
-            greenhouse_id=greenhouse_id,
-            captured_at=captured_at,
-            position=position,
-            scan_id=self._scan_id,
-        )
+
+        try:
+            await self.photos.create(
+                photo_id,
+                greenhouse_id=greenhouse_id,
+                captured_at=captured_at,
+                position=position,
+                scan_id=self._scan_id,
+            )
+        except ConflictError:
+            pass  # already exists from previous attempt (retry idempotency)
 
         if model_name is None:
             models = await self.models.list()

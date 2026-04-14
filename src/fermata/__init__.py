@@ -11,10 +11,12 @@ from fermata.exceptions import (
     ServerError,
     ValidationError,
 )
+from fermata.types import PipelineRun
 
 __all__ = [
     "Fermata",
     "FermataSync",
+    "PipelineRun",
     "FermataError",
     "AuthError",
     "NotFoundError",

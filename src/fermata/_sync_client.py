@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Self
 
 from fermata._client import Fermata
+from fermata.types import PipelineRun
 
 
 class _SyncNamespace:
@@ -45,6 +46,11 @@ class FermataSync:
     Usage:
         with FermataSync(url="http://localhost:3000", username="...", password="...") as f:
             task_id = f.infer(image="photo.jpg", greenhouse_id="gh-01", captured_at="...")
+
+    Pipeline mode (auto-resolves greenhouse, model, cycle from schedule):
+        with FermataSync(url=..., username=..., password=...,
+                         pipeline_id="schedule-uuid", sync_id="run-001") as f:
+            task_id = f.infer(image="photo.jpg", captured_at="...")
     """
 
     def __init__(
@@ -53,6 +59,8 @@ class FermataSync:
         username: str,
         password: str,
         *,
+        pipeline_id: str | None = None,
+        sync_id: str | None = None,
         timeout: float = 30.0,
         max_retries: int = 3,
     ) -> None:
@@ -60,44 +68,55 @@ class FermataSync:
         self._thread = threading.Thread(target=self._loop.run_forever, daemon=True)
         self._thread.start()
 
-        self._async = Fermata(url, username, password, timeout=timeout, max_retries=max_retries)
+        self._async = Fermata(
+            url, username, password,
+            pipeline_id=pipeline_id,
+            sync_id=sync_id,
+            timeout=timeout,
+            max_retries=max_retries,
+        )
 
-        self.photos = SyncPhotos(self._async.photos, self._run)
-        self.inference = SyncInference(self._async.inference, self._run)
+        self.photos = SyncPhotos(self._async.photos, self._do)
+        self.inference = SyncInference(self._async.inference, self._do)
 
     @property
     def scan_id(self) -> str:
         """Unique ID for this scan session. Auto-generated on construction."""
         return self._async.scan_id
 
-    def _run(self, coro: Any) -> Any:
+    @property
+    def run(self) -> PipelineRun | None:
+        """Resolved pipeline context, or None if not in pipeline mode."""
+        return self._async.run
+
+    def _do(self, coro: Any) -> Any:
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
         return future.result()
 
     def __enter__(self) -> Self:
-        self._run(self._async.__aenter__())
+        self._do(self._async.__aenter__())
         return self
 
     def __exit__(self, *exc: Any) -> None:
-        self._run(self._async.__aexit__(*exc))
+        self._do(self._async.__aexit__(*exc))
         self._loop.call_soon_threadsafe(self._loop.stop)
         self._thread.join(timeout=5)
 
     def infer(
         self,
         image: str | Path | bytes,
-        greenhouse_id: str,
         captured_at: str | datetime.datetime,
         *,
+        greenhouse_id: str | None = None,
         position: dict[str, float] | None = None,
         model_name: str | None = None,
         photo_id: str | None = None,
     ) -> str:
-        return self._run(
+        return self._do(
             self._async.infer(
                 image,
-                greenhouse_id,
                 captured_at,
+                greenhouse_id=greenhouse_id,
                 position=position,
                 model_name=model_name,
                 photo_id=photo_id,
