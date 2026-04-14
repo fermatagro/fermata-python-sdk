@@ -456,12 +456,6 @@ paths:
           schema:
             $ref: '#/components/schemas/Models.ScheduleState'
           explode: false
-        - name: type
-          in: query
-          required: false
-          schema:
-            $ref: '#/components/schemas/Models.ScheduleType'
-          explode: false
         - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
         - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
       responses:
@@ -1539,7 +1533,6 @@ components:
         - organizationId
         - templateId
         - scope
-        - type
         - scopeId
         - cronExprUTC
         - arguments
@@ -1556,10 +1549,6 @@ components:
           allOf:
             - $ref: '#/components/schemas/Models.ScheduleScope'
           description: 'Scope type: greenhouse or growing cycle'
-        type:
-          allOf:
-            - $ref: '#/components/schemas/Models.ScheduleType'
-          description: 'Schedule type: cloud or onsite'
         scopeId:
           allOf:
             - $ref: '#/components/schemas/Common.Types.ID'
@@ -1781,7 +1770,6 @@ components:
         - organizationId
         - templateId
         - scope
-        - type
         - scopeId
         - state
         - cronExprUTC
@@ -1805,10 +1793,6 @@ components:
           allOf:
             - $ref: '#/components/schemas/Models.ScheduleScope'
           description: 'Scope type: greenhouse or growing cycle'
-        type:
-          allOf:
-            - $ref: '#/components/schemas/Models.ScheduleType'
-          description: 'Schedule type: cloud or onsite'
         scopeId:
           allOf:
             - $ref: '#/components/schemas/Common.Types.ID'
@@ -1851,12 +1835,6 @@ components:
         - enabled
         - disabled
       description: Schedule state
-    Models.ScheduleType:
-      type: string
-      enum:
-        - cloud
-        - onsite
-      description: Schedule type indicating where the schedule is executed
     Models.StartFireRequest:
       type: object
       required:

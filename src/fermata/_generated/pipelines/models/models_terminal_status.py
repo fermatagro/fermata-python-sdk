@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ModelsTerminalStatus(str, Enum):
     CANCELLED = "cancelled"
     COMPLETED = "completed"

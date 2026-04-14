@@ -1,4 +1,4 @@
-""" Contains all the data models used in inputs/outputs """
+"""Contains all the data models used in inputs/outputs"""
 
 from .common_errors_api_error import CommonErrorsApiError
 from .create_or_update_fire import CreateOrUpdateFire
@@ -22,7 +22,6 @@ from .models_schedule import ModelsSchedule
 from .models_schedule_arguments import ModelsScheduleArguments
 from .models_schedule_scope import ModelsScheduleScope
 from .models_schedule_state import ModelsScheduleState
-from .models_schedule_type import ModelsScheduleType
 from .models_start_fire_request import ModelsStartFireRequest
 from .models_template import ModelsTemplate
 from .models_terminal_status import ModelsTerminalStatus
@@ -59,7 +58,6 @@ __all__ = (
     "ModelsScheduleArguments",
     "ModelsScheduleScope",
     "ModelsScheduleState",
-    "ModelsScheduleType",
     "ModelsStartFireRequest",
     "ModelsTemplate",
     "ModelsTerminalStatus",

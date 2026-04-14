@@ -1,51 +1,37 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-
-
-
-
-
-
 T = TypeVar("T", bound="ModelsStartFireRequest")
-
 
 
 @_attrs_define
 class ModelsStartFireRequest:
-    """ Request to start a fire
+    """Request to start a fire
 
-        Attributes:
-            external_run_id (str): Prefect flow_run_id (immutable once set)
-     """
+    Attributes:
+        external_run_id (str): Prefect flow_run_id (immutable once set)
+    """
 
     external_run_id: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
         external_run_id = self.external_run_id
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "externalRunId": external_run_id,
-        })
+        field_dict.update(
+            {
+                "externalRunId": external_run_id,
+            }
+        )
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -55,7 +41,6 @@ class ModelsStartFireRequest:
         models_start_fire_request = cls(
             external_run_id=external_run_id,
         )
-
 
         models_start_fire_request.additional_properties = d
         return models_start_fire_request

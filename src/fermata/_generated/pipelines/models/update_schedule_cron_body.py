@@ -1,50 +1,36 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
-
-
-
-
-
-
 T = TypeVar("T", bound="UpdateScheduleCronBody")
-
 
 
 @_attrs_define
 class UpdateScheduleCronBody:
-    """ 
-        Attributes:
-            cron_expr_utc (str):
-     """
+    """
+    Attributes:
+        cron_expr_utc (str):
+    """
 
     cron_expr_utc: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
         cron_expr_utc = self.cron_expr_utc
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "cronExprUTC": cron_expr_utc,
-        })
+        field_dict.update(
+            {
+                "cronExprUTC": cron_expr_utc,
+            }
+        )
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
@@ -54,7 +40,6 @@ class UpdateScheduleCronBody:
         update_schedule_cron_body = cls(
             cron_expr_utc=cron_expr_utc,
         )
-
 
         update_schedule_cron_body.additional_properties = d
         return update_schedule_cron_body

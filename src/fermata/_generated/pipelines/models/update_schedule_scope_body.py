@@ -1,76 +1,56 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
+from uuid import UUID
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
 from ..models.models_schedule_scope import ModelsScheduleScope
-from uuid import UUID
-
-
-
-
-
 
 T = TypeVar("T", bound="UpdateScheduleScopeBody")
 
 
-
 @_attrs_define
 class UpdateScheduleScopeBody:
-    """ 
-        Attributes:
-            scope (ModelsScheduleScope): Scope type for schedule binding
-            scope_id (UUID): UUID identifier
-     """
+    """
+    Attributes:
+        scope (ModelsScheduleScope): Scope type for schedule binding
+        scope_id (UUID): UUID identifier
+    """
 
     scope: ModelsScheduleScope
     scope_id: UUID
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         scope = self.scope.value
 
         scope_id = str(self.scope_id)
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "scope": scope,
-            "scopeId": scope_id,
-        })
+        field_dict.update(
+            {
+                "scope": scope,
+                "scopeId": scope_id,
+            }
+        )
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         scope = ModelsScheduleScope(d.pop("scope"))
 
-
-
-
         scope_id = UUID(d.pop("scopeId"))
-
-
-
 
         update_schedule_scope_body = cls(
             scope=scope,
             scope_id=scope_id,
         )
-
 
         update_schedule_scope_body.additional_properties = d
         return update_schedule_scope_body

@@ -106,14 +106,14 @@ class Fermata:
 
         # 1. Resolve schedule (scope=growing_cycle, scope_id=cycle_id)
         schedule = await self.pipelines.get_schedule(self._pipeline_id)
-        cycle_id = schedule["scopeId"]
-        template_id = schedule["templateId"]
-        model_name: str | None = schedule.get("arguments", {}).get("model_name")
-        org_id = schedule["organizationId"]
+        cycle_id = str(schedule.scope_id)
+        template_id = str(schedule.template_id)
+        model_name: str | None = schedule.arguments.additional_properties.get("model_name")
+        org_id = schedule.organization_id
 
         # 2. Get greenhouse from growing cycle
         cycle = await self.cultivation.get_cycle(cycle_id)
-        greenhouse_id = cycle["greenhouseId"]
+        greenhouse_id = str(cycle.greenhouse_id)
 
         # 3. Auto-select model if not in schedule arguments
         if not model_name:

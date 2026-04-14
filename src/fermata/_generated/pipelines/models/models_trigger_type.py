@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ModelsTriggerType(str, Enum):
     REQUEST = "request"
     SCHEDULE = "schedule"

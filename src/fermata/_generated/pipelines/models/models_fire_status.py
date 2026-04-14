@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ModelsFireStatus(str, Enum):
     CANCELLED = "cancelled"
     COMPLETED = "completed"

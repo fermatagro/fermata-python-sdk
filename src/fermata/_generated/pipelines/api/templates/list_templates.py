@@ -1,39 +1,27 @@
 from http import HTTPStatus
-from typing import Any, cast
-from urllib.parse import quote
+from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.list_templates_response_200 import ListTemplatesResponse200
-from ...types import UNSET, Unset
-from typing import cast
-
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
     *,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> dict[str, Any]:
-    
-
-    
-
     params: dict[str, Any] = {}
 
     params["cursor"] = cursor
 
     params["limit"] = limit
 
-
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
-
 
     _kwargs: dict[str, Any] = {
         "method": "get",
@@ -41,37 +29,29 @@ def _get_kwargs(
         "params": params,
     }
 
-
     return _kwargs
 
 
-
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ListTemplatesResponse200 | None:
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CommonErrorsApiError | ListTemplatesResponse200 | None:
     if response.status_code == 200:
         response_200 = ListTemplatesResponse200.from_dict(response.json())
-
-
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
-
-
 
         return response_500
 
@@ -81,7 +61,9 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ListTemplatesResponse200]:
+def _build_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CommonErrorsApiError | ListTemplatesResponse200]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -95,9 +77,8 @@ def sync_detailed(
     client: AuthenticatedClient,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> Response[CommonErrorsApiError | ListTemplatesResponse200]:
-    """  List available pipeline templates
+    """List available pipeline templates
 
     Args:
         cursor (str | Unset):
@@ -109,13 +90,11 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListTemplatesResponse200]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         cursor=cursor,
-limit=limit,
-
+        limit=limit,
     )
 
     response = client.get_httpx_client().request(
@@ -124,14 +103,14 @@ limit=limit,
 
     return _build_response(client=client, response=response)
 
+
 def sync(
     *,
     client: AuthenticatedClient,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> CommonErrorsApiError | ListTemplatesResponse200 | None:
-    """  List available pipeline templates
+    """List available pipeline templates
 
     Args:
         cursor (str | Unset):
@@ -143,24 +122,22 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ListTemplatesResponse200
-     """
-
+    """
 
     return sync_detailed(
         client=client,
-cursor=cursor,
-limit=limit,
-
+        cursor=cursor,
+        limit=limit,
     ).parsed
+
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> Response[CommonErrorsApiError | ListTemplatesResponse200]:
-    """  List available pipeline templates
+    """List available pipeline templates
 
     Args:
         cursor (str | Unset):
@@ -172,29 +149,25 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListTemplatesResponse200]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         cursor=cursor,
-limit=limit,
-
+        limit=limit,
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> CommonErrorsApiError | ListTemplatesResponse200 | None:
-    """  List available pipeline templates
+    """List available pipeline templates
 
     Args:
         cursor (str | Unset):
@@ -206,12 +179,12 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ListTemplatesResponse200
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        client=client,
-cursor=cursor,
-limit=limit,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            client=client,
+            cursor=cursor,
+            limit=limit,
+        )
+    ).parsed

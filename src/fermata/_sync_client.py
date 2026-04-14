@@ -38,10 +38,10 @@ class SyncInference(_SyncNamespace):
 
 
 class SyncPipelines(_SyncNamespace):
-    def list_schedules(self) -> list[dict[str, Any]]:
+    def list_schedules(self) -> Any:
         return self._run(self._async.list_schedules())
 
-    def get_schedule(self, schedule_id: str) -> dict[str, Any]:
+    def get_schedule(self, schedule_id: str) -> Any:
         return self._run(self._async.get_schedule(schedule_id))
 
 

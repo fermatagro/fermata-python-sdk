@@ -1,64 +1,44 @@
 from http import HTTPStatus
-from typing import Any, cast
-from urllib.parse import quote
+from typing import Any
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.models_generate_fires_result import ModelsGenerateFiresResult
-from typing import cast
+from ...types import Response
 
 
-
-def _get_kwargs(
-    
-) -> dict[str, Any]:
-    
-
-    
-
-    
-
+def _get_kwargs() -> dict[str, Any]:
     _kwargs: dict[str, Any] = {
         "method": "post",
         "url": "/api/v1/pipelines/fires/generate",
     }
 
-
     return _kwargs
 
 
-
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ModelsGenerateFiresResult | None:
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CommonErrorsApiError | ModelsGenerateFiresResult | None:
     if response.status_code == 200:
         response_200 = ModelsGenerateFiresResult.from_dict(response.json())
-
-
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_403
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
-
-
 
         return response_500
 
@@ -68,7 +48,9 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ModelsGenerateFiresResult]:
+def _build_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CommonErrorsApiError | ModelsGenerateFiresResult]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -80,9 +62,8 @@ def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Res
 def sync_detailed(
     *,
     client: AuthenticatedClient,
-
 ) -> Response[CommonErrorsApiError | ModelsGenerateFiresResult]:
-    """  Generate missing schedule-triggered fires.
+    """Generate missing schedule-triggered fires.
 
     Scheduler/system operation that creates Fire records for all enabled schedules
     up to the current time.
@@ -98,12 +79,9 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsGenerateFiresResult]
-     """
+    """
 
-
-    kwargs = _get_kwargs(
-        
-    )
+    kwargs = _get_kwargs()
 
     response = client.get_httpx_client().request(
         **kwargs,
@@ -111,12 +89,12 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
+
 def sync(
     *,
     client: AuthenticatedClient,
-
 ) -> CommonErrorsApiError | ModelsGenerateFiresResult | None:
-    """  Generate missing schedule-triggered fires.
+    """Generate missing schedule-triggered fires.
 
     Scheduler/system operation that creates Fire records for all enabled schedules
     up to the current time.
@@ -132,20 +110,18 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ModelsGenerateFiresResult
-     """
-
+    """
 
     return sync_detailed(
         client=client,
-
     ).parsed
+
 
 async def asyncio_detailed(
     *,
     client: AuthenticatedClient,
-
 ) -> Response[CommonErrorsApiError | ModelsGenerateFiresResult]:
-    """  Generate missing schedule-triggered fires.
+    """Generate missing schedule-triggered fires.
 
     Scheduler/system operation that creates Fire records for all enabled schedules
     up to the current time.
@@ -161,25 +137,20 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ModelsGenerateFiresResult]
-     """
+    """
 
+    kwargs = _get_kwargs()
 
-    kwargs = _get_kwargs(
-        
-    )
-
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     *,
     client: AuthenticatedClient,
-
 ) -> CommonErrorsApiError | ModelsGenerateFiresResult | None:
-    """  Generate missing schedule-triggered fires.
+    """Generate missing schedule-triggered fires.
 
     Scheduler/system operation that creates Fire records for all enabled schedules
     up to the current time.
@@ -195,10 +166,10 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ModelsGenerateFiresResult
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        client=client,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            client=client,
+        )
+    ).parsed

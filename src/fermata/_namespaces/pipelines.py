@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from fermata._generated.pipelines.models.list_schedules_response_200 import ListSchedulesResponse200
+from fermata._generated.pipelines.models.models_schedule import ModelsSchedule
 from fermata._transport import Transport
 
 
@@ -9,22 +11,22 @@ class AsyncPipelines:
     def __init__(self, transport: Transport) -> None:
         self._t = transport
 
-    async def list_schedules(self) -> list[dict[str, Any]]:
+    async def list_schedules(self) -> list[ModelsSchedule]:
         """List all pipeline schedules for the current organization.
 
         GET /api/v1/pipelines/schedules
         """
         resp = await self._t.request("GET", "/api/v1/pipelines/schedules")
-        data = resp.json()
-        return data.get("items", [])
+        page = ListSchedulesResponse200.from_dict(resp.json())
+        return page.items
 
-    async def get_schedule(self, schedule_id: str) -> dict[str, Any]:
+    async def get_schedule(self, schedule_id: str) -> ModelsSchedule:
         """Fetch a pipeline schedule by ID.
 
         GET /api/v1/pipelines/schedules/{scheduleId}
         """
         resp = await self._t.request("GET", f"/api/v1/pipelines/schedules/{schedule_id}")
-        return resp.json()
+        return ModelsSchedule.from_dict(resp.json())
 
     async def create_fire(
         self,

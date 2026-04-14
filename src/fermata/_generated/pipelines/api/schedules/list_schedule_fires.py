@@ -1,22 +1,17 @@
+import datetime
 from http import HTTPStatus
-from typing import Any, cast
+from typing import Any
 from urllib.parse import quote
+from uuid import UUID
 
 import httpx
 
-from ...client import AuthenticatedClient, Client
-from ...types import Response, UNSET
 from ... import errors
-
+from ...client import AuthenticatedClient, Client
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.list_schedule_fires_response_200 import ListScheduleFiresResponse200
 from ...models.models_fire_status import ModelsFireStatus
-from ...types import UNSET, Unset
-from dateutil.parser import isoparse
-from typing import cast
-from uuid import UUID
-import datetime
-
+from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
@@ -28,12 +23,7 @@ def _get_kwargs(
     to: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> dict[str, Any]:
-    
-
-    
-
     params: dict[str, Any] = {}
 
     params["organizationId"] = organization_id
@@ -54,54 +44,44 @@ def _get_kwargs(
 
     params["limit"] = limit
 
-
     params = {k: v for k, v in params.items() if v is not UNSET and v is not None}
-
 
     _kwargs: dict[str, Any] = {
         "method": "get",
-        "url": "/api/v1/pipelines/schedules/{schedule_id}/fires".format(schedule_id=quote(str(schedule_id), safe=""),),
+        "url": "/api/v1/pipelines/schedules/{schedule_id}/fires".format(
+            schedule_id=quote(str(schedule_id), safe=""),
+        ),
         "params": params,
     }
-
 
     return _kwargs
 
 
-
-def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> CommonErrorsApiError | ListScheduleFiresResponse200 | None:
+def _parse_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> CommonErrorsApiError | ListScheduleFiresResponse200 | None:
     if response.status_code == 200:
         response_200 = ListScheduleFiresResponse200.from_dict(response.json())
-
-
 
         return response_200
 
     if response.status_code == 401:
         response_401 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_401
 
     if response.status_code == 403:
         response_403 = CommonErrorsApiError.from_dict(response.json())
-
-
 
         return response_403
 
     if response.status_code == 404:
         response_404 = CommonErrorsApiError.from_dict(response.json())
 
-
-
         return response_404
 
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
-
-
 
         return response_500
 
@@ -111,7 +91,9 @@ def _parse_response(*, client: AuthenticatedClient | Client, response: httpx.Res
         return None
 
 
-def _build_response(*, client: AuthenticatedClient | Client, response: httpx.Response) -> Response[CommonErrorsApiError | ListScheduleFiresResponse200]:
+def _build_response(
+    *, client: AuthenticatedClient | Client, response: httpx.Response
+) -> Response[CommonErrorsApiError | ListScheduleFiresResponse200]:
     return Response(
         status_code=HTTPStatus(response.status_code),
         content=response.content,
@@ -130,9 +112,8 @@ def sync_detailed(
     to: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> Response[CommonErrorsApiError | ListScheduleFiresResponse200]:
-    """  List fires for a specific schedule
+    """List fires for a specific schedule
 
     Args:
         schedule_id (UUID): UUID identifier
@@ -154,18 +135,16 @@ def sync_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListScheduleFiresResponse200]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         schedule_id=schedule_id,
-organization_id=organization_id,
-status=status,
-from_=from_,
-to=to,
-cursor=cursor,
-limit=limit,
-
+        organization_id=organization_id,
+        status=status,
+        from_=from_,
+        to=to,
+        cursor=cursor,
+        limit=limit,
     )
 
     response = client.get_httpx_client().request(
@@ -173,6 +152,7 @@ limit=limit,
     )
 
     return _build_response(client=client, response=response)
+
 
 def sync(
     schedule_id: UUID,
@@ -184,9 +164,8 @@ def sync(
     to: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> CommonErrorsApiError | ListScheduleFiresResponse200 | None:
-    """  List fires for a specific schedule
+    """List fires for a specific schedule
 
     Args:
         schedule_id (UUID): UUID identifier
@@ -208,20 +187,19 @@ def sync(
 
     Returns:
         CommonErrorsApiError | ListScheduleFiresResponse200
-     """
-
+    """
 
     return sync_detailed(
         schedule_id=schedule_id,
-client=client,
-organization_id=organization_id,
-status=status,
-from_=from_,
-to=to,
-cursor=cursor,
-limit=limit,
-
+        client=client,
+        organization_id=organization_id,
+        status=status,
+        from_=from_,
+        to=to,
+        cursor=cursor,
+        limit=limit,
     ).parsed
+
 
 async def asyncio_detailed(
     schedule_id: UUID,
@@ -233,9 +211,8 @@ async def asyncio_detailed(
     to: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> Response[CommonErrorsApiError | ListScheduleFiresResponse200]:
-    """  List fires for a specific schedule
+    """List fires for a specific schedule
 
     Args:
         schedule_id (UUID): UUID identifier
@@ -257,25 +234,22 @@ async def asyncio_detailed(
 
     Returns:
         Response[CommonErrorsApiError | ListScheduleFiresResponse200]
-     """
-
+    """
 
     kwargs = _get_kwargs(
         schedule_id=schedule_id,
-organization_id=organization_id,
-status=status,
-from_=from_,
-to=to,
-cursor=cursor,
-limit=limit,
-
+        organization_id=organization_id,
+        status=status,
+        from_=from_,
+        to=to,
+        cursor=cursor,
+        limit=limit,
     )
 
-    response = await client.get_async_httpx_client().request(
-        **kwargs
-    )
+    response = await client.get_async_httpx_client().request(**kwargs)
 
     return _build_response(client=client, response=response)
+
 
 async def asyncio(
     schedule_id: UUID,
@@ -287,9 +261,8 @@ async def asyncio(
     to: datetime.datetime,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
-
 ) -> CommonErrorsApiError | ListScheduleFiresResponse200 | None:
-    """  List fires for a specific schedule
+    """List fires for a specific schedule
 
     Args:
         schedule_id (UUID): UUID identifier
@@ -311,17 +284,17 @@ async def asyncio(
 
     Returns:
         CommonErrorsApiError | ListScheduleFiresResponse200
-     """
+    """
 
-
-    return (await asyncio_detailed(
-        schedule_id=schedule_id,
-client=client,
-organization_id=organization_id,
-status=status,
-from_=from_,
-to=to,
-cursor=cursor,
-limit=limit,
-
-    )).parsed
+    return (
+        await asyncio_detailed(
+            schedule_id=schedule_id,
+            client=client,
+            organization_id=organization_id,
+            status=status,
+            from_=from_,
+            to=to,
+            cursor=cursor,
+            limit=limit,
+        )
+    ).parsed

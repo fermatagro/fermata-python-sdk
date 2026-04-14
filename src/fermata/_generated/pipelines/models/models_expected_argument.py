@@ -1,36 +1,28 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..types import UNSET, Unset
-
 from ..models.models_argument_type import ModelsArgumentType
 from ..types import UNSET, Unset
-
-
-
-
-
 
 T = TypeVar("T", bound="ModelsExpectedArgument")
 
 
-
 @_attrs_define
 class ModelsExpectedArgument:
-    """ Metadata describing an expected argument for a pipeline template
+    """Metadata describing an expected argument for a pipeline template
 
-        Attributes:
-            name (str): Argument name (key used when passing arguments to the pipeline)
-            type_ (ModelsArgumentType): Type of an expected argument value
-            required (bool): Whether this argument must be provided
-            default_value (str | Unset): Default value when argument is omitted (serialized as string)
-            description (str | Unset): Human-readable description of the argument's purpose
-     """
+    Attributes:
+        name (str): Argument name (key used when passing arguments to the pipeline)
+        type_ (ModelsArgumentType): Type of an expected argument value
+        required (bool): Whether this argument must be provided
+        default_value (str | Unset): Default value when argument is omitted (serialized as string)
+        description (str | Unset): Human-readable description of the argument's purpose
+    """
 
     name: str
     type_: ModelsArgumentType
@@ -38,10 +30,6 @@ class ModelsExpectedArgument:
     default_value: str | Unset = UNSET
     description: str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         name = self.name
@@ -54,14 +42,15 @@ class ModelsExpectedArgument:
 
         description = self.description
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "name": name,
-            "type": type_,
-            "required": required,
-        })
+        field_dict.update(
+            {
+                "name": name,
+                "type": type_,
+                "required": required,
+            }
+        )
         if default_value is not UNSET:
             field_dict["defaultValue"] = default_value
         if description is not UNSET:
@@ -69,17 +58,12 @@ class ModelsExpectedArgument:
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         name = d.pop("name")
 
         type_ = ModelsArgumentType(d.pop("type"))
-
-
-
 
         required = d.pop("required")
 
@@ -94,7 +78,6 @@ class ModelsExpectedArgument:
             default_value=default_value,
             description=description,
         )
-
 
         models_expected_argument.additional_properties = d
         return models_expected_argument

@@ -31,13 +31,15 @@ SCHEDULE_RESPONSE = {
     "scope": "growing_cycle",
     "scopeId": CYCLE_ID,
     "state": "enabled",
-    "cronExprUtc": "0 0 * * *",
+    "cronExprUTC": "0 0 * * *",
     "arguments": {"model_name": "tomato-v3"},
     "createdAt": "2026-04-01T00:00:00Z",
+    "updatedAt": "2026-04-01T00:00:00Z",
 }
 
 CYCLE_RESPONSE = {
     "id": CYCLE_ID,
+    "description": "Spring 2026",
     "organizationId": ORG_ID,
     "greenhouseId": GREENHOUSE_ID,
     "plantingDate": "2026-03-01T00:00:00Z",
