@@ -9,6 +9,15 @@ class AsyncPipelines:
     def __init__(self, transport: Transport) -> None:
         self._t = transport
 
+    async def list_schedules(self) -> list[dict[str, Any]]:
+        """List all pipeline schedules for the current organization.
+
+        GET /api/v1/pipelines/schedules
+        """
+        resp = await self._t.request("GET", "/api/v1/pipelines/schedules")
+        data = resp.json()
+        return data.get("items", [])
+
     async def get_schedule(self, schedule_id: str) -> dict[str, Any]:
         """Fetch a pipeline schedule by ID.
 

@@ -37,6 +37,14 @@ class SyncInference(_SyncNamespace):
         return self._run(self._async.get(task_id))
 
 
+class SyncPipelines(_SyncNamespace):
+    def list_schedules(self) -> list[dict[str, Any]]:
+        return self._run(self._async.list_schedules())
+
+    def get_schedule(self, schedule_id: str) -> dict[str, Any]:
+        return self._run(self._async.get_schedule(schedule_id))
+
+
 class FermataSync:
     """Sync Fermata SDK client.
 
@@ -78,6 +86,7 @@ class FermataSync:
 
         self.photos = SyncPhotos(self._async.photos, self._do)
         self.inference = SyncInference(self._async.inference, self._do)
+        self.pipelines = SyncPipelines(self._async.pipelines, self._do)
 
     @property
     def scan_id(self) -> str:
