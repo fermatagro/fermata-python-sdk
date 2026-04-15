@@ -1,38 +1,28 @@
 from __future__ import annotations
 
+import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import Any, TypeVar
+from uuid import UUID
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-
-from ..types import UNSET, Unset
-
 from dateutil.parser import isoparse
-from typing import cast
-from uuid import UUID
-import datetime
-
-
-
-
-
 
 T = TypeVar("T", bound="ModelsUploadLinkResponse")
 
 
-
 @_attrs_define
 class ModelsUploadLinkResponse:
-    """ Response with presigned upload URL
+    """Response with presigned upload URL
 
-        Attributes:
-            photo_id (UUID): UUID identifier
-            upload_url (str): Presigned S3 URL for direct upload (PUT)
-            download_url (str): Presigned S3 URL for direct download (GET) - use for preview before metadata is created
-            delete_url (str): Presigned S3 URL for direct delete (DELETE) - use to cleanup orphan files on retake/cancel
-            expires_at (datetime.datetime): When the presigned URL expires
-     """
+    Attributes:
+        photo_id (UUID): UUID identifier
+        upload_url (str): Presigned S3 URL for direct upload (PUT)
+        download_url (str): Presigned S3 URL for direct download (GET) - use for preview before metadata is created
+        delete_url (str): Presigned S3 URL for direct delete (DELETE) - use to cleanup orphan files on retake/cancel
+        expires_at (datetime.datetime): When the presigned URL expires
+    """
 
     photo_id: UUID
     upload_url: str
@@ -40,10 +30,6 @@ class ModelsUploadLinkResponse:
     delete_url: str
     expires_at: datetime.datetime
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
-
-
-
-
 
     def to_dict(self) -> dict[str, Any]:
         photo_id = str(self.photo_id)
@@ -56,28 +42,24 @@ class ModelsUploadLinkResponse:
 
         expires_at = self.expires_at.isoformat()
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "photoId": photo_id,
-            "uploadUrl": upload_url,
-            "downloadUrl": download_url,
-            "deleteUrl": delete_url,
-            "expiresAt": expires_at,
-        })
+        field_dict.update(
+            {
+                "photoId": photo_id,
+                "uploadUrl": upload_url,
+                "downloadUrl": download_url,
+                "deleteUrl": delete_url,
+                "expiresAt": expires_at,
+            }
+        )
 
         return field_dict
-
-
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
         photo_id = UUID(d.pop("photoId"))
-
-
-
 
         upload_url = d.pop("uploadUrl")
 
@@ -87,9 +69,6 @@ class ModelsUploadLinkResponse:
 
         expires_at = isoparse(d.pop("expiresAt"))
 
-
-
-
         models_upload_link_response = cls(
             photo_id=photo_id,
             upload_url=upload_url,
@@ -97,7 +76,6 @@ class ModelsUploadLinkResponse:
             delete_url=delete_url,
             expires_at=expires_at,
         )
-
 
         models_upload_link_response.additional_properties = d
         return models_upload_link_response

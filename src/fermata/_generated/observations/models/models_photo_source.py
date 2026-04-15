@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ModelsPhotoSource(str, Enum):
     HUMAN = "human"
     PIPELINE = "pipeline"
