@@ -59,8 +59,8 @@ class AsyncPipelines:
         )
         await call_async(_create_fire.asyncio_detailed(UUID(fire_id), body=body, client=self._c))
 
-    async def start_fire(self, fire_id: str, *, external_run_id: str = "") -> None:
-        body = ModelsStartFireRequest(external_run_id=external_run_id)
+    async def start_fire(self, fire_id: str, *, external_run_id: str | None = None) -> None:
+        body = ModelsStartFireRequest(external_run_id=external_run_id or fire_id)
         await call_async(_start_fire.asyncio_detailed(UUID(fire_id), body=body, client=self._c))
 
     async def complete_fire(self, fire_id: str, *, error_message: str | None = None) -> None:
