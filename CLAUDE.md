@@ -15,29 +15,49 @@ make fmt              # Format code (ruff)
 ## Architecture
 
 ```
-TokenManager (_auth.py)           — self-contained token lifecycle (own httpx clients)
+TokenManager (_auth.py)           — self-contained token lifecycle (own httpx client)
   ↓
 FermataAuth (_http.py)            — httpx Auth flow: token injection + 401/502/503 retry
   ↓
-ApiClient / SyncApiClient (_http.py) — duck-types generated AuthenticatedClient
+ApiClient (_http.py)              — duck-types generated AuthenticatedClient
   ↓
-call_async / call_sync (_call.py) — unwrap generated Response → typed model or exception
+call_async (_call.py)             — unwrap generated Response → typed model or exception
   ↓
-Namespaces (_namespaces/*.py)     — thin wrappers around generated API functions
+Async* namespaces (_namespaces/)  — all logic lives here (body building, API calls)
+  ↓
+Sync* namespaces (_namespaces/)   — typed one-line delegates to Async* via run()
   ↓
 Generated code (_generated/)      — models + API functions from OpenAPI specs
 ```
+
+### Async-first pattern
+
+All logic is written once in `Async*` classes. `Sync*` classes delegate to them via `loop.run_until_complete()`:
+
+```python
+# Async — all logic here
+class AsyncPipelines:
+    async def get_schedule(self, schedule_id: str) -> ModelsSchedule:
+        return await call_async(_get_schedule.asyncio_detailed(UUID(schedule_id), client=self._c))
+
+# Sync — typed delegate, zero logic
+class SyncPipelines:
+    def get_schedule(self, schedule_id: str) -> ModelsSchedule:
+        return self._run(self._a.get_schedule(schedule_id))
+```
+
+`FermataSync` wraps `Fermata` the same way — no duplicated `infer()` or `_init_pipeline()`.
 
 ### Key files
 
 | File | Purpose |
 |------|---------|
-| `_auth.py` | `TokenManager` — token exchange, caching, auto-refresh. Owns its own httpx clients for `/auth/token`. |
-| `_http.py` | `FermataAuth` (httpx Auth flow) + `ApiClient`/`SyncApiClient` adapters. All auth + retry logic lives here. |
-| `_call.py` | `call_async()`/`call_sync()` — unwrap generated `Response`, map HTTP status to our exception hierarchy. |
+| `_auth.py` | `TokenManager` — async-only token exchange, caching, auto-refresh. |
+| `_http.py` | `FermataAuth` (async httpx Auth flow) + `ApiClient` adapter. All auth + retry logic. |
+| `_call.py` | `call_async()` — unwrap generated `Response`, map HTTP status to our exception hierarchy. |
 | `_client.py` | `Fermata` — async client. Pipeline init, `infer()` convenience, deterministic photo IDs. |
-| `_sync_client.py` | `FermataSync` — sync client. Direct sync calls, no background thread. |
-| `_namespaces/*.py` | Each file has `Async*` + `Sync*` classes. Methods are one-liners calling generated functions. |
+| `_sync_client.py` | `FermataSync` — wraps `Fermata` with `loop.run_until_complete()`. ~50 lines, no logic duplication. |
+| `_namespaces/*.py` | `Async*` classes (logic) + `Sync*` classes (typed delegates). |
 | `types.py` | Stable re-exports of generated model types (`Schedule`, `GrowingCycle`, `InferenceTask`, etc.) |
 | `exceptions.py` | Exception hierarchy: `AuthError`, `NotFoundError`, `ConflictError`, etc. |
 | `_generated/` | Auto-generated from filtered OpenAPI specs. **Never edit manually.** |
@@ -123,6 +143,16 @@ pytest tests/integration/ -v
 ```
 
 Tests create their own data (greenhouses, cycles, schedules) via the API.
+
+## README consistency
+
+When changing public API (method signatures, return types, new parameters, new namespaces), update `README.md` in the same commit:
+- `infer()` signature block must match actual parameters
+- Methods reference table must match actual return types
+- `PipelineRun` fields table must match the dataclass
+- Code examples must use current API (e.g., typed model attributes, not dict access)
+- `photos.create()` returns `None` (not `Photo`)
+- `list_schedules()` / `get_schedule()` return typed `Schedule` objects
 
 ## Git workflow
 

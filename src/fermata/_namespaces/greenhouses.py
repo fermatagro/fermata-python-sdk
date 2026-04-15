@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
-from fermata._call import call_async, call_sync
+from fermata._call import call_async
 from fermata._generated.greenhouses.api.greenhouses import list_greenhouses as _list_greenhouses
 from fermata._generated.greenhouses.models.models_greenhouse import ModelsGreenhouse
 
@@ -17,9 +18,9 @@ class AsyncGreenhouses:
 
 
 class SyncGreenhouses:
-    def __init__(self, client: Any) -> None:
-        self._c = client
+    def __init__(self, async_ns: AsyncGreenhouses, run: Callable[..., Any]) -> None:
+        self._a = async_ns
+        self._run = run
 
     def list(self) -> list[ModelsGreenhouse]:
-        page = call_sync(_list_greenhouses.sync_detailed(client=self._c))
-        return page.items
+        return self._run(self._a.list())

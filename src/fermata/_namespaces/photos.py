@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -8,7 +9,7 @@ from uuid import UUID
 import httpx
 from dateutil.parser import isoparse
 
-from fermata._call import call_async, call_sync
+from fermata._call import call_async
 from fermata._generated.observations.api.photos import (
     create_photo as _create_photo,
 )
@@ -60,6 +61,7 @@ class AsyncPhotos:
         growing_cycle_id: str = "",
         source: str = "human",
         position: dict[str, float] | None = None,
+        ptz: list[float] | None = None,
         scan_id: str | None = None,
     ) -> None:
         pos = CommonTypesGridPos(
@@ -75,53 +77,22 @@ class AsyncPhotos:
             captured_at=_parse_dt(captured_at),
             source=ModelsPhotoSource(source),
             pos=pos,
-            ptz=[0.0, 0.0, 0.0],
+            ptz=ptz or [0.0, 0.0, 0.0],
             pipeline_id=UUID(scan_id) if scan_id else UNSET,
         )
         await call_async(_create_photo.asyncio_detailed(UUID(photo_id), body=body, client=self._c))
 
 
 class SyncPhotos:
-    def __init__(self, client: Any, raw_client: httpx.Client) -> None:
-        self._c = client
-        self._raw = raw_client
+    def __init__(self, async_ns: AsyncPhotos, run: Callable[..., Any]) -> None:
+        self._a = async_ns
+        self._run = run
 
-    def upload_link(
-        self, photo_id: str, captured_at: str | datetime.datetime
-    ) -> ModelsUploadLinkResponse:
-        body = ModelsCreateUploadLink(captured_at=_parse_dt(captured_at))
-        return call_sync(_upload_link.sync_detailed(UUID(photo_id), body=body, client=self._c))
+    def upload_link(self, photo_id: str, captured_at: str | datetime.datetime) -> ModelsUploadLinkResponse:
+        return self._run(self._a.upload_link(photo_id, captured_at))
 
     def upload(self, upload_url: str, image: str | Path | bytes) -> None:
-        resp = self._raw.put(upload_url, content=_read_image(image))
-        resp.raise_for_status()
+        self._run(self._a.upload(upload_url, image))
 
-    def create(
-        self,
-        photo_id: str,
-        *,
-        greenhouse_id: str,
-        captured_at: str | datetime.datetime,
-        culture_id: str = "",
-        growing_cycle_id: str = "",
-        source: str = "human",
-        position: dict[str, float] | None = None,
-        scan_id: str | None = None,
-    ) -> None:
-        pos = CommonTypesGridPos(
-            x=position.get("x", 0) if position else 0,
-            y=position.get("y", 0) if position else 0,
-            h=position.get("h", 0) if position else 0,
-        )
-        body = CreateOrUpdatePhoto(
-            id=UUID(photo_id),
-            greenhouse_id=UUID(greenhouse_id),
-            culture_id=culture_id,
-            growing_cycle_id=UUID(growing_cycle_id) if growing_cycle_id else UUID(int=0),
-            captured_at=_parse_dt(captured_at),
-            source=ModelsPhotoSource(source),
-            pos=pos,
-            ptz=[0.0, 0.0, 0.0],
-            pipeline_id=UUID(scan_id) if scan_id else UNSET,
-        )
-        call_sync(_create_photo.sync_detailed(UUID(photo_id), body=body, client=self._c))
+    def create(self, photo_id: str, **kw: Any) -> None:
+        self._run(self._a.create(photo_id, **kw))

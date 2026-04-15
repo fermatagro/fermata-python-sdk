@@ -6,40 +6,28 @@ from typing import Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.models_ai_model_type import ModelsAIModelType
-
-T = TypeVar("T", bound="ModelsAIModel")
+T = TypeVar("T", bound="ModelsStartFireRequest")
 
 
 @_attrs_define
-class ModelsAIModel:
-    """AI Model from ML API
+class ModelsStartFireRequest:
+    """Request to start a fire
 
     Attributes:
-        model_name (str): Model name (unique identifier)
-        model_type (ModelsAIModelType): Type of AI model
-        is_active (bool): Whether the model is active
+        external_run_id (str): Prefect flow_run_id (immutable once set)
     """
 
-    model_name: str
-    model_type: ModelsAIModelType
-    is_active: bool
+    external_run_id: str
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        model_name = self.model_name
-
-        model_type = self.model_type.value
-
-        is_active = self.is_active
+        external_run_id = self.external_run_id
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "modelName": model_name,
-                "modelType": model_type,
-                "isActive": is_active,
+                "externalRunId": external_run_id,
             }
         )
 
@@ -48,20 +36,14 @@ class ModelsAIModel:
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        model_name = d.pop("modelName")
+        external_run_id = d.pop("externalRunId")
 
-        model_type = ModelsAIModelType(d.pop("modelType"))
-
-        is_active = d.pop("isActive")
-
-        models_ai_model = cls(
-            model_name=model_name,
-            model_type=model_type,
-            is_active=is_active,
+        models_start_fire_request = cls(
+            external_run_id=external_run_id,
         )
 
-        models_ai_model.additional_properties = d
-        return models_ai_model
+        models_start_fire_request.additional_properties = d
+        return models_start_fire_request
 
     @property
     def additional_keys(self) -> list[str]:

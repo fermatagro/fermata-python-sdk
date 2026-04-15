@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class DevicesModelsDeviceType(str, Enum):
     CAMERA = "camera"
     ROUTER = "router"

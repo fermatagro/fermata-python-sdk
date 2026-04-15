@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ModelsAIModelType(str, Enum):
     CLASSIFICATION = "classification"
     DETECTION = "detection"

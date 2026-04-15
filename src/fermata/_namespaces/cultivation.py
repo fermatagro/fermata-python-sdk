@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Callable
 from typing import Any
 from uuid import UUID
 
-from fermata._call import call_async, call_sync
+from fermata._call import call_async
 from fermata._generated.cultivation.api.growing_cycles import (
     get_cycle as _get_cycle,
 )
@@ -31,16 +32,12 @@ class AsyncCultivation:
 
 
 class SyncCultivation:
-    def __init__(self, client: Any) -> None:
-        self._c = client
+    def __init__(self, async_ns: AsyncCultivation, run: Callable[..., Any]) -> None:
+        self._a = async_ns
+        self._run = run
 
     def get_cycle(self, cycle_id: str) -> ModelsGrowingCycle:
-        return call_sync(_get_cycle.sync_detailed(UUID(cycle_id), client=self._c))
+        return self._run(self._a.get_cycle(cycle_id))
 
-    def list_active_cycles(
-        self, greenhouse_id: str, at_time: datetime.datetime
-    ) -> list[ModelsGrowingCycle]:
-        page = call_sync(
-            _list_active.sync_detailed(client=self._c, greenhouse_id=UUID(greenhouse_id), at_time=at_time)
-        )
-        return page.items
+    def list_active_cycles(self, greenhouse_id: str, at_time: datetime.datetime) -> list[ModelsGrowingCycle]:
+        return self._run(self._a.list_active_cycles(greenhouse_id, at_time))

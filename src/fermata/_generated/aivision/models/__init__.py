@@ -1,4 +1,4 @@
-""" Contains all the data models used in inputs/outputs """
+"""Contains all the data models used in inputs/outputs"""
 
 from .common_errors_api_error import CommonErrorsApiError
 from .models_inference_request import ModelsInferenceRequest

@@ -10,6 +10,7 @@ from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.list_schedules_response_200 import ListSchedulesResponse200
 from ...models.models_schedule_scope import ModelsScheduleScope
 from ...models.models_schedule_state import ModelsScheduleState
+from ...models.models_schedule_type import ModelsScheduleType
 from ...types import UNSET, Response, Unset
 
 
@@ -19,6 +20,7 @@ def _get_kwargs(
     scope: ModelsScheduleScope | Unset = UNSET,
     scope_id: UUID | Unset = UNSET,
     state: ModelsScheduleState | Unset = UNSET,
+    type_: ModelsScheduleType | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> dict[str, Any]:
@@ -45,6 +47,12 @@ def _get_kwargs(
         json_state = state.value
 
     params["state"] = json_state
+
+    json_type_: str | Unset = UNSET
+    if not isinstance(type_, Unset):
+        json_type_ = type_.value
+
+    params["type"] = json_type_
 
     params["cursor"] = cursor
 
@@ -108,6 +116,7 @@ def sync_detailed(
     scope: ModelsScheduleScope | Unset = UNSET,
     scope_id: UUID | Unset = UNSET,
     state: ModelsScheduleState | Unset = UNSET,
+    type_: ModelsScheduleType | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> Response[CommonErrorsApiError | ListSchedulesResponse200]:
@@ -118,6 +127,8 @@ def sync_detailed(
         scope (ModelsScheduleScope | Unset): Scope type for schedule binding
         scope_id (UUID | Unset): UUID identifier
         state (ModelsScheduleState | Unset): Schedule state
+        type_ (ModelsScheduleType | Unset): Schedule type indicating where the schedule is
+            executed
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -134,6 +145,7 @@ def sync_detailed(
         scope=scope,
         scope_id=scope_id,
         state=state,
+        type_=type_,
         cursor=cursor,
         limit=limit,
     )
@@ -152,6 +164,7 @@ def sync(
     scope: ModelsScheduleScope | Unset = UNSET,
     scope_id: UUID | Unset = UNSET,
     state: ModelsScheduleState | Unset = UNSET,
+    type_: ModelsScheduleType | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> CommonErrorsApiError | ListSchedulesResponse200 | None:
@@ -162,6 +175,8 @@ def sync(
         scope (ModelsScheduleScope | Unset): Scope type for schedule binding
         scope_id (UUID | Unset): UUID identifier
         state (ModelsScheduleState | Unset): Schedule state
+        type_ (ModelsScheduleType | Unset): Schedule type indicating where the schedule is
+            executed
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -179,6 +194,7 @@ def sync(
         scope=scope,
         scope_id=scope_id,
         state=state,
+        type_=type_,
         cursor=cursor,
         limit=limit,
     ).parsed
@@ -191,6 +207,7 @@ async def asyncio_detailed(
     scope: ModelsScheduleScope | Unset = UNSET,
     scope_id: UUID | Unset = UNSET,
     state: ModelsScheduleState | Unset = UNSET,
+    type_: ModelsScheduleType | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> Response[CommonErrorsApiError | ListSchedulesResponse200]:
@@ -201,6 +218,8 @@ async def asyncio_detailed(
         scope (ModelsScheduleScope | Unset): Scope type for schedule binding
         scope_id (UUID | Unset): UUID identifier
         state (ModelsScheduleState | Unset): Schedule state
+        type_ (ModelsScheduleType | Unset): Schedule type indicating where the schedule is
+            executed
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -217,6 +236,7 @@ async def asyncio_detailed(
         scope=scope,
         scope_id=scope_id,
         state=state,
+        type_=type_,
         cursor=cursor,
         limit=limit,
     )
@@ -233,6 +253,7 @@ async def asyncio(
     scope: ModelsScheduleScope | Unset = UNSET,
     scope_id: UUID | Unset = UNSET,
     state: ModelsScheduleState | Unset = UNSET,
+    type_: ModelsScheduleType | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> CommonErrorsApiError | ListSchedulesResponse200 | None:
@@ -243,6 +264,8 @@ async def asyncio(
         scope (ModelsScheduleScope | Unset): Scope type for schedule binding
         scope_id (UUID | Unset): UUID identifier
         state (ModelsScheduleState | Unset): Schedule state
+        type_ (ModelsScheduleType | Unset): Schedule type indicating where the schedule is
+            executed
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -261,6 +284,7 @@ async def asyncio(
             scope=scope,
             scope_id=scope_id,
             state=state,
+            type_=type_,
             cursor=cursor,
             limit=limit,
         )

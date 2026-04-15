@@ -134,6 +134,9 @@ class Fermata:
         )
         self._scan_id = fire_id
 
+        # 6. Mark fire as running
+        await self.pipelines.start_fire(fire_id)
+
     async def __aenter__(self) -> Self:
         await self._tm.open()
         api = ApiClient(self._url, self._auth, timeout=self._timeout)
@@ -150,6 +153,9 @@ class Fermata:
         return self
 
     async def __aexit__(self, *exc: Any) -> None:
+        if self._run:
+            error = str(exc[1]) if exc[1] else None
+            await self.pipelines.complete_fire(self._run.run_id, error_message=error)
         await self._raw.aclose()
         await self._api.aclose()
         await self._tm.close()
@@ -161,6 +167,7 @@ class Fermata:
         *,
         greenhouse_id: str | None = None,
         position: dict[str, float] | None = None,
+        ptz: list[float] | None = None,
         model_name: str | None = None,
         photo_id: str | None = None,
     ) -> str:
@@ -197,6 +204,7 @@ class Fermata:
                 culture_id=culture_id,
                 growing_cycle_id=growing_cycle_id,
                 position=position,
+                ptz=ptz,
                 scan_id=self._scan_id,
             )
         except ConflictError:

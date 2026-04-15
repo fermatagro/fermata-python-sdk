@@ -11,6 +11,7 @@ from dateutil.parser import isoparse
 
 from ..models.models_schedule_scope import ModelsScheduleScope
 from ..models.models_schedule_state import ModelsScheduleState
+from ..models.models_schedule_type import ModelsScheduleType
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ class ModelsSchedule:
         organization_id (str): Organization identifier (opaque string)
         template_id (UUID): UUID identifier
         scope (ModelsScheduleScope): Scope type for schedule binding
+        type_ (ModelsScheduleType): Schedule type indicating where the schedule is executed
         scope_id (UUID): UUID identifier
         state (ModelsScheduleState): Schedule state
         cron_expr_utc (str): Cron expression in UTC timezone
@@ -42,6 +44,7 @@ class ModelsSchedule:
     organization_id: str
     template_id: UUID
     scope: ModelsScheduleScope
+    type_: ModelsScheduleType
     scope_id: UUID
     state: ModelsScheduleState
     cron_expr_utc: str
@@ -59,6 +62,8 @@ class ModelsSchedule:
         template_id = str(self.template_id)
 
         scope = self.scope.value
+
+        type_ = self.type_.value
 
         scope_id = str(self.scope_id)
 
@@ -84,6 +89,7 @@ class ModelsSchedule:
                 "organizationId": organization_id,
                 "templateId": template_id,
                 "scope": scope,
+                "type": type_,
                 "scopeId": scope_id,
                 "state": state,
                 "cronExprUTC": cron_expr_utc,
@@ -110,6 +116,8 @@ class ModelsSchedule:
 
         scope = ModelsScheduleScope(d.pop("scope"))
 
+        type_ = ModelsScheduleType(d.pop("type"))
+
         scope_id = UUID(d.pop("scopeId"))
 
         state = ModelsScheduleState(d.pop("state"))
@@ -134,6 +142,7 @@ class ModelsSchedule:
             organization_id=organization_id,
             template_id=template_id,
             scope=scope,
+            type_=type_,
             scope_id=scope_id,
             state=state,
             cron_expr_utc=cron_expr_utc,

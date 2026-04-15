@@ -6,62 +6,56 @@ from typing import Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-from ..models.models_ai_model_type import ModelsAIModelType
+from ..models.models_terminal_status import ModelsTerminalStatus
+from ..types import UNSET, Unset
 
-T = TypeVar("T", bound="ModelsAIModel")
+T = TypeVar("T", bound="ModelsCompleteFireRequest")
 
 
 @_attrs_define
-class ModelsAIModel:
-    """AI Model from ML API
+class ModelsCompleteFireRequest:
+    """Request to complete a fire with terminal status
 
     Attributes:
-        model_name (str): Model name (unique identifier)
-        model_type (ModelsAIModelType): Type of AI model
-        is_active (bool): Whether the model is active
+        status (ModelsTerminalStatus): Terminal status for completing a fire
+        error_message (str | Unset): Error message (should be present when status=failed)
     """
 
-    model_name: str
-    model_type: ModelsAIModelType
-    is_active: bool
+    status: ModelsTerminalStatus
+    error_message: str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        model_name = self.model_name
+        status = self.status.value
 
-        model_type = self.model_type.value
-
-        is_active = self.is_active
+        error_message = self.error_message
 
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
             {
-                "modelName": model_name,
-                "modelType": model_type,
-                "isActive": is_active,
+                "status": status,
             }
         )
+        if error_message is not UNSET:
+            field_dict["errorMessage"] = error_message
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        model_name = d.pop("modelName")
+        status = ModelsTerminalStatus(d.pop("status"))
 
-        model_type = ModelsAIModelType(d.pop("modelType"))
+        error_message = d.pop("errorMessage", UNSET)
 
-        is_active = d.pop("isActive")
-
-        models_ai_model = cls(
-            model_name=model_name,
-            model_type=model_type,
-            is_active=is_active,
+        models_complete_fire_request = cls(
+            status=status,
+            error_message=error_message,
         )
 
-        models_ai_model.additional_properties = d
-        return models_ai_model
+        models_complete_fire_request.additional_properties = d
+        return models_complete_fire_request
 
     @property
     def additional_keys(self) -> list[str]:
