@@ -1,0 +1,254 @@
+openapi: 3.0.0
+info:
+  title: Demetra Cultivation API
+  version: 0.0.0
+tags:
+- name: Cultures
+- name: Treatment Types
+- name: Growing Cycles
+- name: Growing Cycle Regions
+- name: Treatments
+- name: Notes
+paths:
+  /api/v1/cycles/active:
+    get:
+      operationId: listActiveCyclesAtTime
+      description: List active growing cycles at a specific time
+      parameters:
+      - name: greenhouseId
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
+        explode: false
+      - name: atTime
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+      - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.GrowingCycle'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - Growing Cycles
+      security:
+      - BearerAuth: []
+  /api/v1/cycles/{cycleId}:
+    get:
+      operationId: getCycle
+      description: Get a specific growing cycle
+      parameters:
+      - name: cycleId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.GrowingCycle'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - Growing Cycles
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    Common.Errors.ApiError:
+      type: object
+      required:
+      - request_id
+      - message
+      properties:
+        request_id:
+          type: string
+          description: Unique identifier for the request, useful for debugging
+        message:
+          type: string
+          description: Human-readable message describing the error
+      description: All error responses share these common fields
+    Common.Errors.AuthenticationError:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          enum:
+          - AuthenticationRequired
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that authentication is required to access the resource
+    Common.Errors.ForbiddenError:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          enum:
+          - Forbidden
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that action is forbidden due to lack of permissions
+    Common.Errors.InternalServerError:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          enum:
+          - InternalServerError
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that an internal server error occurred
+    Common.Errors.NotFoundError:
+      type: object
+      required:
+      - code
+      - resource_id
+      properties:
+        code:
+          type: string
+          enum:
+          - NotFound
+        resource_id:
+          type: string
+          description: Identifier of the resource that was not found
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that the requested resource was not found
+    Common.Types.CurrencyCode:
+      type: string
+      pattern: ^[A-Z]{3}$
+      format: currency-code
+      description: Currency code (ISO 4217)
+    Common.Types.ID:
+      type: string
+      format: uuid
+      description: UUID identifier
+    Common.Types.OrganizationID:
+      type: string
+      description: Organization identifier (opaque string)
+    Models.GrowingCycle:
+      type: object
+      required:
+      - id
+      - description
+      - organizationId
+      - greenhouseId
+      - plantingDate
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/Common.Types.ID'
+          readOnly: true
+        description:
+          type: string
+        organizationId:
+          allOf:
+          - $ref: '#/components/schemas/Common.Types.OrganizationID'
+          readOnly: true
+        currency:
+          $ref: '#/components/schemas/Common.Types.CurrencyCode'
+        greenhouseId:
+          $ref: '#/components/schemas/Common.Types.ID'
+        cultureId:
+          type: string
+        plantingDate:
+          type: string
+          format: date-time
+        harvestDate:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A growing cycle (planting to harvest) in a greenhouse
+  parameters:
+    Common.Pagination.PageParams.cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Token to retrieve items after a specific point
+      schema:
+        type: string
+      explode: false
+    Common.Pagination.PageParams.limit:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of items to return (server may return fewer)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+        default: 100
+      explode: false
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: Bearer

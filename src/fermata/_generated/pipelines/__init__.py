@@ -1,5 +1,5 @@
+"""A client library for accessing Demetra Pipelines API"""
 
-""" A client library for accessing Demetra Pipelines API """
 from .client import AuthenticatedClient, Client
 
 __all__ = (

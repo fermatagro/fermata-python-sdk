@@ -1,57 +1,47 @@
 from __future__ import annotations
 
+import datetime
 from collections.abc import Mapping
-from typing import Any, TypeVar, BinaryIO, TextIO, TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Any, TypeVar
+from uuid import UUID
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
-
-from ..types import UNSET, Unset
+from dateutil.parser import isoparse
 
 from ..models.models_schedule_scope import ModelsScheduleScope
 from ..models.models_schedule_state import ModelsScheduleState
-from ..models.models_schedule_type import ModelsScheduleType
 from ..types import UNSET, Unset
-from dateutil.parser import isoparse
-from typing import cast
-from uuid import UUID
-import datetime
 
 if TYPE_CHECKING:
-  from ..models.models_schedule_arguments import ModelsScheduleArguments
-
-
-
+    from ..models.models_schedule_arguments import ModelsScheduleArguments
 
 
 T = TypeVar("T", bound="ModelsSchedule")
 
 
-
 @_attrs_define
 class ModelsSchedule:
-    """ A schedule that triggers pipeline execution on a cron basis
+    """A schedule that triggers pipeline execution on a cron basis
 
-        Attributes:
-            id (UUID): UUID identifier
-            organization_id (str): Organization identifier (opaque string)
-            template_id (UUID): UUID identifier
-            scope (ModelsScheduleScope): Scope type for schedule binding
-            type_ (ModelsScheduleType): Schedule type indicating where the schedule is executed
-            scope_id (UUID): UUID identifier
-            state (ModelsScheduleState): Schedule state
-            cron_expr_utc (str): Cron expression in UTC timezone
-            arguments (ModelsScheduleArguments): Arguments to pass to the pipeline
-            created_at (datetime.datetime):
-            updated_at (datetime.datetime):
-            start_at (datetime.datetime | Unset): When the schedule becomes active (optional)
-     """
+    Attributes:
+        id (UUID): UUID identifier
+        organization_id (str): Organization identifier (opaque string)
+        template_id (UUID): UUID identifier
+        scope (ModelsScheduleScope): Scope type for schedule binding
+        scope_id (UUID): UUID identifier
+        state (ModelsScheduleState): Schedule state
+        cron_expr_utc (str): Cron expression in UTC timezone
+        arguments (ModelsScheduleArguments): Arguments to pass to the pipeline
+        created_at (datetime.datetime):
+        updated_at (datetime.datetime):
+        start_at (datetime.datetime | Unset): When the schedule becomes active (optional)
+    """
 
     id: UUID
     organization_id: str
     template_id: UUID
     scope: ModelsScheduleScope
-    type_: ModelsScheduleType
     scope_id: UUID
     state: ModelsScheduleState
     cron_expr_utc: str
@@ -61,12 +51,7 @@ class ModelsSchedule:
     start_at: datetime.datetime | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
-
-
-
-
     def to_dict(self) -> dict[str, Any]:
-        from ..models.models_schedule_arguments import ModelsScheduleArguments
         id = str(self.id)
 
         organization_id = self.organization_id
@@ -74,8 +59,6 @@ class ModelsSchedule:
         template_id = str(self.template_id)
 
         scope = self.scope.value
-
-        type_ = self.type_.value
 
         scope_id = str(self.scope_id)
 
@@ -93,98 +76,64 @@ class ModelsSchedule:
         if not isinstance(self.start_at, Unset):
             start_at = self.start_at.isoformat()
 
-
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
-        field_dict.update({
-            "id": id,
-            "organizationId": organization_id,
-            "templateId": template_id,
-            "scope": scope,
-            "type": type_,
-            "scopeId": scope_id,
-            "state": state,
-            "cronExprUTC": cron_expr_utc,
-            "arguments": arguments,
-            "createdAt": created_at,
-            "updatedAt": updated_at,
-        })
+        field_dict.update(
+            {
+                "id": id,
+                "organizationId": organization_id,
+                "templateId": template_id,
+                "scope": scope,
+                "scopeId": scope_id,
+                "state": state,
+                "cronExprUTC": cron_expr_utc,
+                "arguments": arguments,
+                "createdAt": created_at,
+                "updatedAt": updated_at,
+            }
+        )
         if start_at is not UNSET:
             field_dict["startAt"] = start_at
 
         return field_dict
 
-
-
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.models_schedule_arguments import ModelsScheduleArguments
+
         d = dict(src_dict)
         id = UUID(d.pop("id"))
-
-
-
 
         organization_id = d.pop("organizationId")
 
         template_id = UUID(d.pop("templateId"))
 
-
-
-
         scope = ModelsScheduleScope(d.pop("scope"))
-
-
-
-
-        type_ = ModelsScheduleType(d.pop("type"))
-
-
-
 
         scope_id = UUID(d.pop("scopeId"))
 
-
-
-
         state = ModelsScheduleState(d.pop("state"))
-
-
-
 
         cron_expr_utc = d.pop("cronExprUTC")
 
         arguments = ModelsScheduleArguments.from_dict(d.pop("arguments"))
 
-
-
-
         created_at = isoparse(d.pop("createdAt"))
-
-
-
 
         updated_at = isoparse(d.pop("updatedAt"))
 
-
-
-
         _start_at = d.pop("startAt", UNSET)
         start_at: datetime.datetime | Unset
-        if isinstance(_start_at,  Unset):
+        if isinstance(_start_at, Unset):
             start_at = UNSET
         else:
             start_at = isoparse(_start_at)
-
-
-
 
         models_schedule = cls(
             id=id,
             organization_id=organization_id,
             template_id=template_id,
             scope=scope,
-            type_=type_,
             scope_id=scope_id,
             state=state,
             cron_expr_utc=cron_expr_utc,
@@ -193,7 +142,6 @@ class ModelsSchedule:
             updated_at=updated_at,
             start_at=start_at,
         )
-
 
         models_schedule.additional_properties = d
         return models_schedule

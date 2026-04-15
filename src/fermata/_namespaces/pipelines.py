@@ -1,21 +1,90 @@
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID
 
+from fermata._call import call_async, call_sync
+from fermata._generated.pipelines.api.fires import create_fire as _create_fire
+from fermata._generated.pipelines.api.schedules import (
+    get_schedule as _get_schedule,
+)
+from fermata._generated.pipelines.api.schedules import (
+    list_schedules as _list_schedules,
+)
+from fermata._generated.pipelines.models.create_or_update_fire import CreateOrUpdateFire
+from fermata._generated.pipelines.models.create_or_update_fire_arguments import CreateOrUpdateFireArguments
+from fermata._generated.pipelines.models.models_fire_status import ModelsFireStatus
 from fermata._generated.pipelines.models.models_schedule import ModelsSchedule
-from fermata._generated.pipelines.models.models_template import ModelsTemplate
-from fermata._transport import Transport
+from fermata._generated.pipelines.models.models_schedule_scope import ModelsScheduleScope
 
 
 class AsyncPipelines:
-    def __init__(self, transport: Transport) -> None:
-        self._t = transport
+    def __init__(self, client: Any) -> None:
+        self._c = client
 
-    async def list(self) -> list[ModelsTemplate]:
-        resp = await self._t.request("GET", "/api/v1/pipelines/templates")
-        return [ModelsTemplate.from_dict(item) for item in resp.json()["items"]]
+    async def list_schedules(self) -> list[ModelsSchedule]:
+        page = await call_async(_list_schedules.asyncio_detailed(client=self._c))
+        return page.items
 
-    async def list_schedules(self, template_id: UUID | str | None = None) -> list[ModelsSchedule]:
-        params = {"templateId": str(template_id)} if template_id is not None else None
-        resp = await self._t.request("GET", "/api/v1/pipelines/schedules", params=params)
-        return [ModelsSchedule.from_dict(item) for item in resp.json()["items"]]
+    async def get_schedule(self, schedule_id: str) -> ModelsSchedule:
+        return await call_async(_get_schedule.asyncio_detailed(UUID(schedule_id), client=self._c))
+
+    async def create_fire(
+        self,
+        fire_id: str,
+        *,
+        template_id: str,
+        scope: str,
+        scope_id: str,
+        trigger_id: str,
+        arguments: dict[str, Any] | None = None,
+    ) -> None:
+        args = CreateOrUpdateFireArguments()
+        if arguments:
+            args.additional_properties = arguments
+        body = CreateOrUpdateFire(
+            organization_id="",  # resolved from token by server
+            pipeline_template_id=UUID(template_id),
+            trigger_id=UUID(trigger_id),
+            scope=ModelsScheduleScope(scope),
+            scope_id=UUID(scope_id),
+            status=ModelsFireStatus.PENDING,
+            arguments=args,
+        )
+        await call_async(_create_fire.asyncio_detailed(UUID(fire_id), body=body, client=self._c))
+
+
+class SyncPipelines:
+    def __init__(self, client: Any) -> None:
+        self._c = client
+
+    def list_schedules(self) -> list[ModelsSchedule]:
+        page = call_sync(_list_schedules.sync_detailed(client=self._c))
+        return page.items
+
+    def get_schedule(self, schedule_id: str) -> ModelsSchedule:
+        return call_sync(_get_schedule.sync_detailed(UUID(schedule_id), client=self._c))
+
+    def create_fire(
+        self,
+        fire_id: str,
+        *,
+        template_id: str,
+        scope: str,
+        scope_id: str,
+        trigger_id: str,
+        arguments: dict[str, Any] | None = None,
+    ) -> None:
+        args = CreateOrUpdateFireArguments()
+        if arguments:
+            args.additional_properties = arguments
+        body = CreateOrUpdateFire(
+            organization_id="",
+            pipeline_template_id=UUID(template_id),
+            trigger_id=UUID(trigger_id),
+            scope=ModelsScheduleScope(scope),
+            scope_id=UUID(scope_id),
+            status=ModelsFireStatus.PENDING,
+            arguments=args,
+        )
+        call_sync(_create_fire.sync_detailed(UUID(fire_id), body=body, client=self._c))

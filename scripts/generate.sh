@@ -7,13 +7,27 @@ SPEC_DIR="$SDK_ROOT/spec"
 GEN_DIR="$SDK_ROOT/src/fermata/_generated"
 DEMETRA_OPENAPI="$(cd "$SDK_ROOT/.." && pwd)/demetra/api/openapi"
 VENV_BIN="$SDK_ROOT/.venv/bin"
+FILTER="$VENV_BIN/python $SCRIPT_DIR/filter_spec.py"
 
-DOMAINS=(observations aivision catalog pipelines)
+DOMAINS=(observations aivision catalog pipelines cultivation greenhouses)
 
-echo "=== Copying specs from demetra ==="
+# Operations the SDK actually uses (matched by operationId).
+# Only these are kept in the filtered specs — everything else is stripped.
+declare -A OPS
+OPS[observations]="createPhoto createPhotoUploadLink"
+OPS[aivision]="submitInference getInferenceTask"
+OPS[catalog]="listAIModels getAIModelByName"
+OPS[pipelines]="listSchedules getSchedule createFire"
+OPS[cultivation]="getCycle listActiveCyclesAtTime"
+OPS[greenhouses]="listGreenhouses"
+
+echo "=== Copying and filtering specs from demetra ==="
 for domain in "${DOMAINS[@]}"; do
-    cp "$DEMETRA_OPENAPI/$domain.yml" "$SPEC_DIR/"
-    echo "  Copied $domain.yml"
+    cp "$DEMETRA_OPENAPI/$domain.yml" "$SPEC_DIR/$domain.full.yml"
+    ops="${OPS[$domain]}"
+    $FILTER "$SPEC_DIR/$domain.full.yml" $ops > "$SPEC_DIR/$domain.yml"
+    rm "$SPEC_DIR/$domain.full.yml"
+    echo "  $domain: kept $(echo $ops | wc -w | tr -d ' ') operations"
 done
 
 echo ""
@@ -34,13 +48,10 @@ echo ""
 echo "=== Cleaning up generated scaffolding ==="
 for domain in "${DOMAINS[@]}"; do
     output="$GEN_DIR/$domain"
-    # Remove generated project files we don't need (we have our own pyproject.toml)
     rm -f "$output/pyproject.toml" "$output/README.md" "$output/.gitignore"
     rm -rf "$output/.ruff_cache"
-    # The generated package is nested under a derived name — move contents up
     pkg_dir=$(find "$output" -maxdepth 1 -type d -name "*_client" | head -1)
     if [ -n "$pkg_dir" ]; then
-        # Move package contents to domain root
         mv "$pkg_dir"/* "$output/"
         rm -rf "$pkg_dir"
     fi

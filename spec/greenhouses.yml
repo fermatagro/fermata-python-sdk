@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  title: Demetra GreenhouseCore API
+  version: 0.0.0
+tags:
+- name: Greenhouses
+- name: Greenhouse Objects
+- name: Device Placements
+- name: Control Points
+- name: Zone Objects
+paths:
+  /api/v1/greenhouses:
+    get:
+      operationId: listGreenhouses
+      description: List all greenhouses in the organization
+      parameters:
+      - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+      - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.Greenhouse'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - Greenhouses
+      security:
+      - BearerAuth: []
+components:
+  parameters:
+    Common.Pagination.PageParams.cursor:
+      name: cursor
+      in: query
+      required: false
+      description: Token to retrieve items after a specific point
+      schema:
+        type: string
+      explode: false
+    Common.Pagination.PageParams.limit:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of items to return (server may return fewer)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+        default: 100
+      explode: false
+  schemas:
+    Common.Errors.ApiError:
+      type: object
+      required:
+      - request_id
+      - message
+      properties:
+        request_id:
+          type: string
+          description: Unique identifier for the request, useful for debugging
+        message:
+          type: string
+          description: Human-readable message describing the error
+      description: All error responses share these common fields
+    Common.Errors.AuthenticationError:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          enum:
+          - AuthenticationRequired
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that authentication is required to access the resource
+    Common.Errors.ForbiddenError:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          enum:
+          - Forbidden
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that action is forbidden due to lack of permissions
+    Common.Errors.InternalServerError:
+      type: object
+      required:
+      - code
+      properties:
+        code:
+          type: string
+          enum:
+          - InternalServerError
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that an internal server error occurred
+    Common.Types.ID:
+      type: string
+      format: uuid
+      description: UUID identifier
+    Common.Types.OrganizationID:
+      type: string
+      description: Organization identifier (opaque string)
+    Models.Greenhouse:
+      type: object
+      required:
+      - id
+      - organizationId
+      - description
+      - width
+      - height
+      - tz
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/Common.Types.ID'
+          description: Unique identifier
+          readOnly: true
+        organizationId:
+          allOf:
+          - $ref: '#/components/schemas/Common.Types.OrganizationID'
+          description: Organization that owns this greenhouse
+          readOnly: true
+        description:
+          type: string
+          description: Human-readable name/description
+        width:
+          type: number
+          format: double
+        height:
+          type: number
+          format: double
+        tz:
+          type: string
+          description: IANA timezone identifier (e.g., 'Europe/Moscow')
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A greenhouse structure within an organization
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: Bearer
