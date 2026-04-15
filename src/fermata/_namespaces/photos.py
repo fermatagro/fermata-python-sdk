@@ -60,6 +60,7 @@ class AsyncPhotos:
         growing_cycle_id: str = "",
         source: str = "human",
         position: dict[str, float] | None = None,
+        ptz: list[float] | None = None,
         scan_id: str | None = None,
     ) -> None:
         pos = CommonTypesGridPos(
@@ -75,7 +76,7 @@ class AsyncPhotos:
             captured_at=_parse_dt(captured_at),
             source=ModelsPhotoSource(source),
             pos=pos,
-            ptz=[0.0, 0.0, 0.0],
+            ptz=ptz or [0.0, 0.0, 0.0],
             pipeline_id=UUID(scan_id) if scan_id else UNSET,
         )
         await call_async(_create_photo.asyncio_detailed(UUID(photo_id), body=body, client=self._c))
@@ -106,6 +107,7 @@ class SyncPhotos:
         growing_cycle_id: str = "",
         source: str = "human",
         position: dict[str, float] | None = None,
+        ptz: list[float] | None = None,
         scan_id: str | None = None,
     ) -> None:
         pos = CommonTypesGridPos(
@@ -121,7 +123,7 @@ class SyncPhotos:
             captured_at=_parse_dt(captured_at),
             source=ModelsPhotoSource(source),
             pos=pos,
-            ptz=[0.0, 0.0, 0.0],
+            ptz=ptz or [0.0, 0.0, 0.0],
             pipeline_id=UUID(scan_id) if scan_id else UNSET,
         )
         call_sync(_create_photo.sync_detailed(UUID(photo_id), body=body, client=self._c))
