@@ -56,6 +56,114 @@ paths:
               $ref: '#/components/schemas/CreateOrUpdateFire'
       security:
       - BearerAuth: []
+  /api/v1/pipelines/fires/{fireId}/complete:
+    post:
+      operationId: completeFire
+      description: 'Complete a fire with terminal status.
+
+
+        Sets final status (completed|failed|cancelled|skipped) and finishedAt=now.
+
+        errorMessage should be provided when status=failed.'
+      parameters:
+      - name: fireId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - Fires
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.CompleteFireRequest'
+      security:
+      - BearerAuth: []
+  /api/v1/pipelines/fires/{fireId}/start:
+    post:
+      operationId: startFire
+      description: 'Start a fire.
+
+
+        Transitions status from pending to running.
+
+        Sets startedAt=now and stores externalRunId (Prefect flow_run_id).
+
+        externalRunId is immutable once set.'
+      parameters:
+      - name: fireId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - Fires
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Models.StartFireRequest'
+      security:
+      - BearerAuth: []
   /api/v1/pipelines/schedules:
     get:
       operationId: listSchedules
@@ -84,6 +192,12 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/Models.ScheduleState'
+        explode: false
+      - name: type
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/Models.ScheduleType'
         explode: false
       - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
       - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
@@ -306,6 +420,19 @@ components:
           format: date-time
           description: When execution finished (terminal status reached)
       description: ''
+    Models.CompleteFireRequest:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Models.TerminalStatus'
+          description: Final status
+        errorMessage:
+          type: string
+          description: Error message (should be present when status=failed)
+      description: Request to complete a fire with terminal status
     Models.FireStatus:
       type: string
       enum:
@@ -333,6 +460,7 @@ components:
       - organizationId
       - templateId
       - scope
+      - type
       - scopeId
       - state
       - cronExprUTC
@@ -356,6 +484,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/Models.ScheduleScope'
           description: 'Scope type: greenhouse or growing cycle'
+        type:
+          allOf:
+          - $ref: '#/components/schemas/Models.ScheduleType'
+          description: 'Schedule type: cloud or onsite'
         scopeId:
           allOf:
           - $ref: '#/components/schemas/Common.Types.ID'
@@ -398,6 +530,30 @@ components:
       - enabled
       - disabled
       description: Schedule state
+    Models.ScheduleType:
+      type: string
+      enum:
+      - cloud
+      - onsite
+      description: Schedule type indicating where the schedule is executed
+    Models.StartFireRequest:
+      type: object
+      required:
+      - externalRunId
+      properties:
+        externalRunId:
+          type: string
+          description: Prefect flow_run_id (immutable once set)
+      description: Request to start a fire
+    Models.TerminalStatus:
+      type: string
+      enum:
+      - completed
+      - partial
+      - failed
+      - cancelled
+      - skipped
+      description: Terminal status for completing a fire
   parameters:
     Common.Pagination.PageParams.cursor:
       name: cursor

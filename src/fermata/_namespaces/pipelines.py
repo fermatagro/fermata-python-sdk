@@ -5,7 +5,9 @@ from typing import Any
 from uuid import UUID
 
 from fermata._call import call_async
+from fermata._generated.pipelines.api.fires import complete_fire as _complete_fire
 from fermata._generated.pipelines.api.fires import create_fire as _create_fire
+from fermata._generated.pipelines.api.fires import start_fire as _start_fire
 from fermata._generated.pipelines.api.schedules import (
     get_schedule as _get_schedule,
 )
@@ -14,9 +16,12 @@ from fermata._generated.pipelines.api.schedules import (
 )
 from fermata._generated.pipelines.models.create_or_update_fire import CreateOrUpdateFire
 from fermata._generated.pipelines.models.create_or_update_fire_arguments import CreateOrUpdateFireArguments
+from fermata._generated.pipelines.models.models_complete_fire_request import ModelsCompleteFireRequest
 from fermata._generated.pipelines.models.models_fire_status import ModelsFireStatus
 from fermata._generated.pipelines.models.models_schedule import ModelsSchedule
 from fermata._generated.pipelines.models.models_schedule_scope import ModelsScheduleScope
+from fermata._generated.pipelines.models.models_start_fire_request import ModelsStartFireRequest
+from fermata._generated.pipelines.models.models_terminal_status import ModelsTerminalStatus
 
 
 class AsyncPipelines:
@@ -54,6 +59,17 @@ class AsyncPipelines:
         )
         await call_async(_create_fire.asyncio_detailed(UUID(fire_id), body=body, client=self._c))
 
+    async def start_fire(self, fire_id: str, *, external_run_id: str = "") -> None:
+        body = ModelsStartFireRequest(external_run_id=external_run_id)
+        await call_async(_start_fire.asyncio_detailed(UUID(fire_id), body=body, client=self._c))
+
+    async def complete_fire(self, fire_id: str, *, error_message: str | None = None) -> None:
+        status = ModelsTerminalStatus.FAILED if error_message else ModelsTerminalStatus.COMPLETED
+        body = ModelsCompleteFireRequest(status=status)
+        if error_message:
+            body.error_message = error_message
+        await call_async(_complete_fire.asyncio_detailed(UUID(fire_id), body=body, client=self._c))
+
 
 class SyncPipelines:
     def __init__(self, async_ns: AsyncPipelines, run: Callable[..., Any]) -> None:
@@ -68,3 +84,9 @@ class SyncPipelines:
 
     def create_fire(self, fire_id: str, **kw: Any) -> None:
         self._run(self._a.create_fire(fire_id, **kw))
+
+    def start_fire(self, fire_id: str, **kw: Any) -> None:
+        self._run(self._a.start_fire(fire_id, **kw))
+
+    def complete_fire(self, fire_id: str, **kw: Any) -> None:
+        self._run(self._a.complete_fire(fire_id, **kw))

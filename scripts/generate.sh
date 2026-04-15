@@ -17,7 +17,7 @@ declare -A OPS
 OPS[observations]="createPhoto createPhotoUploadLink"
 OPS[aivision]="submitInference getInferenceTask"
 OPS[catalog]="listAIModels getAIModelByName"
-OPS[pipelines]="listSchedules getSchedule createFire"
+OPS[pipelines]="listSchedules getSchedule createFire startFire completeFire"
 OPS[cultivation]="getCycle listActiveCyclesAtTime"
 OPS[greenhouses]="listGreenhouses"
 

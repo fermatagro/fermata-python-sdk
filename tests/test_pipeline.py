@@ -29,6 +29,7 @@ SCHEDULE_RESPONSE = {
     "organizationId": ORG_ID,
     "templateId": TEMPLATE_ID,
     "scope": "growing_cycle",
+    "type": "onsite",
     "scopeId": CYCLE_ID,
     "state": "enabled",
     "cronExprUTC": "0 0 * * *",
@@ -71,10 +72,12 @@ def _upload_link_handler(request: httpx.Request) -> httpx.Response:
 
 
 def _mock_pipeline_init(mock_hera: respx.Router) -> None:
-    """Register mocks for the pipeline init sequence."""
+    """Register mocks for the pipeline init + lifecycle sequence."""
     mock_hera.get(f"/api/v1/pipelines/schedules/{SCHEDULE_ID}").respond(200, json=SCHEDULE_RESPONSE)
     mock_hera.get(f"/api/v1/cycles/{CYCLE_ID}").respond(200, json=CYCLE_RESPONSE)
-    mock_hera.post(url__regex=r"/api/v1/pipelines/fires/.+").respond(201)
+    mock_hera.post(url__regex=r"/api/v1/pipelines/fires/[^/]+$").respond(201)  # create
+    mock_hera.post(url__regex=r"/api/v1/pipelines/fires/[^/]+/start").respond(200)  # start
+    mock_hera.post(url__regex=r"/api/v1/pipelines/fires/[^/]+/complete").respond(200)  # complete
 
 
 # --- Pipeline init ---
