@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Awaitable
-from typing import Any, TypeVar
+from typing import Any
 
 from fermata.exceptions import (
     AuthError,
@@ -22,9 +22,6 @@ _STATUS_MAP: dict[int, type[FermataError]] = {
     409: ConflictError,
     422: ValidationError,
 }
-
-T = TypeVar("T")
-
 
 def _unwrap(resp: Any) -> Any:
     """Extract success result from a generated Response, raising on errors.
@@ -47,8 +44,3 @@ def _unwrap(resp: Any) -> Any:
 async def call_async(coro: Awaitable[Any]) -> Any:
     """Await a generated ``asyncio_detailed`` call and unwrap the response."""
     return _unwrap(await coro)
-
-
-def call_sync(resp: Any) -> Any:
-    """Unwrap a generated ``sync_detailed`` response."""
-    return _unwrap(resp)

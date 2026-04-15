@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 from uuid import UUID
 
-from fermata._call import call_async, call_sync
+from fermata._call import call_async
 from fermata._generated.aivision.api.inference import (
     get_inference_task as _get_task,
 )
@@ -29,13 +30,12 @@ class AsyncInference:
 
 
 class SyncInference:
-    def __init__(self, client: Any) -> None:
-        self._c = client
+    def __init__(self, async_ns: AsyncInference, run: Callable[..., Any]) -> None:
+        self._a = async_ns
+        self._run = run
 
     def submit(self, photo_id: str, model_name: str) -> str:
-        body = ModelsInferenceRequest(photo_id=UUID(photo_id), model_name=model_name)
-        result: ModelsInferenceResponse = call_sync(_submit.sync_detailed(body=body, client=self._c))
-        return str(result.task_id)
+        return self._run(self._a.submit(photo_id, model_name))
 
     def get(self, task_id: str) -> ModelsTask:
-        return call_sync(_get_task.sync_detailed(UUID(task_id), client=self._c))
+        return self._run(self._a.get(task_id))

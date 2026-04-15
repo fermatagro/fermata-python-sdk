@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
-from fermata._call import call_async, call_sync
+from fermata._call import call_async
 from fermata._generated.catalog.api.ai_models import (
     get_ai_model_by_name as _get_model,
 )
@@ -24,11 +25,12 @@ class AsyncModels:
 
 
 class SyncModels:
-    def __init__(self, client: Any) -> None:
-        self._c = client
+    def __init__(self, async_ns: AsyncModels, run: Callable[..., Any]) -> None:
+        self._a = async_ns
+        self._run = run
 
     def list(self) -> list[ModelsAIModel]:
-        return call_sync(_list_models.sync_detailed(client=self._c))
+        return self._run(self._a.list())
 
     def get(self, name: str) -> ModelsAIModel:
-        return call_sync(_get_model.sync_detailed(name, client=self._c))
+        return self._run(self._a.get(name))

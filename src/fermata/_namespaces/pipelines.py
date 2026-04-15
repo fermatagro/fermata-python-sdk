@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 from uuid import UUID
 
-from fermata._call import call_async, call_sync
+from fermata._call import call_async
 from fermata._generated.pipelines.api.fires import create_fire as _create_fire
 from fermata._generated.pipelines.api.schedules import (
     get_schedule as _get_schedule,
@@ -43,7 +44,7 @@ class AsyncPipelines:
         if arguments:
             args.additional_properties = arguments
         body = CreateOrUpdateFire(
-            organization_id="",  # resolved from token by server
+            organization_id="",
             pipeline_template_id=UUID(template_id),
             trigger_id=UUID(trigger_id),
             scope=ModelsScheduleScope(scope),
@@ -55,36 +56,15 @@ class AsyncPipelines:
 
 
 class SyncPipelines:
-    def __init__(self, client: Any) -> None:
-        self._c = client
+    def __init__(self, async_ns: AsyncPipelines, run: Callable[..., Any]) -> None:
+        self._a = async_ns
+        self._run = run
 
     def list_schedules(self) -> list[ModelsSchedule]:
-        page = call_sync(_list_schedules.sync_detailed(client=self._c))
-        return page.items
+        return self._run(self._a.list_schedules())
 
     def get_schedule(self, schedule_id: str) -> ModelsSchedule:
-        return call_sync(_get_schedule.sync_detailed(UUID(schedule_id), client=self._c))
+        return self._run(self._a.get_schedule(schedule_id))
 
-    def create_fire(
-        self,
-        fire_id: str,
-        *,
-        template_id: str,
-        scope: str,
-        scope_id: str,
-        trigger_id: str,
-        arguments: dict[str, Any] | None = None,
-    ) -> None:
-        args = CreateOrUpdateFireArguments()
-        if arguments:
-            args.additional_properties = arguments
-        body = CreateOrUpdateFire(
-            organization_id="",
-            pipeline_template_id=UUID(template_id),
-            trigger_id=UUID(trigger_id),
-            scope=ModelsScheduleScope(scope),
-            scope_id=UUID(scope_id),
-            status=ModelsFireStatus.PENDING,
-            arguments=args,
-        )
-        call_sync(_create_fire.sync_detailed(UUID(fire_id), body=body, client=self._c))
+    def create_fire(self, fire_id: str, **kw: Any) -> None:
+        self._run(self._a.create_fire(fire_id, **kw))
