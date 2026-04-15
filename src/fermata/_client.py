@@ -168,6 +168,7 @@ class Fermata:
         greenhouse_id: str | None = None,
         position: dict[str, float] | None = None,
         ptz: list[float] | None = None,
+        device_id: str | None = None,
         model_name: str | None = None,
         photo_id: str | None = None,
     ) -> str:
@@ -205,6 +206,7 @@ class Fermata:
                 growing_cycle_id=growing_cycle_id,
                 position=position,
                 ptz=ptz,
+                device_id=device_id,
                 scan_id=self._scan_id,
             )
         except ConflictError:

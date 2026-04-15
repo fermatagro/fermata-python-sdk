@@ -62,6 +62,7 @@ class AsyncPhotos:
         source: str = "human",
         position: dict[str, float] | None = None,
         ptz: list[float] | None = None,
+        device_id: str | None = None,
         scan_id: str | None = None,
     ) -> None:
         pos = CommonTypesGridPos(
@@ -78,6 +79,7 @@ class AsyncPhotos:
             source=ModelsPhotoSource(source),
             pos=pos,
             ptz=ptz or [0.0, 0.0, 0.0],
+            device_id=UUID(device_id) if device_id else UNSET,
             pipeline_id=UUID(scan_id) if scan_id else UNSET,
         )
         await call_async(_create_photo.asyncio_detailed(UUID(photo_id), body=body, client=self._c))
