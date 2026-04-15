@@ -24,9 +24,11 @@ You will receive the following from Fermata during onboarding:
 You can also discover available pipeline schedules programmatically:
 
 ```python
+from fermata import FermataSync
+
 with FermataSync(url="http://localhost:3000", username="...", password="...") as fermata:
     for s in fermata.pipelines.list_schedules():
-        print(f"{s['id']}  scope={s['scope']}  scopeId={s['scopeId']}")
+        print(f"{s.id}  scope={s.scope}  scopeId={s.scope_id}")
 ```
 
 ## Quick Start
@@ -77,9 +79,10 @@ with FermataSync(
 
 When `pipeline_id` and `sync_id` are provided, the SDK automatically resolves:
 
-- **Greenhouse** — from the pipeline schedule's scope
+- **Greenhouse** — derived from the growing cycle linked to the schedule
 - **AI model** — from the schedule's arguments (or the first available model)
-- **Growing cycle** — the currently active cycle for the greenhouse
+- **Growing cycle** — from the schedule's scope (scope=growing_cycle)
+- **Culture** — from the growing cycle
 
 ```python
 with FermataSync(
@@ -93,6 +96,7 @@ with FermataSync(
     print(f"Greenhouse: {fermata.run.greenhouse_id}")
     print(f"Model: {fermata.run.model_name}")
     print(f"Cycle: {fermata.run.growing_cycle_id}")
+    print(f"Culture: {fermata.run.culture_id}")
     print(f"Run ID: {fermata.run.run_id}")
 
     # No need to pass greenhouse_id or model_name
@@ -110,29 +114,11 @@ In pipeline mode, photo IDs are generated deterministically from the `sync_id`, 
 | Field | Type | Description |
 |-------|------|-------------|
 | `run_id` | `str` | Unique ID for this run (pipeline fire ID) |
-| `greenhouse_id` | `str` | Greenhouse from the schedule |
-| `growing_cycle_id` | `str \| None` | Active growing cycle (None if no active cycle) |
+| `greenhouse_id` | `str` | Greenhouse derived from the growing cycle |
+| `growing_cycle_id` | `str` | Growing cycle from the schedule scope |
+| `culture_id` | `str` | Culture from the growing cycle |
 | `model_name` | `str` | AI model to use |
 | `organization_id` | `str` | Organization ID |
-
-## Scan Sessions
-
-Each client instance represents a single scan session. All photos submitted through the same instance are automatically grouped together. The scan ID is generated when the client is created.
-
-```python
-# Scan 1
-with FermataSync(...) as fermata:
-    print(f"Scan: {fermata.scan_id}")
-    fermata.infer(image="photo1.jpg", ...)
-    fermata.infer(image="photo2.jpg", ...)  # same scan
-
-# Scan 2 — new instance, new scan_id
-with FermataSync(...) as fermata:
-    print(f"Scan: {fermata.scan_id}")
-    fermata.infer(image="photo3.jpg", ...)  # different scan
-```
-
-Use `fermata.scan_id` to log or correlate the scan in your own systems.
 
 ## `fermata.infer()`
 
@@ -145,6 +131,7 @@ task_id = fermata.infer(
     *,
     greenhouse_id=None, # Required in manual mode, auto-filled in pipeline mode
     position=None,      # Robot position: {"x": float, "y": float, "h": float}
+    ptz=None,           # Camera pan/tilt/zoom: [float, float, float] (default: [0,0,0])
     model_name=None,    # AI model to use (default: auto-selected)
     photo_id=None,      # Custom photo ID (default: auto-generated)
 )
@@ -186,6 +173,12 @@ fermata.infer(
         "h": 2.0,   # height in meters
     },
 )
+```
+
+**`ptz`** — Camera pan/tilt/zoom settings. Optional, defaults to `[0, 0, 0]`:
+
+```python
+fermata.infer(..., ptz=[0.5, 0.3, 1.0])  # [pan, tilt, zoom]
 ```
 
 ## Robot Scan Example
@@ -288,7 +281,7 @@ with FermataSync(url="...", username="...", password="...") as fermata:
     fermata.photos.upload(link.upload_url, "path/to/photo.jpg")  # file path or bytes
 
     # Step 3 — Register photo metadata
-    photo = fermata.photos.create(
+    fermata.photos.create(
         photo_id,
         greenhouse_id="gh-01",
         captured_at="2026-04-01T10:00:00Z",
@@ -315,11 +308,11 @@ This is useful when you need to:
 |--------|---------|-------------|
 | `fermata.photos.upload_link(photo_id, captured_at)` | `UploadLink` | Get presigned upload/download URLs |
 | `fermata.photos.upload(upload_url, image)` | — | Upload image bytes to storage |
-| `fermata.photos.create(photo_id, *, greenhouse_id, captured_at, position)` | `Photo` | Register photo metadata |
+| `fermata.photos.create(photo_id, *, greenhouse_id, captured_at, ...)` | — | Register photo metadata |
 | `fermata.inference.submit(photo_id, model_name)` | `str` | Submit photo for inference, returns task_id |
 | `fermata.inference.get(task_id)` | `InferenceTask` | Get task status and details |
-| `fermata.pipelines.list_schedules()` | `list[dict]` | List available pipeline schedules |
-| `fermata.pipelines.get_schedule(schedule_id)` | `dict` | Get a pipeline schedule by ID |
+| `fermata.pipelines.list_schedules()` | `list[Schedule]` | List available pipeline schedules |
+| `fermata.pipelines.get_schedule(schedule_id)` | `Schedule` | Get a pipeline schedule by ID |
 
 ### `UploadLink` fields
 
