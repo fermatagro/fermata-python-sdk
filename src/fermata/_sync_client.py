@@ -140,6 +140,7 @@ class FermataSync:
         *,
         greenhouse_id: str | None = None,
         position: dict[str, float] | None = None,
+        ptz: list[float] | None = None,
         model_name: str | None = None,
         photo_id: str | None = None,
     ) -> str:
@@ -174,6 +175,7 @@ class FermataSync:
                 culture_id=culture_id,
                 growing_cycle_id=growing_cycle_id,
                 position=position,
+                ptz=ptz,
                 scan_id=self._scan_id,
             )
         except ConflictError:
