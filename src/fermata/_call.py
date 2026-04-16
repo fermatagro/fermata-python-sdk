@@ -34,9 +34,22 @@ def _unwrap(resp: Any) -> Any:
     if 200 <= status < 300:
         return resp.parsed
 
+    # Try parsed error model first, fall back to raw response body
     parsed = resp.parsed
-    message = parsed.message if hasattr(parsed, "message") else f"HTTP {status}"
-    request_id = parsed.request_id if hasattr(parsed, "request_id") else None
+    message = f"HTTP {status}"
+    request_id: str | None = None
+    if hasattr(parsed, "message"):
+        message = parsed.message
+        request_id = getattr(parsed, "request_id", None)
+    elif resp.content:
+        try:
+            import json
+            body = json.loads(resp.content)
+            message = body.get("message", message)
+            request_id = body.get("request_id")
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            pass
+
     exc_class = _STATUS_MAP.get(status, ServerError if status >= 500 else FermataError)
     raise exc_class(message, status_code=status, request_id=request_id)
 
