@@ -8,6 +8,7 @@ GEN_DIR="$SDK_ROOT/src/fermata/_generated"
 DEMETRA_OPENAPI="$(cd "$SDK_ROOT/.." && pwd)/demetra/api/openapi"
 VENV_BIN="$SDK_ROOT/.venv/bin"
 FILTER="$VENV_BIN/python $SCRIPT_DIR/filter_spec.py"
+VERSION_FILE="$SPEC_DIR/VERSION"
 
 DOMAINS=(observations aivision catalog pipelines cultivation greenhouses)
 
@@ -21,13 +22,41 @@ OPS[pipelines]="listSchedules getSchedule createFire startFire completeFire"
 OPS[cultivation]="getCycle listActiveCyclesAtTime"
 OPS[greenhouses]="listGreenhouses"
 
+# Load pinned spec versions from spec/VERSION (format: "domain: X.Y.Z").
+declare -A PINNED
+while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    domain="${line%%:*}"
+    version="${line#*:}"
+    version="${version// /}"
+    PINNED[$domain]="$version"
+done < "$VERSION_FILE"
+
 echo "=== Copying and filtering specs from demetra ==="
 for domain in "${DOMAINS[@]}"; do
+    expected="${PINNED[$domain]:-}"
+    if [[ -z "$expected" ]]; then
+        echo "Error: domain '$domain' is not pinned in $VERSION_FILE" >&2
+        echo "  Add a line: $domain: <version>" >&2
+        exit 1
+    fi
+
     cp "$DEMETRA_OPENAPI/$domain.yml" "$SPEC_DIR/$domain.full.yml"
+
+    actual=$("$VENV_BIN/python" -c "import yaml,sys; print(yaml.safe_load(open(sys.argv[1]))['info']['version'])" "$SPEC_DIR/$domain.full.yml")
+    if [[ "$actual" != "$expected" ]]; then
+        rm -f "$SPEC_DIR/$domain.full.yml"
+        echo "Error: $domain spec version mismatch" >&2
+        echo "  pinned ($VERSION_FILE): $expected" >&2
+        echo "  upstream (demetra):     $actual" >&2
+        echo "  → If the change is intentional, bump $VERSION_FILE to $actual and rerun 'make generate'." >&2
+        exit 1
+    fi
+
     ops="${OPS[$domain]}"
     $FILTER "$SPEC_DIR/$domain.full.yml" $ops > "$SPEC_DIR/$domain.yml"
     rm "$SPEC_DIR/$domain.full.yml"
-    echo "  $domain: kept $(echo $ops | wc -w | tr -d ' ') operations"
+    echo "  $domain@$actual: kept $(echo $ops | wc -w | tr -d ' ') operations"
 done
 
 echo ""

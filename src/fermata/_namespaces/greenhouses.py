@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any
 
 from fermata._call import call_async
-from fermata._generated.greenhouses.api.greenhouses import list_greenhouses as _list_greenhouses
+from fermata._generated.greenhouses.api.greenhouse_api import list_greenhouses as _list_greenhouses
 from fermata._generated.greenhouses.models.models_greenhouse import ModelsGreenhouse
 
 

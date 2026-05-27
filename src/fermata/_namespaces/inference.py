@@ -5,10 +5,10 @@ from typing import Any
 from uuid import UUID
 
 from fermata._call import call_async
-from fermata._generated.aivision.api.inference import (
+from fermata._generated.aivision.api.inference_api import (
     get_inference_task as _get_task,
 )
-from fermata._generated.aivision.api.inference import (
+from fermata._generated.aivision.api.inference_api import (
     submit_inference as _submit,
 )
 from fermata._generated.aivision.models.models_inference_request import ModelsInferenceRequest

@@ -67,12 +67,44 @@ class SyncPipelines:
 Generated code is committed. The generation pipeline:
 
 1. Copy full specs from `demetra/api/openapi/*.yml`
-2. **Filter** to Hera-only operations via `scripts/filter_spec.py`
-3. Run `openapi-python-client` per domain
+2. **Assert** each spec's `info.version` matches the pin in `spec/VERSION` — fail otherwise
+3. **Filter** to Hera-only operations via `scripts/filter_spec.py`
+4. Run `openapi-python-client` per domain
 
 ```bash
 make generate
 ```
+
+### Spec version pinning
+
+`spec/VERSION` pins the upstream demetra spec version per domain:
+
+```
+observations: 1.3.0
+aivision: 1.1.0
+catalog: 1.0.0
+cultivation: 1.5.0
+greenhouses: 1.1.0
+pipelines: 1.2.0
+```
+
+`generate.sh` asserts that demetra's `info.version` matches each pin before filtering. If demetra bumped a spec (e.g. observations → 1.4.0) but the SDK pin still says 1.3.0, generation fails with:
+
+```
+Error: observations spec version mismatch
+  pinned (spec/VERSION): 1.3.0
+  upstream (demetra):    1.4.0
+  → If the change is intentional, bump spec/VERSION to 1.4.0 and rerun 'make generate'.
+```
+
+This makes spec upgrades an explicit, reviewable action — you can't silently absorb upstream changes.
+
+**Bumping a pinned version:**
+
+1. Verify the demetra spec change is intentional and the SDK should adopt it
+2. Edit `spec/VERSION` to the new version
+3. Run `make generate`
+4. Commit `spec/VERSION`, regenerated code under `src/fermata/_generated/`, and any namespace adjustments together
 
 ### Adding a new SDK method
 

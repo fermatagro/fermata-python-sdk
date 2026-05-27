@@ -8,14 +8,14 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.common_errors_api_error import CommonErrorsApiError
-from ...models.create_or_update_photo import CreateOrUpdatePhoto
+from ...models.models_create_or_update_photo import ModelsCreateOrUpdatePhoto
 from ...types import Response
 
 
 def _get_kwargs(
     photo_id: UUID,
     *,
-    body: CreateOrUpdatePhoto,
+    body: ModelsCreateOrUpdatePhoto,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
@@ -51,6 +51,11 @@ def _parse_response(
 
         return response_403
 
+    if response.status_code == 409:
+        response_409 = CommonErrorsApiError.from_dict(response.json())
+
+        return response_409
+
     if response.status_code == 500:
         response_500 = CommonErrorsApiError.from_dict(response.json())
 
@@ -77,13 +82,13 @@ def sync_detailed(
     photo_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdatePhoto,
+    body: ModelsCreateOrUpdatePhoto,
 ) -> Response[Any | CommonErrorsApiError]:
     """Create photo metadata after S3 upload
 
     Args:
         photo_id (UUID): UUID identifier
-        body (CreateOrUpdatePhoto):
+        body (ModelsCreateOrUpdatePhoto): A photograph captured in the greenhouse
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -109,13 +114,13 @@ def sync(
     photo_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdatePhoto,
+    body: ModelsCreateOrUpdatePhoto,
 ) -> Any | CommonErrorsApiError | None:
     """Create photo metadata after S3 upload
 
     Args:
         photo_id (UUID): UUID identifier
-        body (CreateOrUpdatePhoto):
+        body (ModelsCreateOrUpdatePhoto): A photograph captured in the greenhouse
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -136,13 +141,13 @@ async def asyncio_detailed(
     photo_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdatePhoto,
+    body: ModelsCreateOrUpdatePhoto,
 ) -> Response[Any | CommonErrorsApiError]:
     """Create photo metadata after S3 upload
 
     Args:
         photo_id (UUID): UUID identifier
-        body (CreateOrUpdatePhoto):
+        body (ModelsCreateOrUpdatePhoto): A photograph captured in the greenhouse
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -166,13 +171,13 @@ async def asyncio(
     photo_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdatePhoto,
+    body: ModelsCreateOrUpdatePhoto,
 ) -> Any | CommonErrorsApiError | None:
     """Create photo metadata after S3 upload
 
     Args:
         photo_id (UUID): UUID identifier
-        body (CreateOrUpdatePhoto):
+        body (ModelsCreateOrUpdatePhoto): A photograph captured in the greenhouse
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

@@ -5,13 +5,13 @@ from typing import Any
 from uuid import UUID
 
 from fermata._call import call_async
-from fermata._generated.pipelines.api.fires import complete_fire as _complete_fire
-from fermata._generated.pipelines.api.fires import create_fire as _create_fire
-from fermata._generated.pipelines.api.fires import start_fire as _start_fire
-from fermata._generated.pipelines.api.schedules import (
+from fermata._generated.pipelines.api.fires_api import complete_fire as _complete_fire
+from fermata._generated.pipelines.api.fires_api import create_fire as _create_fire
+from fermata._generated.pipelines.api.fires_api import start_fire as _start_fire
+from fermata._generated.pipelines.api.schedules_api import (
     get_schedule as _get_schedule,
 )
-from fermata._generated.pipelines.api.schedules import (
+from fermata._generated.pipelines.api.schedules_api import (
     list_schedules as _list_schedules,
 )
 from fermata._generated.pipelines.models.create_or_update_fire import CreateOrUpdateFire

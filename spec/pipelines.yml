@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: Demetra Pipelines API
-  version: 0.0.0
+  version: 1.2.0
 tags:
-- name: Templates
-- name: Schedules
-- name: Fires
+- name: TemplatesAPI
+- name: SchedulesAPI
+- name: FiresAPI
 paths:
   /api/v1/pipelines/fires/{fireId}:
     post:
@@ -47,7 +47,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - Fires
+      - FiresAPI
       requestBody:
         required: true
         content:
@@ -100,7 +100,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - Fires
+      - FiresAPI
       requestBody:
         required: true
         content:
@@ -115,11 +115,10 @@ paths:
       description: 'Start a fire.
 
 
-        Transitions status from pending to running.
+        Transitions to running from pending, failed, cancelled, or running.
 
-        Sets startedAt=now and stores externalRunId (Prefect flow_run_id).
-
-        externalRunId is immutable once set.'
+        Retry-safe on running->running: startedAt is preserved; externalRunId is overwritten
+        with the value from the latest request.'
       parameters:
       - name: fireId
         in: path
@@ -155,7 +154,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - Fires
+      - FiresAPI
       requestBody:
         required: true
         content:
@@ -239,7 +238,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - Schedules
+      - SchedulesAPI
       security:
       - BearerAuth: []
   /api/v1/pipelines/schedules/{scheduleId}:
@@ -284,7 +283,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - Schedules
+      - SchedulesAPI
       security:
       - BearerAuth: []
 components:
@@ -365,7 +364,6 @@ components:
       type: object
       required:
       - organizationId
-      - pipelineTemplateId
       - triggerId
       - scope
       - scopeId
@@ -378,7 +376,10 @@ components:
         pipelineTemplateId:
           allOf:
           - $ref: '#/components/schemas/Common.Types.ID'
-          description: Reference to the pipeline template
+          description: Reference to the pipeline template. Optional — only set for
+            schedule-triggered fires and mirrored onsite fires (whose schedule and
+            template were synced from cloud beforehand). Request-triggered fires created
+            directly via the API may omit it.
         triggerId:
           allOf:
           - $ref: '#/components/schemas/Common.Types.ID'

@@ -86,9 +86,9 @@ def sync_detailed(
 ) -> Response[Any | CommonErrorsApiError]:
     """Start a fire.
 
-    Transitions status from pending to running.
-    Sets startedAt=now and stores externalRunId (Prefect flow_run_id).
-    externalRunId is immutable once set.
+    Transitions to running from pending, failed, cancelled, or running.
+    Retry-safe on running->running: startedAt is preserved; externalRunId is overwritten with the value
+    from the latest request.
 
     Args:
         fire_id (UUID): UUID identifier
@@ -122,9 +122,9 @@ def sync(
 ) -> Any | CommonErrorsApiError | None:
     """Start a fire.
 
-    Transitions status from pending to running.
-    Sets startedAt=now and stores externalRunId (Prefect flow_run_id).
-    externalRunId is immutable once set.
+    Transitions to running from pending, failed, cancelled, or running.
+    Retry-safe on running->running: startedAt is preserved; externalRunId is overwritten with the value
+    from the latest request.
 
     Args:
         fire_id (UUID): UUID identifier
@@ -153,9 +153,9 @@ async def asyncio_detailed(
 ) -> Response[Any | CommonErrorsApiError]:
     """Start a fire.
 
-    Transitions status from pending to running.
-    Sets startedAt=now and stores externalRunId (Prefect flow_run_id).
-    externalRunId is immutable once set.
+    Transitions to running from pending, failed, cancelled, or running.
+    Retry-safe on running->running: startedAt is preserved; externalRunId is overwritten with the value
+    from the latest request.
 
     Args:
         fire_id (UUID): UUID identifier
@@ -187,9 +187,9 @@ async def asyncio(
 ) -> Any | CommonErrorsApiError | None:
     """Start a fire.
 
-    Transitions status from pending to running.
-    Sets startedAt=now and stores externalRunId (Prefect flow_run_id).
-    externalRunId is immutable once set.
+    Transitions to running from pending, failed, cancelled, or running.
+    Retry-safe on running->running: startedAt is preserved; externalRunId is overwritten with the value
+    from the latest request.
 
     Args:
         fire_id (UUID): UUID identifier

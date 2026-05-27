@@ -15,15 +15,16 @@ from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
     from ..models.common_types_grid_pos import CommonTypesGridPos
-    from ..models.create_or_update_photo_metadata import CreateOrUpdatePhotoMetadata
+    from ..models.models_create_or_update_photo_metadata import ModelsCreateOrUpdatePhotoMetadata
 
 
-T = TypeVar("T", bound="CreateOrUpdatePhoto")
+T = TypeVar("T", bound="ModelsCreateOrUpdatePhoto")
 
 
 @_attrs_define
-class CreateOrUpdatePhoto:
-    """
+class ModelsCreateOrUpdatePhoto:
+    """A photograph captured in the greenhouse
+
     Attributes:
         id (UUID): UUID identifier
         greenhouse_id (UUID): UUID identifier
@@ -39,7 +40,8 @@ class CreateOrUpdatePhoto:
         device_type (DevicesModelsDeviceType | Unset): Device type
         zone_object_id (UUID | Unset): UUID identifier
         pipeline_id (UUID | Unset): UUID identifier
-        metadata (CreateOrUpdatePhotoMetadata | Unset): Additional metadata (resolution, format, etc.)
+        metadata (ModelsCreateOrUpdatePhotoMetadata | Unset): Additional metadata (resolution, format, etc.)
+        cam_pos (list[float] | Unset): Camera position as [x, y, z] coordinates
     """
 
     id: UUID
@@ -55,7 +57,8 @@ class CreateOrUpdatePhoto:
     device_type: DevicesModelsDeviceType | Unset = UNSET
     zone_object_id: UUID | Unset = UNSET
     pipeline_id: UUID | Unset = UNSET
-    metadata: CreateOrUpdatePhotoMetadata | Unset = UNSET
+    metadata: ModelsCreateOrUpdatePhotoMetadata | Unset = UNSET
+    cam_pos: list[float] | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -97,6 +100,10 @@ class CreateOrUpdatePhoto:
         if not isinstance(self.metadata, Unset):
             metadata = self.metadata.to_dict()
 
+        cam_pos: list[float] | Unset = UNSET
+        if not isinstance(self.cam_pos, Unset):
+            cam_pos = self.cam_pos
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -123,13 +130,15 @@ class CreateOrUpdatePhoto:
             field_dict["pipelineId"] = pipeline_id
         if metadata is not UNSET:
             field_dict["metadata"] = metadata
+        if cam_pos is not UNSET:
+            field_dict["camPos"] = cam_pos
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         from ..models.common_types_grid_pos import CommonTypesGridPos
-        from ..models.create_or_update_photo_metadata import CreateOrUpdatePhotoMetadata
+        from ..models.models_create_or_update_photo_metadata import ModelsCreateOrUpdatePhotoMetadata
 
         d = dict(src_dict)
         id = UUID(d.pop("id"))
@@ -179,13 +188,15 @@ class CreateOrUpdatePhoto:
             pipeline_id = UUID(_pipeline_id)
 
         _metadata = d.pop("metadata", UNSET)
-        metadata: CreateOrUpdatePhotoMetadata | Unset
+        metadata: ModelsCreateOrUpdatePhotoMetadata | Unset
         if isinstance(_metadata, Unset):
             metadata = UNSET
         else:
-            metadata = CreateOrUpdatePhotoMetadata.from_dict(_metadata)
+            metadata = ModelsCreateOrUpdatePhotoMetadata.from_dict(_metadata)
 
-        create_or_update_photo = cls(
+        cam_pos = cast(list[float], d.pop("camPos", UNSET))
+
+        models_create_or_update_photo = cls(
             id=id,
             greenhouse_id=greenhouse_id,
             culture_id=culture_id,
@@ -200,10 +211,11 @@ class CreateOrUpdatePhoto:
             zone_object_id=zone_object_id,
             pipeline_id=pipeline_id,
             metadata=metadata,
+            cam_pos=cam_pos,
         )
 
-        create_or_update_photo.additional_properties = d
-        return create_or_update_photo
+        models_create_or_update_photo.additional_properties = d
+        return models_create_or_update_photo
 
     @property
     def additional_keys(self) -> list[str]:

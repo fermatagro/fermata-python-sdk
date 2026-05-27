@@ -10,14 +10,14 @@ import httpx
 from dateutil.parser import isoparse
 
 from fermata._call import call_async
-from fermata._generated.observations.api.photos import (
+from fermata._generated.observations.api.photos_api import (
     create_photo as _create_photo,
 )
-from fermata._generated.observations.api.photos import (
+from fermata._generated.observations.api.photos_api import (
     create_photo_upload_link as _upload_link,
 )
 from fermata._generated.observations.models.common_types_grid_pos import CommonTypesGridPos
-from fermata._generated.observations.models.create_or_update_photo import CreateOrUpdatePhoto
+from fermata._generated.observations.models.models_create_or_update_photo import ModelsCreateOrUpdatePhoto
 from fermata._generated.observations.models.models_create_upload_link import ModelsCreateUploadLink
 from fermata._generated.observations.models.models_photo_source import ModelsPhotoSource
 from fermata._generated.observations.models.models_upload_link_response import ModelsUploadLinkResponse
@@ -70,7 +70,7 @@ class AsyncPhotos:
             y=position.get("y", 0) if position else 0,
             h=position.get("h", 0) if position else 0,
         )
-        body = CreateOrUpdatePhoto(
+        body = ModelsCreateOrUpdatePhoto(
             id=UUID(photo_id),
             greenhouse_id=UUID(greenhouse_id),
             culture_id=culture_id,

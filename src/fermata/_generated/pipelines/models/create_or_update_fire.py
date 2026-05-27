@@ -25,7 +25,6 @@ class CreateOrUpdateFire:
     """
     Attributes:
         organization_id (str): Organization identifier (opaque string)
-        pipeline_template_id (UUID): UUID identifier
         trigger_id (UUID): UUID identifier
         scope (ModelsScheduleScope): Scope type for schedule binding
         scope_id (UUID): UUID identifier
@@ -35,6 +34,7 @@ class CreateOrUpdateFire:
             - pending → running → completed|partial|failed
             - pending|running → cancelled|skipped
             - failed|cancelled → running (retry)
+        pipeline_template_id (UUID | Unset): UUID identifier
         scheduled_at (datetime.datetime | Unset): When the pipeline is scheduled to run (defaults to server time if
             omitted)
         external_run_id (str | Unset): Prefect flow_run_id, set at start (immutable once set)
@@ -45,11 +45,11 @@ class CreateOrUpdateFire:
     """
 
     organization_id: str
-    pipeline_template_id: UUID
     trigger_id: UUID
     scope: ModelsScheduleScope
     scope_id: UUID
     status: ModelsFireStatus
+    pipeline_template_id: UUID | Unset = UNSET
     scheduled_at: datetime.datetime | Unset = UNSET
     external_run_id: str | Unset = UNSET
     error_message: str | Unset = UNSET
@@ -61,8 +61,6 @@ class CreateOrUpdateFire:
     def to_dict(self) -> dict[str, Any]:
         organization_id = self.organization_id
 
-        pipeline_template_id = str(self.pipeline_template_id)
-
         trigger_id = str(self.trigger_id)
 
         scope = self.scope.value
@@ -70,6 +68,10 @@ class CreateOrUpdateFire:
         scope_id = str(self.scope_id)
 
         status = self.status.value
+
+        pipeline_template_id: str | Unset = UNSET
+        if not isinstance(self.pipeline_template_id, Unset):
+            pipeline_template_id = str(self.pipeline_template_id)
 
         scheduled_at: str | Unset = UNSET
         if not isinstance(self.scheduled_at, Unset):
@@ -96,13 +98,14 @@ class CreateOrUpdateFire:
         field_dict.update(
             {
                 "organizationId": organization_id,
-                "pipelineTemplateId": pipeline_template_id,
                 "triggerId": trigger_id,
                 "scope": scope,
                 "scopeId": scope_id,
                 "status": status,
             }
         )
+        if pipeline_template_id is not UNSET:
+            field_dict["pipelineTemplateId"] = pipeline_template_id
         if scheduled_at is not UNSET:
             field_dict["scheduledAt"] = scheduled_at
         if external_run_id is not UNSET:
@@ -125,8 +128,6 @@ class CreateOrUpdateFire:
         d = dict(src_dict)
         organization_id = d.pop("organizationId")
 
-        pipeline_template_id = UUID(d.pop("pipelineTemplateId"))
-
         trigger_id = UUID(d.pop("triggerId"))
 
         scope = ModelsScheduleScope(d.pop("scope"))
@@ -134,6 +135,13 @@ class CreateOrUpdateFire:
         scope_id = UUID(d.pop("scopeId"))
 
         status = ModelsFireStatus(d.pop("status"))
+
+        _pipeline_template_id = d.pop("pipelineTemplateId", UNSET)
+        pipeline_template_id: UUID | Unset
+        if isinstance(_pipeline_template_id, Unset):
+            pipeline_template_id = UNSET
+        else:
+            pipeline_template_id = UUID(_pipeline_template_id)
 
         _scheduled_at = d.pop("scheduledAt", UNSET)
         scheduled_at: datetime.datetime | Unset
@@ -169,11 +177,11 @@ class CreateOrUpdateFire:
 
         create_or_update_fire = cls(
             organization_id=organization_id,
-            pipeline_template_id=pipeline_template_id,
             trigger_id=trigger_id,
             scope=scope,
             scope_id=scope_id,
             status=status,
+            pipeline_template_id=pipeline_template_id,
             scheduled_at=scheduled_at,
             external_run_id=external_run_id,
             error_message=error_message,

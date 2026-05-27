@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
   title: Demetra Catalog API
-  version: 0.0.0
+  version: 1.0.0
 tags:
-- name: AI Models
-- name: ML Classes
+- name: AIModelsAPI
+- name: MLClassesAPI
 paths:
   /api/v1/models:
     get:
@@ -39,7 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - AI Models
+      - AIModelsAPI
       security:
       - BearerAuth: []
   /api/v1/models/by-name/{modelName}:
@@ -84,7 +84,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - AI Models
+      - AIModelsAPI
       security:
       - BearerAuth: []
 components:
