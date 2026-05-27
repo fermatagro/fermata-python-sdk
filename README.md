@@ -393,32 +393,30 @@ The original exception is also always logged at DEBUG on the `fermata` logger �
 
 ## Releasing
 
-Releases are published to PyPI automatically via GitHub Actions (`.github/workflows/publish.yml`) using PyPI Trusted Publishing. To cut a release:
+Releases are automated by [release-please](https://github.com/googleapis/release-please). The flow:
 
-1. Bump `version` in `pyproject.toml`
-2. Commit the bump on `master`
-3. Tag and push: `git tag v0.2.0 && git push origin v0.2.0`
-4. The workflow verifies the tag matches the pyproject version, builds wheel + sdist, and uploads to https://pypi.org/p/fermata-sdk
+1. Land conventional-commit changes on `master` (`feat:`, `fix:`, `refactor:`, etc. — see `release-please-config.json`)
+2. `release-please.yml` opens/updates a **Release PR** that bumps `pyproject.toml` version, updates `CHANGELOG.md`, and updates `.release-please-manifest.json`
+3. Review the Release PR. When ready, merge it
+4. On merge, release-please creates a git tag (`vX.Y.Z`) and a GitHub Release
+5. `release.yml` runs on the published release, builds wheel + sdist, and uploads to https://pypi.org/p/fermata-sdk via Trusted Publishing
 
-### TestPyPI verification (recommended before first real release)
+No manual version bumps, no manual tagging.
 
-```bash
-make wheel
-twine upload --repository testpypi dist/*
-pip install --index-url https://test.pypi.org/simple/ \
-            --extra-index-url https://pypi.org/simple/ fermata-sdk
-```
+### One-time setup
 
-### One-time PyPI setup
+**PyPI Trusted Publishing** — at https://pypi.org/manage/account/publishing/, add a publisher:
 
-On https://pypi.org/manage/account/publishing/, add a Trusted Publisher for the `fermata-sdk` project:
-
+- PyPI Project Name: `fermata-sdk`
 - Owner: `fermatagro`
-- Repository: `fermata-python-sdk`
-- Workflow: `publish.yml`
-- Environment: `pypi`
+- Repository name: `fermata-python-sdk`
+- Workflow filename: `release.yml`
+- Environment name: `pypi`
 
-After that, no API tokens are needed — the workflow authenticates via GitHub OIDC.
+**GitHub repo**:
+
+- Create an environment named `pypi` (Settings → Environments)
+- Provide a `RELEASE_PLEASE_TOKEN` secret with `contents:write` + `pull-requests:write` (a fine-grained PAT or the org's release-please bot token — same pattern as `demetra` and `prefect-flows`)
 
 ## License
 
