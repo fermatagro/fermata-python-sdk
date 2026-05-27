@@ -422,7 +422,9 @@ After that, no API tokens are needed — the workflow authenticates via GitHub O
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE).
+Proprietary — Copyright © 2025-2026 Fermatagro Technology Limited. All rights reserved. See [LICENSE](LICENSE).
+
+Use of this SDK requires explicit written authorization from Fermatagro Technology Limited. Contact your Fermata representative for licensing.
 
 ## Support
 
