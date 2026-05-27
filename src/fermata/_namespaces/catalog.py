@@ -4,10 +4,10 @@ from collections.abc import Callable
 from typing import Any
 
 from fermata._call import call_async
-from fermata._generated.catalog.api.ai_models import (
+from fermata._generated.catalog.api.ai_models_api import (
     get_ai_model_by_name as _get_model,
 )
-from fermata._generated.catalog.api.ai_models import (
+from fermata._generated.catalog.api.ai_models_api import (
     list_ai_models as _list_models,
 )
 from fermata._generated.catalog.models.models_ai_model import ModelsAIModel

@@ -1,4 +1,4 @@
-.PHONY: generate test lint fmt install run
+.PHONY: generate test lint fmt install run wheel
 
 PYTHON := $(shell command -v python3)
 VENV := .venv/bin
@@ -21,6 +21,10 @@ install:
 	$(PYTHON) -m venv .venv
 	$(VENV)/pip install --upgrade pip
 	$(VENV)/pip install -e ".[dev]"
+
+wheel:
+	rm -f dist/*.whl
+	$(VENV)/python -m build --wheel --outdir dist
 
 run:
 	env $$(cat .env | xargs) $(VENV)/python test.py

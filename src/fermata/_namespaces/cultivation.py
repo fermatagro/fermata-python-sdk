@@ -6,10 +6,10 @@ from typing import Any
 from uuid import UUID
 
 from fermata._call import call_async
-from fermata._generated.cultivation.api.growing_cycles import (
+from fermata._generated.cultivation.api.cycles_api import (
     get_cycle as _get_cycle,
 )
-from fermata._generated.cultivation.api.growing_cycles import (
+from fermata._generated.cultivation.api.cycles_api import (
     list_active_cycles_at_time as _list_active,
 )
 from fermata._generated.cultivation.models.models_growing_cycle import ModelsGrowingCycle

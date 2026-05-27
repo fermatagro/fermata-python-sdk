@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Awaitable
 from typing import Any
 
+import httpx
+
 from fermata.exceptions import (
     AuthError,
     ConflictError,
@@ -12,6 +14,7 @@ from fermata.exceptions import (
     NotFoundError,
     ServerError,
     ValidationError,
+    _reraise_as_connection_error,
 )
 
 _STATUS_MAP: dict[int, type[FermataError]] = {
@@ -56,4 +59,8 @@ def _unwrap(resp: Any) -> Any:
 
 async def call_async(coro: Awaitable[Any]) -> Any:
     """Await a generated ``asyncio_detailed`` call and unwrap the response."""
-    return _unwrap(await coro)
+    try:
+        resp = await coro
+    except httpx.RequestError as exc:
+        _reraise_as_connection_error(exc)
+    return _unwrap(resp)

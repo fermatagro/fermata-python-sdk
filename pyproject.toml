@@ -3,16 +3,38 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fermata"
+name = "fermata-sdk"
 version = "0.1.0"
 description = "Python SDK for Fermata On-Site (Hera API)"
+readme = "README.md"
+license = "LicenseRef-Proprietary"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
+authors = [{ name = "Fermata" }]
+keywords = ["fermata", "agritech", "computer-vision", "greenhouse", "ai", "inference", "hera"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
 dependencies = [
     "httpx>=0.27",
     "attrs>=23.2",
     "uuid-utils>=0.6",
     "python-dateutil>=2.8",
 ]
+
+[project.urls]
+Homepage = "https://github.com/fermatagro/fermata-python-sdk"
+Repository = "https://github.com/fermatagro/fermata-python-sdk"
+Issues = "https://github.com/fermatagro/fermata-python-sdk/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -24,6 +46,8 @@ dev = [
     "openapi-python-client>=0.28",
     "pyyaml>=6.0",
     "psycopg2-binary>=2.9",
+    "build>=1.2",
+    "twine>=6.0",
 ]
 
 [tool.hatch.build.targets.wheel]

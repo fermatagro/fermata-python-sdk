@@ -5,10 +5,14 @@ Python client for Fermata On-Site. Captures greenhouse photos from your robots/c
 ## Installation
 
 ```bash
-pip install fermata
+pip install fermata-sdk
 ```
 
-Requires Python 3.12+.
+Requires Python 3.12+. The import name is `fermata`:
+
+```python
+from fermata import Fermata, FermataSync
+```
 
 ## Setup
 
@@ -357,7 +361,70 @@ with FermataSync(...) as fermata:
 | `ServerError` | Internal server error |
 | `FermataError` | Base class for all SDK errors |
 
-Network errors and temporary outages are automatically retried (3 attempts with backoff).
+Auth (401) is auto-refreshed and retried once. Server outages (502/503) are retried with backoff (up to 3 attempts). Network errors (connection refused, timeout) are **not** retried — they surface as `ConnectionError` immediately.
+
+### Debugging connection errors
+
+By default, `ConnectionError` shows a clean one-line message and hides the underlying httpx/httpcore traceback. Uncaught `FermataError` tracebacks are also filtered to drop SDK + transport internal frames, leaving only your code + the error message:
+
+```
+Traceback (most recent call last):
+  File "scan_images.py", line 16, in <module>
+    asyncio.run(main())
+  File "scan_images.py", line 12, in main
+    await client.list_schedules()
+fermata.exceptions.ConnectionError: Cannot reach http://hera:3000/auth/token: connection timed out
+```
+
+The original httpx exception is still available on `__context__` for inspection (caught-exception paths are not filtered):
+
+```python
+except ConnectionError as e:
+    print(e.__context__)  # the original httpx.ConnectTimeout
+```
+
+For the full chained traceback including SDK + httpx frames (useful when debugging transport-level issues), set `FERMATA_DEBUG=1`:
+
+```bash
+FERMATA_DEBUG=1 python my_script.py
+```
+
+The original exception is also always logged at DEBUG on the `fermata` logger — enable via `logging.basicConfig(level=logging.DEBUG)`.
+
+## Releasing
+
+Releases are published to PyPI automatically via GitHub Actions (`.github/workflows/publish.yml`) using PyPI Trusted Publishing. To cut a release:
+
+1. Bump `version` in `pyproject.toml`
+2. Commit the bump on `master`
+3. Tag and push: `git tag v0.2.0 && git push origin v0.2.0`
+4. The workflow verifies the tag matches the pyproject version, builds wheel + sdist, and uploads to https://pypi.org/p/fermata-sdk
+
+### TestPyPI verification (recommended before first real release)
+
+```bash
+make wheel
+twine upload --repository testpypi dist/*
+pip install --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ fermata-sdk
+```
+
+### One-time PyPI setup
+
+On https://pypi.org/manage/account/publishing/, add a Trusted Publisher for the `fermata-sdk` project:
+
+- Owner: `fermatagro`
+- Repository: `fermata-python-sdk`
+- Workflow: `publish.yml`
+- Environment: `pypi`
+
+After that, no API tokens are needed — the workflow authenticates via GitHub OIDC.
+
+## License
+
+Proprietary — Copyright © 2025-2026 Fermatagro Technology Limited. All rights reserved. See [LICENSE](LICENSE).
+
+Use of this SDK requires explicit written authorization from Fermatagro Technology Limited. Contact your Fermata representative for licensing.
 
 ## Support
 

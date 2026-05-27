@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
   title: Demetra GreenhouseCore API
-  version: 0.0.0
+  version: 1.1.0
 tags:
-- name: Greenhouses
-- name: Greenhouse Objects
-- name: Device Placements
-- name: Control Points
-- name: Zone Objects
+- name: GreenhouseAPI
+- name: GreenhouseObjectsAPI
+- name: DevicePlacementsAPI
+- name: ControlPointsAPI
+- name: ZoneObjectsAPI
 paths:
   /api/v1/greenhouses:
     get:
@@ -54,9 +54,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Common.Errors.InternalServerError'
       tags:
-      - Greenhouses
+      - GreenhouseAPI
       security:
-      - BearerAuth: []
+      - OAuth2Auth:
+        - read:greenhouse
 components:
   parameters:
     Common.Pagination.PageParams.cursor:
@@ -180,6 +181,14 @@ components:
           readOnly: true
       description: A greenhouse structure within an organization
   securitySchemes:
+    OAuth2Auth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.croptimus.com/oidc/token
+          scopes:
+            read:greenhouse: ''
+            write:greenhouse: ''
     BearerAuth:
       type: http
       scheme: Bearer

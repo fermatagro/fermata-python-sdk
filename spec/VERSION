@@ -1,5 +1,6 @@
-observations: demetra@HEAD
-aivision: demetra@HEAD
-greenhouses: demetra@HEAD
-cultivation: demetra@HEAD
-catalog: demetra@HEAD
+observations: 1.3.0
+aivision: 1.1.0
+catalog: 1.0.0
+cultivation: 1.5.0
+greenhouses: 1.1.0
+pipelines: 1.2.0
