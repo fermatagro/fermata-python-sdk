@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import pytest
 import httpx
+import pytest
 import respx
 
 from fermata._auth import TokenManager
-from fermata.exceptions import AuthError
+from fermata.exceptions import AuthError, ConnectionError
 
 HERA_URL = "http://hera-test:3000"
 
@@ -91,3 +91,51 @@ async def test_token_exchange_failure():
                 await tm.get_token()
         finally:
             await tm.close()
+
+
+async def test_token_exchange_connection_error_is_clean(monkeypatch):
+    """Network failure → typed ConnectionError, no chained traceback by default."""
+    monkeypatch.delenv("FERMATA_DEBUG", raising=False)
+
+    with respx.mock(base_url=HERA_URL) as router:
+        request = httpx.Request("POST", f"{HERA_URL}/auth/token")
+        router.post("/auth/token").mock(side_effect=httpx.ConnectTimeout("boom", request=request))
+
+        tm = TokenManager(HERA_URL, "user", "pass")
+        await tm.open()
+        try:
+            with pytest.raises(ConnectionError) as exc_info:
+                await tm.get_token()
+        finally:
+            await tm.close()
+
+    exc = exc_info.value
+    assert "timed out" in str(exc)
+    assert HERA_URL in str(exc)
+    # Chained traceback suppressed for end users
+    assert exc.__cause__ is None
+    assert exc.__suppress_context__ is True
+    # Original still preserved on __context__ for debuggers
+    assert isinstance(exc.__context__, httpx.ConnectTimeout)
+
+
+async def test_token_exchange_connection_error_debug_mode(monkeypatch):
+    """FERMATA_DEBUG=1 exposes the chained traceback for debugging."""
+    monkeypatch.setenv("FERMATA_DEBUG", "1")
+
+    with respx.mock(base_url=HERA_URL) as router:
+        request = httpx.Request("POST", f"{HERA_URL}/auth/token")
+        router.post("/auth/token").mock(side_effect=httpx.ConnectError("refused", request=request))
+
+        tm = TokenManager(HERA_URL, "user", "pass")
+        await tm.open()
+        try:
+            with pytest.raises(ConnectionError) as exc_info:
+                await tm.get_token()
+        finally:
+            await tm.close()
+
+    exc = exc_info.value
+    # Full chain exposed: explicit __cause__ makes the default traceback printer
+    # render "The above exception was the direct cause of the following exception".
+    assert isinstance(exc.__cause__, httpx.ConnectError)

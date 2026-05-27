@@ -6,7 +6,7 @@ import time
 
 import httpx
 
-from fermata.exceptions import AuthError
+from fermata.exceptions import AuthError, _reraise_as_connection_error
 
 
 def _extract_org_id(token: str) -> str | None:
@@ -68,8 +68,8 @@ class TokenManager:
                 data={"client_id": self._username, "client_secret": self._password},
                 headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
-        except httpx.HTTPError as exc:
-            raise AuthError(f"Token exchange failed: {exc}") from exc
+        except httpx.RequestError as exc:
+            _reraise_as_connection_error(exc)
         self._parse_token_response(response)
 
     def _parse_token_response(self, response: httpx.Response) -> None:

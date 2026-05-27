@@ -24,6 +24,7 @@ dev = [
     "openapi-python-client>=0.28",
     "pyyaml>=6.0",
     "psycopg2-binary>=2.9",
+    "build>=1.2",
 ]
 
 [tool.hatch.build.targets.wheel]

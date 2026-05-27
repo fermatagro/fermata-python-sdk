@@ -357,7 +357,35 @@ with FermataSync(...) as fermata:
 | `ServerError` | Internal server error |
 | `FermataError` | Base class for all SDK errors |
 
-Network errors and temporary outages are automatically retried (3 attempts with backoff).
+Auth (401) is auto-refreshed and retried once. Server outages (502/503) are retried with backoff (up to 3 attempts). Network errors (connection refused, timeout) are **not** retried — they surface as `ConnectionError` immediately.
+
+### Debugging connection errors
+
+By default, `ConnectionError` shows a clean one-line message and hides the underlying httpx/httpcore traceback. Uncaught `FermataError` tracebacks are also filtered to drop SDK + transport internal frames, leaving only your code + the error message:
+
+```
+Traceback (most recent call last):
+  File "scan_images.py", line 16, in <module>
+    asyncio.run(main())
+  File "scan_images.py", line 12, in main
+    await client.list_schedules()
+fermata.exceptions.ConnectionError: Cannot reach http://hera:3000/auth/token: connection timed out
+```
+
+The original httpx exception is still available on `__context__` for inspection (caught-exception paths are not filtered):
+
+```python
+except ConnectionError as e:
+    print(e.__context__)  # the original httpx.ConnectTimeout
+```
+
+For the full chained traceback including SDK + httpx frames (useful when debugging transport-level issues), set `FERMATA_DEBUG=1`:
+
+```bash
+FERMATA_DEBUG=1 python my_script.py
+```
+
+The original exception is also always logged at DEBUG on the `fermata` logger — enable via `logging.basicConfig(level=logging.DEBUG)`.
 
 ## Support
 

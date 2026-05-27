@@ -22,6 +22,7 @@ from fermata._generated.observations.models.models_create_upload_link import Mod
 from fermata._generated.observations.models.models_photo_source import ModelsPhotoSource
 from fermata._generated.observations.models.models_upload_link_response import ModelsUploadLinkResponse
 from fermata._generated.observations.types import UNSET
+from fermata.exceptions import _reraise_as_connection_error
 
 
 def _parse_dt(value: str | datetime.datetime) -> datetime.datetime:
@@ -48,7 +49,10 @@ class AsyncPhotos:
         return await call_async(_upload_link.asyncio_detailed(UUID(photo_id), body=body, client=self._c))
 
     async def upload(self, upload_url: str, image: str | Path | bytes) -> None:
-        resp = await self._raw.put(upload_url, content=_read_image(image))
+        try:
+            resp = await self._raw.put(upload_url, content=_read_image(image))
+        except httpx.RequestError as exc:
+            _reraise_as_connection_error(exc)
         resp.raise_for_status()
 
     async def create(
