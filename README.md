@@ -5,10 +5,14 @@ Python client for Fermata On-Site. Captures greenhouse photos from your robots/c
 ## Installation
 
 ```bash
-pip install fermata
+pip install fermata-sdk
 ```
 
-Requires Python 3.12+.
+Requires Python 3.12+. The import name is `fermata`:
+
+```python
+from fermata import Fermata, FermataSync
+```
 
 ## Setup
 
@@ -386,6 +390,39 @@ FERMATA_DEBUG=1 python my_script.py
 ```
 
 The original exception is also always logged at DEBUG on the `fermata` logger — enable via `logging.basicConfig(level=logging.DEBUG)`.
+
+## Releasing
+
+Releases are published to PyPI automatically via GitHub Actions (`.github/workflows/publish.yml`) using PyPI Trusted Publishing. To cut a release:
+
+1. Bump `version` in `pyproject.toml`
+2. Commit the bump on `master`
+3. Tag and push: `git tag v0.2.0 && git push origin v0.2.0`
+4. The workflow verifies the tag matches the pyproject version, builds wheel + sdist, and uploads to https://pypi.org/p/fermata-sdk
+
+### TestPyPI verification (recommended before first real release)
+
+```bash
+make wheel
+twine upload --repository testpypi dist/*
+pip install --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ fermata-sdk
+```
+
+### One-time PyPI setup
+
+On https://pypi.org/manage/account/publishing/, add a Trusted Publisher for the `fermata-sdk` project:
+
+- Owner: `fermatagro`
+- Repository: `fermata-python-sdk`
+- Workflow: `publish.yml`
+- Environment: `pypi`
+
+After that, no API tokens are needed — the workflow authenticates via GitHub OIDC.
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
 
 ## Support
 
