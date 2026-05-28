@@ -403,21 +403,6 @@ Releases are automated by [release-please](https://github.com/googleapis/release
 
 No manual version bumps, no manual tagging.
 
-### One-time setup
-
-**PyPI Trusted Publishing** — at https://pypi.org/manage/account/publishing/, add a publisher:
-
-- PyPI Project Name: `fermata-sdk`
-- Owner: `fermatagro`
-- Repository name: `fermata-python-sdk`
-- Workflow filename: `release.yml`
-- Environment name: `pypi`
-
-**GitHub repo**:
-
-- Create an environment named `pypi` (Settings → Environments)
-- Provide a `RELEASE_PLEASE_TOKEN` secret with `contents:write` + `pull-requests:write` (a fine-grained PAT or the org's release-please bot token — same pattern as `demetra` and `prefect-flows`)
-
 ## License
 
 Proprietary — Copyright © 2025-2026 Fermatagro Technology Limited. All rights reserved. See [LICENSE](LICENSE).
