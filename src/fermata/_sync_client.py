@@ -87,6 +87,7 @@ class FermataSync:
         device_id: str | None = None,
         model_name: str | None = None,
         photo_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> str:
         return self._run(
             self._async.infer(
@@ -97,5 +98,6 @@ class FermataSync:
                 device_id=device_id,
                 model_name=model_name,
                 photo_id=photo_id,
+                metadata=metadata,
             )
         )
