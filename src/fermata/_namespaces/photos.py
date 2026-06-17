@@ -18,6 +18,9 @@ from fermata._generated.observations.api.photos_api import (
 )
 from fermata._generated.observations.models.common_types_grid_pos import CommonTypesGridPos
 from fermata._generated.observations.models.models_create_or_update_photo import ModelsCreateOrUpdatePhoto
+from fermata._generated.observations.models.models_create_or_update_photo_metadata import (
+    ModelsCreateOrUpdatePhotoMetadata,
+)
 from fermata._generated.observations.models.models_create_upload_link import ModelsCreateUploadLink
 from fermata._generated.observations.models.models_photo_source import ModelsPhotoSource
 from fermata._generated.observations.models.models_upload_link_response import ModelsUploadLinkResponse
@@ -68,12 +71,14 @@ class AsyncPhotos:
         ptz: list[float] | None = None,
         device_id: str | None = None,
         scan_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         pos = CommonTypesGridPos(
             x=position.get("x", 0) if position else 0,
             y=position.get("y", 0) if position else 0,
             h=position.get("h", 0) if position else 0,
         )
+        meta = ModelsCreateOrUpdatePhotoMetadata.from_dict(metadata) if metadata else UNSET
         body = ModelsCreateOrUpdatePhoto(
             id=UUID(photo_id),
             greenhouse_id=UUID(greenhouse_id),
@@ -85,6 +90,7 @@ class AsyncPhotos:
             ptz=ptz or [0.0, 0.0, 0.0],
             device_id=UUID(device_id) if device_id else UNSET,
             pipeline_id=UUID(scan_id) if scan_id else UNSET,
+            metadata=meta,
         )
         await call_async(_create_photo.asyncio_detailed(UUID(photo_id), body=body, client=self._c))
 

@@ -136,8 +136,10 @@ task_id = fermata.infer(
     greenhouse_id=None, # Required in manual mode, auto-filled in pipeline mode
     position=None,      # Robot position: {"x": float, "y": float, "h": float}
     ptz=None,           # Camera pan/tilt/zoom: [float, float, float] (default: [0,0,0])
+    device_id=None,     # Capturing device ID (UUID)
     model_name=None,    # AI model to use (default: auto-selected)
     photo_id=None,      # Custom photo ID (default: auto-generated)
+    metadata=None,      # Arbitrary photo metadata: {"key": value, ...}
 )
 ```
 
@@ -183,6 +185,19 @@ fermata.infer(
 
 ```python
 fermata.infer(..., ptz=[0.5, 0.3, 1.0])  # [pan, tilt, zoom]
+```
+
+**`metadata`** — Arbitrary key/value metadata to store alongside the photo (e.g. resolution, format, sensor info). Stored on the photo in Fermata Cloud and returned when reading it back. Optional:
+
+```python
+fermata.infer(
+    ...,
+    metadata={
+        "resolution": "4000x3000",
+        "format": "jpeg",
+        "exposure_ms": 12.5,
+    },
+)
 ```
 
 ## Robot Scan Example
