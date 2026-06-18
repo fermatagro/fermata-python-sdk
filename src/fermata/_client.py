@@ -171,6 +171,7 @@ class Fermata:
         device_id: str | None = None,
         model_name: str | None = None,
         photo_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> str:
         """Upload photo + submit inference. Returns task_id."""
         # Fill from run context
@@ -208,6 +209,7 @@ class Fermata:
                 ptz=ptz,
                 device_id=device_id,
                 scan_id=self._scan_id,
+                metadata=metadata,
             )
         except ConflictError:
             pass  # already exists (retry idempotency)
