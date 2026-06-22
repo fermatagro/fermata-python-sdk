@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/fermatagro/fermata-python-sdk/compare/v0.2.0...v0.3.0) (2026-06-18)
+
+
+### Features
+
+* photo metadata ([#7](https://github.com/fermatagro/fermata-python-sdk/issues/7)) ([39e1e01](https://github.com/fermatagro/fermata-python-sdk/commit/39e1e012cffa05a4737eac85bfefada5a42de68e))
+
 ## [0.2.0](https://github.com/fermatagro/fermata-python-sdk/compare/v0.1.0...v0.2.0) (2026-05-27)
 
 
