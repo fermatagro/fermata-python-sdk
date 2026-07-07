@@ -58,6 +58,111 @@ paths:
       security:
       - OAuth2Auth:
         - read:greenhouse
+  /api/v1/greenhouses/{greenhouseId}/objects:
+    get:
+      operationId: listGreenhouseObjects
+      description: List all greenhouse objects
+      parameters:
+      - name: greenhouseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
+      - $ref: '#/components/parameters/Common.Pagination.PageParams.cursor'
+      - $ref: '#/components/parameters/Common.Pagination.PageParams.limit'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Models.GreenhouseObject'
+                    description: Items for the current page
+                  next_token:
+                    type: string
+                    description: Token to retrieve the next page of items, if any
+                description: Generic paginated response model with cursor-based pagination
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - GreenhouseObjectsAPI
+      security:
+      - OAuth2Auth:
+        - read:greenhouse
+  /api/v1/greenhouses/{greenhouseId}/objects/{objectId}:
+    get:
+      operationId: getGreenhouseObject
+      description: Get a specific greenhouse object
+      parameters:
+      - name: greenhouseId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
+      - name: objectId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.NumID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.GreenhouseObject'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - GreenhouseObjectsAPI
+      security:
+      - OAuth2Auth:
+        - read:greenhouse
 components:
   parameters:
     Common.Pagination.PageParams.cursor:
@@ -130,10 +235,64 @@ components:
       allOf:
       - $ref: '#/components/schemas/Common.Errors.ApiError'
       description: Indicates that an internal server error occurred
+    Common.Errors.NotFoundError:
+      type: object
+      required:
+      - code
+      - resource_id
+      properties:
+        code:
+          type: string
+          enum:
+          - NotFound
+        resource_id:
+          type: string
+          description: Identifier of the resource that was not found
+      allOf:
+      - $ref: '#/components/schemas/Common.Errors.ApiError'
+      description: Indicates that the requested resource was not found
+    Common.Types.FlatGridPos:
+      type: object
+      required:
+      - x
+      - y
+      properties:
+        x:
+          type: number
+          format: double
+        y:
+          type: number
+          format: double
+      description: Position on the flat greenhouse grid
+    Common.Types.GridRect:
+      type: object
+      required:
+      - x1
+      - y1
+      - x2
+      - y2
+      properties:
+        x1:
+          type: number
+          format: double
+        y1:
+          type: number
+          format: double
+        x2:
+          type: number
+          format: double
+        y2:
+          type: number
+          format: double
+      description: Rectangular area on the greenhouse grid
     Common.Types.ID:
       type: string
       format: uuid
       description: UUID identifier
+    Common.Types.NumID:
+      type: string
+      format: number
+      description: Numeric identifier
     Common.Types.OrganizationID:
       type: string
       description: Organization identifier (opaque string)
@@ -180,6 +339,50 @@ components:
           format: date-time
           readOnly: true
       description: A greenhouse structure within an organization
+    Models.GreenhouseObject:
+      type: object
+      required:
+      - id
+      - greenhouseId
+      - kind
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+        greenhouseId:
+          allOf:
+          - $ref: '#/components/schemas/Common.Types.ID'
+          readOnly: true
+        kind:
+          $ref: '#/components/schemas/Models.GreenhouseObjectType'
+        description:
+          type: string
+        pos:
+          $ref: '#/components/schemas/Common.Types.FlatGridPos'
+        height:
+          type: number
+          format: double
+        rect:
+          $ref: '#/components/schemas/Common.Types.GridRect'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+      description: Physical object (row, block) within a greenhouse
+    Models.GreenhouseObjectType:
+      type: string
+      enum:
+      - row
+      - block
+      - exit
+      description: Type of object within a greenhouse
   securitySchemes:
     OAuth2Auth:
       type: oauth2

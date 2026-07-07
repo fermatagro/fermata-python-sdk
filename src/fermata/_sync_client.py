@@ -8,6 +8,7 @@ from typing import Any, Self
 from fermata._client import Fermata
 from fermata._namespaces.catalog import SyncModels
 from fermata._namespaces.cultivation import SyncCultivation
+from fermata._namespaces.greenhouse_objects import SyncGreenhouseObjects
 from fermata._namespaces.greenhouses import SyncGreenhouses
 from fermata._namespaces.inference import SyncInference
 from fermata._namespaces.photos import SyncPhotos
@@ -68,6 +69,7 @@ class FermataSync:
         self.inference = SyncInference(self._async.inference, self._run)
         self.models = SyncModels(self._async.models, self._run)
         self.greenhouses = SyncGreenhouses(self._async.greenhouses, self._run)
+        self.greenhouse_objects = SyncGreenhouseObjects(self._async.greenhouse_objects, self._run)
         self.pipelines = SyncPipelines(self._async.pipelines, self._run)
         self.cultivation = SyncCultivation(self._async.cultivation, self._run)
         return self

@@ -75,6 +75,12 @@ Generated code is committed. The generation pipeline:
 make generate
 ```
 
+To regenerate a subset of domains, call the script directly with domain names:
+
+```bash
+scripts/generate.sh greenhouses
+```
+
 ### Spec version pinning
 
 `spec/VERSION` pins the upstream demetra spec version per domain:

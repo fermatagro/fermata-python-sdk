@@ -10,7 +10,16 @@ VENV_BIN="$SDK_ROOT/.venv/bin"
 FILTER="$VENV_BIN/python $SCRIPT_DIR/filter_spec.py"
 VERSION_FILE="$SPEC_DIR/VERSION"
 
-DOMAINS=(observations aivision catalog pipelines cultivation greenhouses)
+# All domains by default; pass domain names as arguments to regenerate a subset,
+# e.g. `scripts/generate.sh greenhouses`.
+ALL_DOMAINS=(observations aivision catalog pipelines cultivation greenhouses)
+DOMAINS=("${@:-${ALL_DOMAINS[@]}}")
+for domain in "${DOMAINS[@]}"; do
+    if [[ ! " ${ALL_DOMAINS[*]} " == *" $domain "* ]]; then
+        echo "Error: unknown domain '$domain' (expected one of: ${ALL_DOMAINS[*]})" >&2
+        exit 1
+    fi
+done
 
 # Operations the SDK actually uses (matched by operationId).
 # Only these are kept in the filtered specs — everything else is stripped.
@@ -20,7 +29,7 @@ OPS[aivision]="submitInference getInferenceTask"
 OPS[catalog]="listAIModels getAIModelByName"
 OPS[pipelines]="listSchedules getSchedule createFire startFire completeFire"
 OPS[cultivation]="getCycle listActiveCyclesAtTime"
-OPS[greenhouses]="listGreenhouses"
+OPS[greenhouses]="listGreenhouses listGreenhouseObjects getGreenhouseObject"
 
 # Load pinned spec versions from spec/VERSION (format: "domain: X.Y.Z").
 declare -A PINNED

@@ -12,6 +12,7 @@ from fermata._auth import TokenManager
 from fermata._http import ApiClient, FermataAuth
 from fermata._namespaces.catalog import AsyncModels
 from fermata._namespaces.cultivation import AsyncCultivation
+from fermata._namespaces.greenhouse_objects import AsyncGreenhouseObjects
 from fermata._namespaces.greenhouses import AsyncGreenhouses
 from fermata._namespaces.inference import AsyncInference
 from fermata._namespaces.photos import AsyncPhotos
@@ -78,6 +79,7 @@ class Fermata:
         self.inference: AsyncInference
         self.models: AsyncModels
         self.greenhouses: AsyncGreenhouses
+        self.greenhouse_objects: AsyncGreenhouseObjects
         self.pipelines: AsyncPipelines
         self.cultivation: AsyncCultivation
 
@@ -146,6 +148,7 @@ class Fermata:
         self.inference = AsyncInference(api)
         self.models = AsyncModels(api)
         self.greenhouses = AsyncGreenhouses(api)
+        self.greenhouse_objects = AsyncGreenhouseObjects(api)
         self.pipelines = AsyncPipelines(api)
         self.cultivation = AsyncCultivation(api)
         if self._pipeline_id:
