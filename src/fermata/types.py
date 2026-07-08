@@ -10,6 +10,12 @@ from fermata._generated.aivision.models.models_task_status import ModelsTaskStat
 from fermata._generated.catalog.models.models_ai_model import ModelsAIModel as Model
 from fermata._generated.cultivation.models.models_growing_cycle import ModelsGrowingCycle as GrowingCycle
 from fermata._generated.greenhouses.models.models_greenhouse import ModelsGreenhouse as Greenhouse
+from fermata._generated.greenhouses.models.models_greenhouse_object import (
+    ModelsGreenhouseObject as GreenhouseObject,
+)
+from fermata._generated.greenhouses.models.models_greenhouse_object_type import (
+    ModelsGreenhouseObjectType as GreenhouseObjectType,
+)
 from fermata._generated.observations.models.models_upload_link_response import (
     ModelsUploadLinkResponse as UploadLink,
 )
@@ -34,6 +40,8 @@ __all__ = [
     "TaskStatus",
     "Model",
     "Greenhouse",
+    "GreenhouseObject",
+    "GreenhouseObjectType",
     "Schedule",
     "GrowingCycle",
     "PipelineRun",
