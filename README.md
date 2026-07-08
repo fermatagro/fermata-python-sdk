@@ -333,7 +333,7 @@ This is useful when you need to:
 | `fermata.pipelines.list_schedules()` | `list[Schedule]` | List available pipeline schedules |
 | `fermata.pipelines.get_schedule(schedule_id)` | `Schedule` | Get a pipeline schedule by ID |
 | `fermata.greenhouses.list()` | `list[Greenhouse]` | List greenhouses in the organization |
-| `fermata.greenhouse_objects.list(greenhouse_id)` | `list[GreenhouseObject]` | List a greenhouse's layout objects (rows, blocks); follows pagination |
+| `fermata.greenhouse_objects.list(greenhouse_id)` | `list[GreenhouseObject]` | List a greenhouse's layout objects (rows, blocks, exits); follows pagination |
 | `fermata.greenhouse_objects.get(greenhouse_id, object_id)` | `GreenhouseObject` | Get a single greenhouse object by its numeric ID |
 
 ### `UploadLink` fields
@@ -357,17 +357,17 @@ This is useful when you need to:
 
 ### `GreenhouseObject` fields
 
-Physical layout elements of a greenhouse (rows, blocks, exits). Import the model types with `from fermata.types import GreenhouseObject, GreenhouseObjectType`.
+Physical layout elements of a greenhouse (rows, blocks, exits). Import the model types with `from fermata.types import GreenhouseObject, GreenhouseObjectType`. Fields marked optional may be unset on a given object.
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | `int` | Object number, unique within the greenhouse |
 | `greenhouse_id` | `UUID` | Greenhouse the object belongs to |
 | `kind` | `GreenhouseObjectType` | `"row"`, `"block"`, or `"exit"` |
-| `description` | `str` | Human-readable label |
-| `pos` | point | Point location on the greenhouse grid (`x`, `y`) — set for point-shaped objects |
-| `rect` | rect | Rectangular area (`x1`, `y1`, `x2`, `y2`) — set for area-shaped objects |
-| `height` | `float` | Height above the greenhouse floor |
+| `description` | `str` | Optional. Human-readable label |
+| `pos` | point | Optional. Point location on the greenhouse grid (`x`, `y`) — set for point-shaped objects |
+| `rect` | rect | Optional. Rectangular area (`x1`, `y1`, `x2`, `y2`) — set for area-shaped objects |
+| `height` | `float` | Optional. Height above the greenhouse floor |
 | `created_at` | `datetime` | When the object was created |
 | `updated_at` | `datetime` | When the object was last modified |
 

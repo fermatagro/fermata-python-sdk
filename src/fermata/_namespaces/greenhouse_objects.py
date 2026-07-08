@@ -20,7 +20,7 @@ class AsyncGreenhouseObjects:
         self._c = client
 
     async def list(self, greenhouse_id: str) -> list[ModelsGreenhouseObject]:
-        """List all physical objects (rows, blocks) of a greenhouse, following pagination."""
+        """List all physical objects (rows, blocks, exits) of a greenhouse, following pagination."""
         items: list[ModelsGreenhouseObject] = []
         cursor: str | Unset = UNSET
         while True:

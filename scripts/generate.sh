@@ -13,7 +13,11 @@ VERSION_FILE="$SPEC_DIR/VERSION"
 # All domains by default; pass domain names as arguments to regenerate a subset,
 # e.g. `scripts/generate.sh greenhouses`.
 ALL_DOMAINS=(observations aivision catalog pipelines cultivation greenhouses)
-DOMAINS=("${@:-${ALL_DOMAINS[@]}}")
+if [[ $# -gt 0 ]]; then
+    DOMAINS=("$@")
+else
+    DOMAINS=("${ALL_DOMAINS[@]}")
+fi
 for domain in "${DOMAINS[@]}"; do
     if [[ ! " ${ALL_DOMAINS[*]} " == *" $domain "* ]]; then
         echo "Error: unknown domain '$domain' (expected one of: ${ALL_DOMAINS[*]})" >&2
