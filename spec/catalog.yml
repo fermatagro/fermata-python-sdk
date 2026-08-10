@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Demetra Catalog API
-  version: 1.0.0
+  version: 1.1.0
 tags:
 - name: AIModelsAPI
 - name: MLClassesAPI
@@ -160,6 +160,7 @@ components:
       - modelName
       - modelType
       - isActive
+      - classes
       properties:
         modelName:
           type: string
@@ -171,7 +172,24 @@ components:
         isActive:
           type: boolean
           description: Whether the model is active
+        classes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Models.AIModelClass'
+          description: Classes the model can detect/classify
       description: AI Model from ML API
+    Models.AIModelClass:
+      type: object
+      required:
+      - className
+      properties:
+        className:
+          type: string
+          description: Class name (e.g. 'whitefly_aphid')
+        legacyNumId:
+          type: string
+          description: Legacy numeric ID
+      description: Class supported by an AI model
     Models.AIModelType:
       type: string
       enum:

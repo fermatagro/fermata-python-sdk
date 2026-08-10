@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Demetra AI Vision API
-  version: 1.1.0
+  version: 3.1.0
 tags:
 - name: PredictionsAPI
 - name: InferenceAPI
@@ -13,6 +13,7 @@ tags:
 - name: TotalAffectedAreaAPI
 - name: HeatmapAPI
 - name: PresetsAPI
+- name: ClassSettingsAPI
 paths:
   /api/v1/inference:
     post:

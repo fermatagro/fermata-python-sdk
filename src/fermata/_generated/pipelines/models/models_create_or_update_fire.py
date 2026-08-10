@@ -14,34 +14,44 @@ from ..models.models_schedule_scope import ModelsScheduleScope
 from ..types import UNSET, Unset
 
 if TYPE_CHECKING:
-    from ..models.create_or_update_fire_arguments import CreateOrUpdateFireArguments
+    from ..models.models_create_or_update_fire_arguments import ModelsCreateOrUpdateFireArguments
 
 
-T = TypeVar("T", bound="CreateOrUpdateFire")
+T = TypeVar("T", bound="ModelsCreateOrUpdateFire")
 
 
 @_attrs_define
-class CreateOrUpdateFire:
-    """
-    Attributes:
-        organization_id (str): Organization identifier (opaque string)
-        trigger_id (UUID): UUID identifier
-        scope (ModelsScheduleScope): Scope type for schedule binding
-        scope_id (UUID): UUID identifier
-        status (ModelsFireStatus): Current status of the fire.
+class ModelsCreateOrUpdateFire:
+    """A Fire represents a single scheduled occurrence/execution instance for a pipeline template.
 
-            State transitions:
-            - pending → running → completed|partial|failed
-            - pending|running → cancelled|skipped
-            - failed|cancelled → running (retry)
-        pipeline_template_id (UUID | Unset): UUID identifier
-        scheduled_at (datetime.datetime | Unset): When the pipeline is scheduled to run (defaults to server time if
-            omitted)
-        external_run_id (str | Unset): Prefect flow_run_id, set at start (immutable once set)
-        error_message (str | Unset): Error message (present when status=failed or status=partial)
-        arguments (CreateOrUpdateFireArguments | Unset): Arguments passed to the pipeline execution
-        started_at (datetime.datetime | Unset): When execution actually started (status changed to running)
-        finished_at (datetime.datetime | Unset): When execution finished (terminal status reached)
+    Immutable planning fields: pipelineTemplateId, triggerType, triggerId, scheduledAt, deduplicationKey, arguments.
+    Mutable execution fields: status, externalRunId, errorMessage, startedAt, finishedAt.
+
+    Deduplication rules (unique constraint on deduplicationKey):
+    - For triggerType="request": deduplicationKey = "request:{triggerId}"
+    - For triggerType="schedule": deduplicationKey = "schedule:{triggerId}:{scheduledAtISO}"
+
+    POST /fires is idempotent: if deduplicationKey exists, returns existing Fire.
+
+        Attributes:
+            organization_id (str): Organization identifier (opaque string)
+            trigger_id (UUID): UUID identifier
+            scope (ModelsScheduleScope): Scope type for schedule binding
+            scope_id (UUID): UUID identifier
+            status (ModelsFireStatus): Current status of the fire.
+
+                State transitions:
+                - pending → running → completed|partial|failed
+                - pending|running → cancelled|skipped
+                - failed|cancelled → running (retry)
+            pipeline_template_id (UUID | Unset): UUID identifier
+            scheduled_at (datetime.datetime | Unset): When the pipeline is scheduled to run (defaults to server time if
+                omitted)
+            external_run_id (str | Unset): Prefect flow_run_id, set at start (immutable once set)
+            error_message (str | Unset): Error message (present when status=failed or status=partial)
+            arguments (ModelsCreateOrUpdateFireArguments | Unset): Arguments passed to the pipeline execution
+            started_at (datetime.datetime | Unset): When execution actually started (status changed to running)
+            finished_at (datetime.datetime | Unset): When execution finished (terminal status reached)
     """
 
     organization_id: str
@@ -53,7 +63,7 @@ class CreateOrUpdateFire:
     scheduled_at: datetime.datetime | Unset = UNSET
     external_run_id: str | Unset = UNSET
     error_message: str | Unset = UNSET
-    arguments: CreateOrUpdateFireArguments | Unset = UNSET
+    arguments: ModelsCreateOrUpdateFireArguments | Unset = UNSET
     started_at: datetime.datetime | Unset = UNSET
     finished_at: datetime.datetime | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
@@ -123,7 +133,7 @@ class CreateOrUpdateFire:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
-        from ..models.create_or_update_fire_arguments import CreateOrUpdateFireArguments
+        from ..models.models_create_or_update_fire_arguments import ModelsCreateOrUpdateFireArguments
 
         d = dict(src_dict)
         organization_id = d.pop("organizationId")
@@ -155,11 +165,11 @@ class CreateOrUpdateFire:
         error_message = d.pop("errorMessage", UNSET)
 
         _arguments = d.pop("arguments", UNSET)
-        arguments: CreateOrUpdateFireArguments | Unset
+        arguments: ModelsCreateOrUpdateFireArguments | Unset
         if isinstance(_arguments, Unset):
             arguments = UNSET
         else:
-            arguments = CreateOrUpdateFireArguments.from_dict(_arguments)
+            arguments = ModelsCreateOrUpdateFireArguments.from_dict(_arguments)
 
         _started_at = d.pop("startedAt", UNSET)
         started_at: datetime.datetime | Unset
@@ -175,7 +185,7 @@ class CreateOrUpdateFire:
         else:
             finished_at = isoparse(_finished_at)
 
-        create_or_update_fire = cls(
+        models_create_or_update_fire = cls(
             organization_id=organization_id,
             trigger_id=trigger_id,
             scope=scope,
@@ -190,8 +200,8 @@ class CreateOrUpdateFire:
             finished_at=finished_at,
         )
 
-        create_or_update_fire.additional_properties = d
-        return create_or_update_fire
+        models_create_or_update_fire.additional_properties = d
+        return models_create_or_update_fire
 
     @property
     def additional_keys(self) -> list[str]:

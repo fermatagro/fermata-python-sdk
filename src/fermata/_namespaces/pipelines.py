@@ -14,9 +14,11 @@ from fermata._generated.pipelines.api.schedules_api import (
 from fermata._generated.pipelines.api.schedules_api import (
     list_schedules as _list_schedules,
 )
-from fermata._generated.pipelines.models.create_or_update_fire import CreateOrUpdateFire
-from fermata._generated.pipelines.models.create_or_update_fire_arguments import CreateOrUpdateFireArguments
 from fermata._generated.pipelines.models.models_complete_fire_request import ModelsCompleteFireRequest
+from fermata._generated.pipelines.models.models_create_or_update_fire import ModelsCreateOrUpdateFire
+from fermata._generated.pipelines.models.models_create_or_update_fire_arguments import (
+    ModelsCreateOrUpdateFireArguments,
+)
 from fermata._generated.pipelines.models.models_fire_status import ModelsFireStatus
 from fermata._generated.pipelines.models.models_schedule import ModelsSchedule
 from fermata._generated.pipelines.models.models_schedule_scope import ModelsScheduleScope
@@ -45,10 +47,10 @@ class AsyncPipelines:
         trigger_id: str,
         arguments: dict[str, Any] | None = None,
     ) -> None:
-        args = CreateOrUpdateFireArguments()
+        args = ModelsCreateOrUpdateFireArguments()
         if arguments:
             args.additional_properties = arguments
-        body = CreateOrUpdateFire(
+        body = ModelsCreateOrUpdateFire(
             organization_id="",
             pipeline_template_id=UUID(template_id),
             trigger_id=UUID(trigger_id),
