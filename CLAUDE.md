@@ -81,26 +81,30 @@ To regenerate a subset of domains, call the script directly with domain names:
 scripts/generate.sh greenhouses
 ```
 
+The script needs bash 4+ for associative arrays. macOS ships bash 3.2 as `/bin/bash`, so
+install a newer one (`brew install bash`) and keep it ahead on `PATH` — otherwise generation
+fails with `declare: -A: invalid option`.
+
 ### Spec version pinning
 
 `spec/VERSION` pins the upstream demetra spec version per domain:
 
 ```
-observations: 1.3.0
-aivision: 1.1.0
-catalog: 1.0.0
-cultivation: 1.5.0
-greenhouses: 1.1.0
-pipelines: 1.2.0
+observations: 1.4.0
+aivision: 3.1.0
+catalog: 1.1.0
+cultivation: 1.10.0
+greenhouses: 1.3.0
+pipelines: 1.4.0
 ```
 
-`generate.sh` asserts that demetra's `info.version` matches each pin before filtering. If demetra bumped a spec (e.g. observations → 1.4.0) but the SDK pin still says 1.3.0, generation fails with:
+`generate.sh` asserts that demetra's `info.version` matches each pin before filtering. If demetra bumped a spec (e.g. observations → 1.5.0) but the SDK pin still says 1.4.0, generation fails with:
 
 ```
 Error: observations spec version mismatch
-  pinned (spec/VERSION): 1.3.0
-  upstream (demetra):    1.4.0
-  → If the change is intentional, bump spec/VERSION to 1.4.0 and rerun 'make generate'.
+  pinned (spec/VERSION): 1.4.0
+  upstream (demetra):    1.5.0
+  → If the change is intentional, bump spec/VERSION to 1.5.0 and rerun 'make generate'.
 ```
 
 This makes spec upgrades an explicit, reviewable action — you can't silently absorb upstream changes.

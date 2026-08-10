@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Requires bash 4+ (associative arrays); macOS ships bash 3.2 at /bin/bash.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
