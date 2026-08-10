@@ -6,28 +6,55 @@ from typing import Any, TypeVar
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
-T = TypeVar("T", bound="CreateOrUpdateFireArguments")
+from ..types import UNSET, Unset
+
+T = TypeVar("T", bound="ModelsAIModelClass")
 
 
 @_attrs_define
-class CreateOrUpdateFireArguments:
-    """Arguments passed to the pipeline execution"""
+class ModelsAIModelClass:
+    """Class supported by an AI model
 
+    Attributes:
+        class_name (str): Class name (e.g. 'whitefly_aphid')
+        legacy_num_id (str | Unset): Legacy numeric ID
+    """
+
+    class_name: str
+    legacy_num_id: str | Unset = UNSET
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
+        class_name = self.class_name
+
+        legacy_num_id = self.legacy_num_id
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
+        field_dict.update(
+            {
+                "className": class_name,
+            }
+        )
+        if legacy_num_id is not UNSET:
+            field_dict["legacyNumId"] = legacy_num_id
 
         return field_dict
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
         d = dict(src_dict)
-        create_or_update_fire_arguments = cls()
+        class_name = d.pop("className")
 
-        create_or_update_fire_arguments.additional_properties = d
-        return create_or_update_fire_arguments
+        legacy_num_id = d.pop("legacyNumId", UNSET)
+
+        models_ai_model_class = cls(
+            class_name=class_name,
+            legacy_num_id=legacy_num_id,
+        )
+
+        models_ai_model_class.additional_properties = d
+        return models_ai_model_class
 
     @property
     def additional_keys(self) -> list[str]:

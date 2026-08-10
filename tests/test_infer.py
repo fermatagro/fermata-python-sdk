@@ -24,7 +24,7 @@ async def test_infer_full_flow(client, mock_hera):
     mock_hera.post(url__regex=r"/api/v1/photos/.+/upload-link").mock(side_effect=_upload_link_handler)
     mock_hera.post(url__regex=r"/api/v1/photos/[0-9a-f-]+$").respond(201)
     mock_hera.get("/api/v1/models").respond(200, json=[
-        {"modelName": "tomato-v3", "modelType": "detection", "isActive": True}
+        {"modelName": "tomato-v3", "modelType": "detection", "isActive": True, "classes": []}
     ])
     mock_hera.post("/api/v1/inference").respond(202, json={
         "taskId": "00000000-0000-0000-0000-000000000099",

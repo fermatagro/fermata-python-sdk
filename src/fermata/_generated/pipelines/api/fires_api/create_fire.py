@@ -8,14 +8,14 @@ import httpx
 from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.common_errors_api_error import CommonErrorsApiError
-from ...models.create_or_update_fire import CreateOrUpdateFire
+from ...models.models_create_or_update_fire import ModelsCreateOrUpdateFire
 from ...types import Response
 
 
 def _get_kwargs(
     fire_id: UUID,
     *,
-    body: CreateOrUpdateFire,
+    body: ModelsCreateOrUpdateFire,
 ) -> dict[str, Any]:
     headers: dict[str, Any] = {}
 
@@ -77,7 +77,7 @@ def sync_detailed(
     fire_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdateFire,
+    body: ModelsCreateOrUpdateFire,
 ) -> Response[Any | CommonErrorsApiError]:
     r"""Create a fire (request trigger).
 
@@ -87,7 +87,18 @@ def sync_detailed(
 
     Args:
         fire_id (UUID): UUID identifier
-        body (CreateOrUpdateFire):
+        body (ModelsCreateOrUpdateFire): A Fire represents a single scheduled occurrence/execution
+            instance for a pipeline template.
+
+            Immutable planning fields: pipelineTemplateId, triggerType, triggerId, scheduledAt,
+            deduplicationKey, arguments.
+            Mutable execution fields: status, externalRunId, errorMessage, startedAt, finishedAt.
+
+            Deduplication rules (unique constraint on deduplicationKey):
+            - For triggerType="request": deduplicationKey = "request:{triggerId}"
+            - For triggerType="schedule": deduplicationKey = "schedule:{triggerId}:{scheduledAtISO}"
+
+            POST /fires is idempotent: if deduplicationKey exists, returns existing Fire.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -113,7 +124,7 @@ def sync(
     fire_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdateFire,
+    body: ModelsCreateOrUpdateFire,
 ) -> Any | CommonErrorsApiError | None:
     r"""Create a fire (request trigger).
 
@@ -123,7 +134,18 @@ def sync(
 
     Args:
         fire_id (UUID): UUID identifier
-        body (CreateOrUpdateFire):
+        body (ModelsCreateOrUpdateFire): A Fire represents a single scheduled occurrence/execution
+            instance for a pipeline template.
+
+            Immutable planning fields: pipelineTemplateId, triggerType, triggerId, scheduledAt,
+            deduplicationKey, arguments.
+            Mutable execution fields: status, externalRunId, errorMessage, startedAt, finishedAt.
+
+            Deduplication rules (unique constraint on deduplicationKey):
+            - For triggerType="request": deduplicationKey = "request:{triggerId}"
+            - For triggerType="schedule": deduplicationKey = "schedule:{triggerId}:{scheduledAtISO}"
+
+            POST /fires is idempotent: if deduplicationKey exists, returns existing Fire.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -144,7 +166,7 @@ async def asyncio_detailed(
     fire_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdateFire,
+    body: ModelsCreateOrUpdateFire,
 ) -> Response[Any | CommonErrorsApiError]:
     r"""Create a fire (request trigger).
 
@@ -154,7 +176,18 @@ async def asyncio_detailed(
 
     Args:
         fire_id (UUID): UUID identifier
-        body (CreateOrUpdateFire):
+        body (ModelsCreateOrUpdateFire): A Fire represents a single scheduled occurrence/execution
+            instance for a pipeline template.
+
+            Immutable planning fields: pipelineTemplateId, triggerType, triggerId, scheduledAt,
+            deduplicationKey, arguments.
+            Mutable execution fields: status, externalRunId, errorMessage, startedAt, finishedAt.
+
+            Deduplication rules (unique constraint on deduplicationKey):
+            - For triggerType="request": deduplicationKey = "request:{triggerId}"
+            - For triggerType="schedule": deduplicationKey = "schedule:{triggerId}:{scheduledAtISO}"
+
+            POST /fires is idempotent: if deduplicationKey exists, returns existing Fire.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.
@@ -178,7 +211,7 @@ async def asyncio(
     fire_id: UUID,
     *,
     client: AuthenticatedClient,
-    body: CreateOrUpdateFire,
+    body: ModelsCreateOrUpdateFire,
 ) -> Any | CommonErrorsApiError | None:
     r"""Create a fire (request trigger).
 
@@ -188,7 +221,18 @@ async def asyncio(
 
     Args:
         fire_id (UUID): UUID identifier
-        body (CreateOrUpdateFire):
+        body (ModelsCreateOrUpdateFire): A Fire represents a single scheduled occurrence/execution
+            instance for a pipeline template.
+
+            Immutable planning fields: pipelineTemplateId, triggerType, triggerId, scheduledAt,
+            deduplicationKey, arguments.
+            Mutable execution fields: status, externalRunId, errorMessage, startedAt, finishedAt.
+
+            Deduplication rules (unique constraint on deduplicationKey):
+            - For triggerType="request": deduplicationKey = "request:{triggerId}"
+            - For triggerType="schedule": deduplicationKey = "schedule:{triggerId}:{scheduledAtISO}"
+
+            POST /fires is idempotent: if deduplicationKey exists, returns existing Fire.
 
     Raises:
         errors.UnexpectedStatus: If the server returns an undocumented status code and Client.raise_on_unexpected_status is True.

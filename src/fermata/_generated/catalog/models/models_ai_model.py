@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from attrs import define as _attrs_define
 from attrs import field as _attrs_field
 
 from ..models.models_ai_model_type import ModelsAIModelType
+
+if TYPE_CHECKING:
+    from ..models.models_ai_model_class import ModelsAIModelClass
+
 
 T = TypeVar("T", bound="ModelsAIModel")
 
@@ -19,11 +23,13 @@ class ModelsAIModel:
         model_name (str): Model name (unique identifier)
         model_type (ModelsAIModelType): Type of AI model
         is_active (bool): Whether the model is active
+        classes (list[ModelsAIModelClass]): Classes the model can detect/classify
     """
 
     model_name: str
     model_type: ModelsAIModelType
     is_active: bool
+    classes: list[ModelsAIModelClass]
     additional_properties: dict[str, Any] = _attrs_field(init=False, factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
@@ -33,6 +39,11 @@ class ModelsAIModel:
 
         is_active = self.is_active
 
+        classes = []
+        for classes_item_data in self.classes:
+            classes_item = classes_item_data.to_dict()
+            classes.append(classes_item)
+
         field_dict: dict[str, Any] = {}
         field_dict.update(self.additional_properties)
         field_dict.update(
@@ -40,6 +51,7 @@ class ModelsAIModel:
                 "modelName": model_name,
                 "modelType": model_type,
                 "isActive": is_active,
+                "classes": classes,
             }
         )
 
@@ -47,6 +59,8 @@ class ModelsAIModel:
 
     @classmethod
     def from_dict(cls: type[T], src_dict: Mapping[str, Any]) -> T:
+        from ..models.models_ai_model_class import ModelsAIModelClass
+
         d = dict(src_dict)
         model_name = d.pop("modelName")
 
@@ -54,10 +68,18 @@ class ModelsAIModel:
 
         is_active = d.pop("isActive")
 
+        classes = []
+        _classes = d.pop("classes")
+        for classes_item_data in _classes:
+            classes_item = ModelsAIModelClass.from_dict(classes_item_data)
+
+            classes.append(classes_item)
+
         models_ai_model = cls(
             model_name=model_name,
             model_type=model_type,
             is_active=is_active,
+            classes=classes,
         )
 
         models_ai_model.additional_properties = d

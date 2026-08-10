@@ -9,16 +9,36 @@ from ... import errors
 from ...client import AuthenticatedClient, Client
 from ...models.common_errors_api_error import CommonErrorsApiError
 from ...models.list_greenhouse_objects_response_200 import ListGreenhouseObjectsResponse200
+from ...models.models_greenhouse_object_type import ModelsGreenhouseObjectType
 from ...types import UNSET, Response, Unset
 
 
 def _get_kwargs(
     greenhouse_id: UUID,
     *,
+    kind: ModelsGreenhouseObjectType | Unset = UNSET,
+    xmin: float | Unset = UNSET,
+    ymin: float | Unset = UNSET,
+    xmax: float | Unset = UNSET,
+    ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> dict[str, Any]:
     params: dict[str, Any] = {}
+
+    json_kind: str | Unset = UNSET
+    if not isinstance(kind, Unset):
+        json_kind = kind.value
+
+    params["kind"] = json_kind
+
+    params["xmin"] = xmin
+
+    params["ymin"] = ymin
+
+    params["xmax"] = xmax
+
+    params["ymax"] = ymax
 
     params["cursor"] = cursor
 
@@ -81,13 +101,23 @@ def sync_detailed(
     greenhouse_id: UUID,
     *,
     client: AuthenticatedClient,
+    kind: ModelsGreenhouseObjectType | Unset = UNSET,
+    xmin: float | Unset = UNSET,
+    ymin: float | Unset = UNSET,
+    xmax: float | Unset = UNSET,
+    ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> Response[CommonErrorsApiError | ListGreenhouseObjectsResponse200]:
-    """List all greenhouse objects
+    """List all greenhouse objects, optionally only those of one kind and/or overlapping a grid rect
 
     Args:
         greenhouse_id (UUID): UUID identifier
+        kind (ModelsGreenhouseObjectType | Unset): Type of object within a greenhouse
+        xmin (float | Unset):
+        ymin (float | Unset):
+        xmax (float | Unset):
+        ymax (float | Unset):
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -101,6 +131,11 @@ def sync_detailed(
 
     kwargs = _get_kwargs(
         greenhouse_id=greenhouse_id,
+        kind=kind,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
         cursor=cursor,
         limit=limit,
     )
@@ -116,13 +151,23 @@ def sync(
     greenhouse_id: UUID,
     *,
     client: AuthenticatedClient,
+    kind: ModelsGreenhouseObjectType | Unset = UNSET,
+    xmin: float | Unset = UNSET,
+    ymin: float | Unset = UNSET,
+    xmax: float | Unset = UNSET,
+    ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> CommonErrorsApiError | ListGreenhouseObjectsResponse200 | None:
-    """List all greenhouse objects
+    """List all greenhouse objects, optionally only those of one kind and/or overlapping a grid rect
 
     Args:
         greenhouse_id (UUID): UUID identifier
+        kind (ModelsGreenhouseObjectType | Unset): Type of object within a greenhouse
+        xmin (float | Unset):
+        ymin (float | Unset):
+        xmax (float | Unset):
+        ymax (float | Unset):
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -137,6 +182,11 @@ def sync(
     return sync_detailed(
         greenhouse_id=greenhouse_id,
         client=client,
+        kind=kind,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
         cursor=cursor,
         limit=limit,
     ).parsed
@@ -146,13 +196,23 @@ async def asyncio_detailed(
     greenhouse_id: UUID,
     *,
     client: AuthenticatedClient,
+    kind: ModelsGreenhouseObjectType | Unset = UNSET,
+    xmin: float | Unset = UNSET,
+    ymin: float | Unset = UNSET,
+    xmax: float | Unset = UNSET,
+    ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> Response[CommonErrorsApiError | ListGreenhouseObjectsResponse200]:
-    """List all greenhouse objects
+    """List all greenhouse objects, optionally only those of one kind and/or overlapping a grid rect
 
     Args:
         greenhouse_id (UUID): UUID identifier
+        kind (ModelsGreenhouseObjectType | Unset): Type of object within a greenhouse
+        xmin (float | Unset):
+        ymin (float | Unset):
+        xmax (float | Unset):
+        ymax (float | Unset):
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -166,6 +226,11 @@ async def asyncio_detailed(
 
     kwargs = _get_kwargs(
         greenhouse_id=greenhouse_id,
+        kind=kind,
+        xmin=xmin,
+        ymin=ymin,
+        xmax=xmax,
+        ymax=ymax,
         cursor=cursor,
         limit=limit,
     )
@@ -179,13 +244,23 @@ async def asyncio(
     greenhouse_id: UUID,
     *,
     client: AuthenticatedClient,
+    kind: ModelsGreenhouseObjectType | Unset = UNSET,
+    xmin: float | Unset = UNSET,
+    ymin: float | Unset = UNSET,
+    xmax: float | Unset = UNSET,
+    ymax: float | Unset = UNSET,
     cursor: str | Unset = UNSET,
     limit: int | Unset = 100,
 ) -> CommonErrorsApiError | ListGreenhouseObjectsResponse200 | None:
-    """List all greenhouse objects
+    """List all greenhouse objects, optionally only those of one kind and/or overlapping a grid rect
 
     Args:
         greenhouse_id (UUID): UUID identifier
+        kind (ModelsGreenhouseObjectType | Unset): Type of object within a greenhouse
+        xmin (float | Unset):
+        ymin (float | Unset):
+        xmax (float | Unset):
+        ymax (float | Unset):
         cursor (str | Unset):
         limit (int | Unset):  Default: 100.
 
@@ -201,6 +276,11 @@ async def asyncio(
         await asyncio_detailed(
             greenhouse_id=greenhouse_id,
             client=client,
+            kind=kind,
+            xmin=xmin,
+            ymin=ymin,
+            xmax=xmax,
+            ymax=ymax,
             cursor=cursor,
             limit=limit,
         )

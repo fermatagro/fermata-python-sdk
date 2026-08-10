@@ -1,11 +1,12 @@
 openapi: 3.0.0
 info:
   title: Demetra Pipelines API
-  version: 1.2.0
+  version: 1.4.0
 tags:
 - name: TemplatesAPI
 - name: SchedulesAPI
 - name: FiresAPI
+- name: RawCapturesAPI
 paths:
   /api/v1/pipelines/fires/{fireId}:
     post:
@@ -53,7 +54,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrUpdateFire'
+              $ref: '#/components/schemas/Models.CreateOrUpdateFire'
       security:
       - BearerAuth: []
   /api/v1/pipelines/fires/{fireId}/complete:
@@ -360,7 +361,20 @@ components:
     Common.Types.OrganizationID:
       type: string
       description: Organization identifier (opaque string)
-    CreateOrUpdateFire:
+    Models.CompleteFireRequest:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Models.TerminalStatus'
+          description: Final status
+        errorMessage:
+          type: string
+          description: Error message (should be present when status=failed)
+      description: Request to complete a fire with terminal status
+    Models.CreateOrUpdateFire:
       type: object
       required:
       - organizationId
@@ -420,20 +434,25 @@ components:
           type: string
           format: date-time
           description: When execution finished (terminal status reached)
-      description: ''
-    Models.CompleteFireRequest:
-      type: object
-      required:
-      - status
-      properties:
-        status:
-          allOf:
-          - $ref: '#/components/schemas/Models.TerminalStatus'
-          description: Final status
-        errorMessage:
-          type: string
-          description: Error message (should be present when status=failed)
-      description: Request to complete a fire with terminal status
+      description: 'A Fire represents a single scheduled occurrence/execution instance
+        for a pipeline template.
+
+
+        Immutable planning fields: pipelineTemplateId, triggerType, triggerId, scheduledAt,
+        deduplicationKey, arguments.
+
+        Mutable execution fields: status, externalRunId, errorMessage, startedAt,
+        finishedAt.
+
+
+        Deduplication rules (unique constraint on deduplicationKey):
+
+        - For triggerType="request": deduplicationKey = "request:{triggerId}"
+
+        - For triggerType="schedule": deduplicationKey = "schedule:{triggerId}:{scheduledAtISO}"
+
+
+        POST /fires is idempotent: if deduplicationKey exists, returns existing Fire.'
     Models.FireStatus:
       type: string
       enum:

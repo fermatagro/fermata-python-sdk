@@ -120,7 +120,7 @@ async def test_pipeline_init_model_fallback(mock_hera: respx.Router) -> None:
     mock_hera.get(f"/api/v1/cycles/{CYCLE_ID}").respond(200, json=CYCLE_RESPONSE)
     mock_hera.post(url__regex=r"/api/v1/pipelines/fires/.+").respond(201)
     mock_hera.get("/api/v1/models").respond(200, json=[
-        {"modelName": "fallback-model", "modelType": "detection", "isActive": True}
+        {"modelName": "fallback-model", "modelType": "detection", "isActive": True, "classes": []}
     ])
 
     async with Fermata(
