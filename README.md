@@ -238,6 +238,49 @@ scan("./today_scan/")
 
 If the robot crashes mid-scan, restart with the same `sync_id` — photos already uploaded are automatically skipped.
 
+## Scan Progress
+
+Inference is asynchronous: `infer()` returns as soon as the task is queued. To follow a whole
+batch, poll `scan_progress()` — that is one request per tick regardless of batch size, instead
+of one request per task.
+
+```python
+import time
+
+with FermataSync(url=FERMATA_URL, username=USERNAME, password=PASSWORD) as fermata:
+    for photo in photos:
+        fermata.infer(image=photo, captured_at=..., greenhouse_id=...)
+
+    while not (progress := fermata.scan_progress()).finished:
+        print(f"{progress.pending} tasks still pending")
+        time.sleep(2)
+
+    print("all tasks finished")
+```
+
+With no argument the method reports on the client's own scan (`fermata.scan_id`, which is the
+fire id in pipeline mode). Pass a scan id to check a different one:
+
+```python
+progress = fermata.scan_progress("01920000-0000-7000-8000-000000000001")
+```
+
+The async client exposes the same method:
+
+```python
+progress = await fermata.scan_progress()
+```
+
+`pending` counts only what is still in flight — done, failed and canceled tasks are
+indistinguishable once they finish. Fetch individual tasks with `fermata.inference.get(task_id)`
+if you need per-task outcomes.
+
+The SDK ships no built-in wait helper on purpose: poll interval, timeout and any progress
+display belong to your application, as in the loop above.
+
+Polling a scan with no photos in your organization raises `NotFoundError`. The same error
+covers servers older than aivision 3.1.0, which do not serve this endpoint at all.
+
 ## Async Client
 
 For applications that use asyncio (e.g., FastAPI backends), use the async client:
@@ -330,6 +373,8 @@ This is useful when you need to:
 | `fermata.photos.create(photo_id, *, greenhouse_id, captured_at, ...)` | — | Register photo metadata |
 | `fermata.inference.submit(photo_id, model_name)` | `str` | Submit photo for inference, returns task_id |
 | `fermata.inference.get(task_id)` | `InferenceTask` | Get task status and details |
+| `fermata.scan_progress(scan_id=None)` | `ScanProgress` | Pending inference-task count for a scan; defaults to the current scan |
+| `fermata.inference.scan_progress(scan_id)` | `ScanProgress` | Same, for an explicit scan id |
 | `fermata.pipelines.list_schedules()` | `list[Schedule]` | List available pipeline schedules |
 | `fermata.pipelines.get_schedule(schedule_id)` | `Schedule` | Get a pipeline schedule by ID |
 | `fermata.greenhouses.list()` | `list[Greenhouse]` | List greenhouses in the organization |
@@ -344,6 +389,14 @@ This is useful when you need to:
 | `download_url` | `str` | Presigned URL — `GET` to preview the uploaded image |
 | `delete_url` | `str` | Presigned URL — `DELETE` to remove an orphaned upload |
 | `expires_at` | `datetime` | When the presigned URLs expire |
+
+### `ScanProgress` fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `scan_id` | `str` | Scan the count refers to (sent to the server as `pipelineId`) |
+| `pending` | `int` | Inference tasks not yet in a terminal state (queued + in-flight) |
+| `finished` | `bool` | `True` once `pending` reaches zero |
 
 ### `InferenceTask` fields
 

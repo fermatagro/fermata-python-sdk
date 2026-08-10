@@ -34,10 +34,28 @@ class PipelineRun:
     organization_id: str
 
 
+@dataclass(frozen=True)
+class ScanProgress:
+    """Aggregate inference progress for one scan.
+
+    ``pending`` counts the tasks that have not reached a terminal state yet.
+    Done, failed and canceled tasks are indistinguishable here — fetch the
+    individual tasks with ``inference.get()`` if you need that detail.
+    """
+
+    scan_id: str
+    pending: int
+
+    @property
+    def finished(self) -> bool:
+        return self.pending == 0
+
+
 __all__ = [
     "UploadLink",
     "InferenceTask",
     "TaskStatus",
+    "ScanProgress",
     "Model",
     "Greenhouse",
     "GreenhouseObject",

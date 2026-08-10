@@ -18,7 +18,7 @@ from fermata._namespaces.inference import AsyncInference
 from fermata._namespaces.photos import AsyncPhotos
 from fermata._namespaces.pipelines import AsyncPipelines
 from fermata.exceptions import ConflictError
-from fermata.types import PipelineRun
+from fermata.types import PipelineRun, ScanProgress
 
 # Fixed namespace for deterministic photo ID generation (UUIDv5).
 _PHOTO_NS = uuid.UUID("a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d")
@@ -90,6 +90,13 @@ class Fermata:
     @property
     def run(self) -> PipelineRun | None:
         return self._run
+
+    async def scan_progress(self, scan_id: str | None = None) -> ScanProgress:
+        """How many inference tasks of a scan are still pending.
+
+        Defaults to this client's own scan. Poll until ``finished``.
+        """
+        return await self.inference.scan_progress(scan_id or self._scan_id)
 
     async def _init_pipeline(self) -> None:
         assert self._pipeline_id is not None

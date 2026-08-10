@@ -4,6 +4,7 @@ from .common_errors_api_error import CommonErrorsApiError
 from .models_inference_request import ModelsInferenceRequest
 from .models_inference_response import ModelsInferenceResponse
 from .models_inference_task_payload import ModelsInferenceTaskPayload
+from .models_pipeline_status import ModelsPipelineStatus
 from .models_task import ModelsTask
 from .models_task_status import ModelsTaskStatus
 
@@ -12,6 +13,7 @@ __all__ = (
     "ModelsInferenceRequest",
     "ModelsInferenceResponse",
     "ModelsInferenceTaskPayload",
+    "ModelsPipelineStatus",
     "ModelsTask",
     "ModelsTaskStatus",
 )

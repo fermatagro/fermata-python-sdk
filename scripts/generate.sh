@@ -30,7 +30,7 @@ done
 # Only these are kept in the filtered specs — everything else is stripped.
 declare -A OPS
 OPS[observations]="createPhoto createPhotoUploadLink"
-OPS[aivision]="submitInference getInferenceTask"
+OPS[aivision]="submitInference getInferenceTask getInferencePipelineStatus"
 OPS[catalog]="listAIModels getAIModelByName"
 OPS[pipelines]="listSchedules getSchedule createFire startFire completeFire"
 OPS[cultivation]="getCycle listActiveCyclesAtTime"

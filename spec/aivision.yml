@@ -63,6 +63,58 @@ paths:
               $ref: '#/components/schemas/Models.InferenceRequest'
       security:
       - BearerAuth: []
+  /api/v1/inference/pipeline/{pipelineId}/status:
+    get:
+      operationId: getInferencePipelineStatus
+      description: 'Aggregate status of all inference tasks submitted with a given
+        pipeline id.
+
+        Returns the number of tasks that have not yet reached a terminal state;
+
+        poll until `pending` reaches zero. Responds 404 when no photos with this
+
+        pipeline id exist in the caller''s organization.'
+      parameters:
+      - name: pipelineId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Common.Types.ID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Models.PipelineStatus'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.AuthenticationError'
+        '403':
+          description: Access is forbidden.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.ForbiddenError'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.NotFoundError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Common.Errors.InternalServerError'
+      tags:
+      - InferenceAPI
+      security:
+      - BearerAuth: []
   /api/v1/inference/task/{taskId}:
     get:
       operationId: getInferenceTask
@@ -246,6 +298,23 @@ components:
           type: string
           description: Current processing stage
       description: Payload information for inference tasks
+    Models.PipelineStatus:
+      type: object
+      required:
+      - pipelineId
+      - pending
+      properties:
+        pipelineId:
+          allOf:
+          - $ref: '#/components/schemas/Common.Types.ID'
+          description: Pipeline ID
+        pending:
+          type: integer
+          format: int64
+          description: Number of inference tasks not yet in a terminal state (queued
+            + in-flight)
+      description: Aggregate status of the inference tasks submitted with a given
+        pipeline id
     Models.Task:
       type: object
       required:
