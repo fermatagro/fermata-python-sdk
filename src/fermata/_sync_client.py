@@ -13,7 +13,7 @@ from fermata._namespaces.greenhouses import SyncGreenhouses
 from fermata._namespaces.inference import SyncInference
 from fermata._namespaces.photos import SyncPhotos
 from fermata._namespaces.pipelines import SyncPipelines
-from fermata.types import PipelineRun
+from fermata.types import PipelineRun, ScanProgress
 
 
 class FermataSync:
@@ -62,6 +62,9 @@ class FermataSync:
     @property
     def run(self) -> PipelineRun | None:
         return self._async.run
+
+    def scan_progress(self, scan_id: str | None = None) -> ScanProgress:
+        return self._run(self._async.scan_progress(scan_id))
 
     def __enter__(self) -> Self:
         self._run(self._async.__aenter__())

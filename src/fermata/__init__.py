@@ -12,7 +12,7 @@ from fermata.exceptions import (
     ServerError,
     ValidationError,
 )
-from fermata.types import PipelineRun
+from fermata.types import PipelineRun, ScanProgress
 
 _install_excepthook()
 
@@ -20,6 +20,7 @@ __all__ = [
     "Fermata",
     "FermataSync",
     "PipelineRun",
+    "ScanProgress",
     "FermataError",
     "AuthError",
     "NotFoundError",
