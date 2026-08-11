@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/fermatagro/fermata-python-sdk/compare/v0.3.0...v0.4.0) (2026-08-11)
+
+
+### Features
+
+* add greenhouse object read methods ([#9](https://github.com/fermatagro/fermata-python-sdk/issues/9)) ([e4badbd](https://github.com/fermatagro/fermata-python-sdk/commit/e4badbdfa4c4789059569e13f9d3ca324dae4efe))
+* add scan_progress() for aggregate inference progress ([#12](https://github.com/fermatagro/fermata-python-sdk/issues/12)) ([e94c80b](https://github.com/fermatagro/fermata-python-sdk/commit/e94c80b9c8de14c96aa9a8b26cfb5e1ee9604f4f))
+
 ## [0.3.0](https://github.com/fermatagro/fermata-python-sdk/compare/v0.2.0...v0.3.0) (2026-06-18)
 
 
